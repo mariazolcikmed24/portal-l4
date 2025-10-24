@@ -338,7 +338,7 @@ export default function WywiadObjawy() {
             />
 
             <div className="flex gap-4 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigate(-1)} className="flex-1">
+              <Button type="button" variant="outline" onClick={() => navigate("/wywiad-ogolny")} className="flex-1">
                 Wstecz
               </Button>
               <Button type="submit" className="flex-1">

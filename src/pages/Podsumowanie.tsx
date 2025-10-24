@@ -5,6 +5,8 @@ import { ProgressSteps } from "@/components/layout/ProgressSteps";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { format } from "date-fns";
+import { pl } from "date-fns/locale";
 
 export default function Podsumowanie() {
   const navigate = useNavigate();
@@ -122,11 +124,19 @@ export default function Podsumowanie() {
             <CardContent className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Data rozpoczęcia:</span>
-                <span className="font-medium">{formData.datyChoroby?.illness_start || '-'}</span>
+                <span className="font-medium">
+                  {formData.datyChoroby?.illness_start 
+                    ? format(new Date(formData.datyChoroby.illness_start), 'dd.MM.yyyy', { locale: pl })
+                    : '-'}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Data zakończenia:</span>
-                <span className="font-medium">{formData.datyChoroby?.illness_end || '-'}</span>
+                <span className="font-medium">
+                  {formData.datyChoroby?.illness_end 
+                    ? format(new Date(formData.datyChoroby.illness_end), 'dd.MM.yyyy', { locale: pl })
+                    : '-'}
+                </span>
               </div>
             </CardContent>
           </Card>

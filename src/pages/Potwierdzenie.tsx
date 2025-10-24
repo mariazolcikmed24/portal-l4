@@ -103,9 +103,6 @@ export default function Potwierdzenie() {
             <Button onClick={() => navigate("/")} className="w-full">
               Wróć na stronę główną
             </Button>
-            <Button variant="outline" onClick={() => window.print()} className="w-full">
-              Drukuj potwierdzenie
-            </Button>
           </div>
         </div>
 

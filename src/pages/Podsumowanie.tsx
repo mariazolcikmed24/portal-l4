@@ -76,6 +76,47 @@ export default function Podsumowanie() {
     return labels[category] || category;
   };
 
+  const getChronicConditionLabel = (condition: string) => {
+    const labels: Record<string, string> = {
+      'hypertension': 'Nadciśnienie',
+      'diabetes': 'Cukrzyca',
+      'asthma': 'Astma',
+      'heart_disease': 'Choroba serca',
+      'thyroid': 'Choroba tarczycy',
+      'autoimmune': 'Choroba autoimmunologiczna',
+      'cancer': 'Nowotwór',
+      'mental_health': 'Choroba psychiczna',
+      'other': 'Inna'
+    };
+    return labels[condition] || condition;
+  };
+
+  const getSymptomLabel = (symptom: string) => {
+    const labels: Record<string, string> = {
+      'fever': 'Gorączka',
+      'chills': 'Dreszcze',
+      'cough': 'Kaszel',
+      'sore_throat': 'Ból gardła',
+      'runny_nose': 'Katar',
+      'headache': 'Ból głowy',
+      'body_aches': 'Bóle mięśniowe',
+      'fatigue': 'Zmęczenie',
+      'nausea': 'Nudności',
+      'vomiting': 'Wymioty',
+      'diarrhea': 'Biegunka',
+      'stomach_pain': 'Ból brzucha',
+      'dizziness': 'Zawroty głowy',
+      'shortness_of_breath': 'Duszność',
+      'chest_pain': 'Ból w klatce piersiowej',
+      'back_pain': 'Ból pleców',
+      'joint_pain': 'Bólstawów',
+      'rash': 'Wysypka',
+      'swelling': 'Obrzęk',
+      'other': 'Inne'
+    };
+    return labels[symptom] || symptom;
+  };
+
   if (!profileData) {
     return (
       <div className="min-h-screen bg-background py-12 px-4">
@@ -183,7 +224,7 @@ export default function Podsumowanie() {
                     {formData.wywiadOgolny.q_chronic === 'yes' && formData.wywiadOgolny.chronic_list?.length > 0 && (
                       <div className="ml-4 mt-1 text-sm">
                         {formData.wywiadOgolny.chronic_list.map((condition: string) => (
-                          <div key={condition}>• {condition}</div>
+                          <div key={condition}>• {getChronicConditionLabel(condition)}</div>
                         ))}
                         {formData.wywiadOgolny.chronic_other && (
                           <div>• Inne: {formData.wywiadOgolny.chronic_other}</div>
@@ -249,7 +290,7 @@ export default function Podsumowanie() {
                     <span className="text-muted-foreground">Objawy: </span>
                     <div className="ml-4 mt-1 text-sm">
                       {formData.wywiadObjawy.symptoms.map((symptom: string) => (
-                        <div key={symptom}>• {symptom}</div>
+                        <div key={symptom}>• {getSymptomLabel(symptom)}</div>
                       ))}
                     </div>
                   </div>

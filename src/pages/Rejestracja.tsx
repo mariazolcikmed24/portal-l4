@@ -425,7 +425,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_employment" className="text-sm font-normal cursor-pointer">
-                      Potwierdzam, że jestem zatrudniony/a lub posiadam prawo do zasiłku chorobowego *
+                      Oświadczam, że jestem aktualnie zatrudniony/a u Pracodawcy wskazanego w ankiecie oraz przysługuje mi prawo do zasiłku chorobowego. *
                     </Label>
                     {errors.consentEmployment && (
                       <p className="text-sm text-destructive">{errors.consentEmployment.message}</p>

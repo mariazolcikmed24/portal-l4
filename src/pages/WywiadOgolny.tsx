@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { ProgressSteps } from "@/components/layout/ProgressSteps";
 
 const medicalSchema = z.object({
   q_pregnant: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
@@ -119,6 +120,8 @@ export default function WywiadOgolny() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
+        <ProgressSteps currentStep={3} />
+        
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Wywiad medyczny - pytania ogólne</h1>
           <p className="text-muted-foreground">Odpowiedz na poniższe pytania dotyczące Twojego stanu zdrowia</p>

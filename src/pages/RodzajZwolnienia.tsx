@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { ProgressSteps } from "@/components/layout/ProgressSteps";
 
 const validateNIP = (nip: string): boolean => {
   if (!/^\d{10}$/.test(nip)) return false;
@@ -113,6 +114,8 @@ export default function RodzajZwolnienia() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
+        <ProgressSteps currentStep={2} />
+        
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Rodzaj zwolnienia</h1>
           <p className="text-muted-foreground">Wybierz typ zwolnienia, którego potrzebujesz</p>

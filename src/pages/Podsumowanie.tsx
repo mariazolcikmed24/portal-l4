@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProgressSteps } from "@/components/layout/ProgressSteps";
 
 export default function Podsumowanie() {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ export default function Podsumowanie() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-4xl mx-auto">
+        <ProgressSteps currentStep={5} />
+        
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Podsumowanie</h1>
           <p className="text-muted-foreground">Sprawdź poprawność wprowadzonych danych przed przejściem do płatności</p>

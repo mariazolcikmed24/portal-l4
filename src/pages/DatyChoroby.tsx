@@ -11,6 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { ProgressSteps } from "@/components/layout/ProgressSteps";
 
 const datesSchema = z.object({
   illness_start: z.date({
@@ -69,6 +70,8 @@ export default function DatyChoroby() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
+        <ProgressSteps currentStep={1} />
+        
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Daty choroby</h1>
           <p className="text-muted-foreground">Podaj daty okresu, na który potrzebujesz zwolnienia lekarskiego</p>

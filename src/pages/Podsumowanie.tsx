@@ -158,31 +158,110 @@ export default function Podsumowanie() {
             <CardHeader>
               <CardTitle>Wywiad medyczny</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {formData.wywiadObjawy?.main_category && (
-                <div>
-                  <span className="text-muted-foreground">Kategoria: </span>
-                  <span className="font-medium">{getMainCategoryLabel(formData.wywiadObjawy.main_category)}</span>
-                </div>
-              )}
-              {formData.wywiadObjawy?.free_text_reason && (
-                <div>
-                  <span className="text-muted-foreground">Powód: </span>
-                  <span className="font-medium">{formData.wywiadObjawy.free_text_reason}</span>
-                </div>
-              )}
-              {formData.wywiadOgolny?.q_chronic === 'yes' && formData.wywiadOgolny?.chronic_list?.length > 0 && (
-                <div>
-                  <span className="text-muted-foreground">Choroby przewlekłe: </span>
-                  <span className="font-medium">Tak</span>
-                </div>
-              )}
-              {formData.wywiadOgolny?.q_meds === 'yes' && (
-                <div>
-                  <span className="text-muted-foreground">Przyjmowane leki: </span>
-                  <span className="font-medium">{formData.wywiadOgolny.meds_list}</span>
-                </div>
-              )}
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm">Wywiad ogólny:</h4>
+                
+                {formData.wywiadOgolny?.q_pregnant && (
+                  <div>
+                    <span className="text-muted-foreground">Ciąża: </span>
+                    <span className="font-medium">{formData.wywiadOgolny.q_pregnant === 'yes' ? 'Tak' : 'Nie'}</span>
+                  </div>
+                )}
+                
+                {formData.wywiadOgolny?.q_pregnant === 'yes' && formData.wywiadOgolny?.q_preg_leave && (
+                  <div>
+                    <span className="text-muted-foreground">Zwolnienie związane z ciążą: </span>
+                    <span className="font-medium">{formData.wywiadOgolny.q_preg_leave === 'yes' ? 'Tak' : 'Nie'}</span>
+                  </div>
+                )}
+                
+                {formData.wywiadOgolny?.q_chronic && (
+                  <div>
+                    <span className="text-muted-foreground">Choroby przewlekłe: </span>
+                    <span className="font-medium">{formData.wywiadOgolny.q_chronic === 'yes' ? 'Tak' : 'Nie'}</span>
+                    {formData.wywiadOgolny.q_chronic === 'yes' && formData.wywiadOgolny.chronic_list?.length > 0 && (
+                      <div className="ml-4 mt-1 text-sm">
+                        {formData.wywiadOgolny.chronic_list.map((condition: string) => (
+                          <div key={condition}>• {condition}</div>
+                        ))}
+                        {formData.wywiadOgolny.chronic_other && (
+                          <div>• Inne: {formData.wywiadOgolny.chronic_other}</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {formData.wywiadOgolny?.q_allergy && (
+                  <div>
+                    <span className="text-muted-foreground">Alergie: </span>
+                    <span className="font-medium">{formData.wywiadOgolny.q_allergy === 'yes' ? 'Tak' : 'Nie'}</span>
+                    {formData.wywiadOgolny.q_allergy === 'yes' && formData.wywiadOgolny.allergy_text && (
+                      <div className="ml-4 mt-1 text-sm">{formData.wywiadOgolny.allergy_text}</div>
+                    )}
+                  </div>
+                )}
+                
+                {formData.wywiadOgolny?.q_meds && (
+                  <div>
+                    <span className="text-muted-foreground">Przyjmowane leki: </span>
+                    <span className="font-medium">{formData.wywiadOgolny.q_meds === 'yes' ? 'Tak' : 'Nie'}</span>
+                    {formData.wywiadOgolny.q_meds === 'yes' && formData.wywiadOgolny.meds_list && (
+                      <div className="ml-4 mt-1 text-sm">{formData.wywiadOgolny.meds_list}</div>
+                    )}
+                  </div>
+                )}
+                
+                {formData.wywiadOgolny?.q_long_leave && (
+                  <div>
+                    <span className="text-muted-foreground">Długotrwałe zwolnienie (powyżej 33 dni w roku): </span>
+                    <span className="font-medium">{formData.wywiadOgolny.q_long_leave === 'yes' ? 'Tak' : 'Nie'}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2 pt-4 border-t">
+                <h4 className="font-semibold text-sm">Objawy i dolegliwości:</h4>
+                
+                {formData.wywiadObjawy?.main_category && (
+                  <div>
+                    <span className="text-muted-foreground">Kategoria: </span>
+                    <span className="font-medium">{getMainCategoryLabel(formData.wywiadObjawy.main_category)}</span>
+                  </div>
+                )}
+                
+                {formData.wywiadObjawy?.symptom_duration && (
+                  <div>
+                    <span className="text-muted-foreground">Czas trwania objawów: </span>
+                    <span className="font-medium">
+                      {formData.wywiadObjawy.symptom_duration === 'today' && 'Od dziś'}
+                      {formData.wywiadObjawy.symptom_duration === 'yesterday' && 'Od wczoraj'}
+                      {formData.wywiadObjawy.symptom_duration === '2-3_days' && '2-3 dni'}
+                      {formData.wywiadObjawy.symptom_duration === 'week' && 'Tydzień'}
+                      {formData.wywiadObjawy.symptom_duration === 'longer' && 'Dłużej'}
+                    </span>
+                  </div>
+                )}
+                
+                {formData.wywiadObjawy?.symptoms && formData.wywiadObjawy.symptoms.length > 0 && (
+                  <div>
+                    <span className="text-muted-foreground">Objawy: </span>
+                    <div className="ml-4 mt-1 text-sm">
+                      {formData.wywiadObjawy.symptoms.map((symptom: string) => (
+                        <div key={symptom}>• {symptom}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {formData.wywiadObjawy?.free_text_reason && (
+                  <div>
+                    <span className="text-muted-foreground">Opis dolegliwości: </span>
+                    <div className="mt-1 text-sm bg-muted/30 p-2 rounded">{formData.wywiadObjawy.free_text_reason}</div>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 

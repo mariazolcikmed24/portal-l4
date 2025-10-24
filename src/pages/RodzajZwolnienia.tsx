@@ -172,6 +172,9 @@ export default function RodzajZwolnienia() {
                     )}
                   </div>
                 ))}
+                {'nips' in form.formState.errors && form.formState.errors.nips && (
+                  <p className="text-sm text-destructive">{String(form.formState.errors.nips.message)}</p>
+                )}
                 <Button type="button" variant="outline" onClick={addEmployerNip} className="w-full">
                   <Plus className="h-4 w-4 mr-2" /> Dodaj pracodawcę
                 </Button>
@@ -254,6 +257,9 @@ export default function RodzajZwolnienia() {
                       )}
                     </div>
                   ))}
+                  {'care_nips' in form.formState.errors && form.formState.errors.care_nips && (
+                    <p className="text-sm text-destructive">{String(form.formState.errors.care_nips.message)}</p>
+                  )}
                   <Button type="button" variant="outline" onClick={addCareNip} className="w-full">
                     <Plus className="h-4 w-4 mr-2" /> Dodaj pracodawcę
                   </Button>

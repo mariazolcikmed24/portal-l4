@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 const medicalSchema = z.object({
@@ -124,48 +125,28 @@ export default function WywiadOgolny() {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Ciąża */}
-            <FormField
-              control={form.control}
-              name="q_pregnant"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Czy jesteś w ciąży? *</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="yes" id="preg_yes" />
-                        <Label htmlFor="preg_yes">Tak</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="no" id="preg_no" />
-                        <Label htmlFor="preg_no">Nie</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {qPregnant === "yes" && (
-              <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Ciąża</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="q_preg_leave"
+                  name="q_pregnant"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Czy potrzebujesz zwolnienia ciążowego? *</FormLabel>
+                      <FormLabel>Czy jesteś w ciąży? *</FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value}>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="yes" id="preg_leave_yes" />
-                            <Label htmlFor="preg_leave_yes">Tak</Label>
+                            <RadioGroupItem value="yes" id="preg_yes" />
+                            <Label htmlFor="preg_yes">Tak</Label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="no" id="preg_leave_no" />
-                            <Label htmlFor="preg_leave_no">Nie</Label>
+                            <RadioGroupItem value="no" id="preg_no" />
+                            <Label htmlFor="preg_no">Nie</Label>
                           </div>
                         </RadioGroup>
                       </FormControl>
@@ -174,240 +155,295 @@ export default function WywiadOgolny() {
                   )}
                 />
 
-                {qPregLeave === "yes" && (
-                  <FormField
-                    control={form.control}
-                    name="upload_preg_card"
-                    render={({ field: { onChange, value, ...field } }) => (
-                      <FormItem>
-                        <FormLabel>Karta ciąży *</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => onChange(e.target.files)}
-                            {...field}
-                          />
-                        </FormControl>
-                        <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB)</p>
-                        <FormMessage />
-                      </FormItem>
+                {qPregnant === "yes" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="q_preg_leave"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Czy potrzebujesz zwolnienia ciążowego? *</FormLabel>
+                          <FormControl>
+                            <RadioGroup onValueChange={field.onChange} value={field.value}>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="yes" id="preg_leave_yes" />
+                                <Label htmlFor="preg_leave_yes">Tak</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="no" id="preg_leave_no" />
+                                <Label htmlFor="preg_leave_no">Nie</Label>
+                              </div>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {qPregLeave === "yes" && (
+                      <FormField
+                        control={form.control}
+                        name="upload_preg_card"
+                        render={({ field: { onChange, value, ...field } }) => (
+                          <FormItem>
+                            <FormLabel>Karta ciąży *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={(e) => onChange(e.target.files)}
+                                {...field}
+                              />
+                            </FormControl>
+                            <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB)</p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     )}
-                  />
+                  </>
                 )}
-              </>
-            )}
+              </CardContent>
+            </Card>
 
             {/* Choroby przewlekłe */}
-            <FormField
-              control={form.control}
-              name="q_chronic"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Czy cierpisz na choroby przewlekłe? *</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="yes" id="chronic_yes" />
-                        <Label htmlFor="chronic_yes">Tak</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="no" id="chronic_no" />
-                        <Label htmlFor="chronic_no">Nie</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {qChronic === "yes" && (
-              <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Choroby przewlekłe</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="chronic_list"
-                  render={() => (
+                  name="q_chronic"
+                  render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Wybierz choroby *</FormLabel>
-                      <div className="space-y-2">
-                        {chronicDiseases.map((disease) => (
-                          <FormField
-                            key={disease.id}
-                            control={form.control}
-                            name="chronic_list"
-                            render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(disease.id)}
-                                    onCheckedChange={(checked) => {
-                                      const current = field.value || [];
-                                      const updated = checked
-                                        ? [...current, disease.id]
-                                        : current.filter((id) => id !== disease.id);
-                                      field.onChange(updated);
-                                    }}
-                                  />
-                                </FormControl>
-                                <Label className="!mt-0 font-normal">{disease.label}</Label>
-                              </FormItem>
-                            )}
-                          />
-                        ))}
-                      </div>
+                      <FormLabel>Czy cierpisz na choroby przewlekłe? *</FormLabel>
+                      <FormControl>
+                        <RadioGroup onValueChange={field.onChange} value={field.value}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="yes" id="chronic_yes" />
+                            <Label htmlFor="chronic_yes">Tak</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="no" id="chronic_no" />
+                            <Label htmlFor="chronic_no">Nie</Label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {chronicList.includes("other") && (
+                {qChronic === "yes" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="chronic_list"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel>Wybierz choroby *</FormLabel>
+                          <div className="space-y-2">
+                            {chronicDiseases.map((disease) => (
+                              <FormField
+                                key={disease.id}
+                                control={form.control}
+                                name="chronic_list"
+                                render={({ field }) => (
+                                  <FormItem className="flex items-center space-x-2">
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(disease.id)}
+                                        onCheckedChange={(checked) => {
+                                          const current = field.value || [];
+                                          const updated = checked
+                                            ? [...current, disease.id]
+                                            : current.filter((id) => id !== disease.id);
+                                          field.onChange(updated);
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <Label className="!mt-0 font-normal">{disease.label}</Label>
+                                  </FormItem>
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {chronicList.includes("other") && (
+                      <FormField
+                        control={form.control}
+                        name="chronic_other_text"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Opisz inne choroby *</FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="Opisz inne choroby przewlekłe..." maxLength={200} {...field} />
+                            </FormControl>
+                            <p className="text-sm text-muted-foreground">{field.value?.length || 0}/200</p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Alergie */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Alergie</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="q_allergy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Czy masz jakieś alergie? *</FormLabel>
+                      <FormControl>
+                        <RadioGroup onValueChange={field.onChange} value={field.value}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="yes" id="allergy_yes" />
+                            <Label htmlFor="allergy_yes">Tak</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="no" id="allergy_no" />
+                            <Label htmlFor="allergy_no">Nie</Label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {qAllergy === "yes" && (
                   <FormField
                     control={form.control}
-                    name="chronic_other_text"
+                    name="allergy_text"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Opisz inne choroby *</FormLabel>
+                        <FormLabel>Wymień alergie *</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Opisz inne choroby przewlekłe..." maxLength={200} {...field} />
+                          <Textarea placeholder="Np. pyłki, orzechy, penicylina..." maxLength={500} {...field} />
                         </FormControl>
-                        <p className="text-sm text-muted-foreground">{field.value?.length || 0}/200</p>
+                        <p className="text-sm text-muted-foreground">{field.value?.length || 0}/500</p>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 )}
-              </>
-            )}
-
-            {/* Alergie */}
-            <FormField
-              control={form.control}
-              name="q_allergy"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Czy masz jakieś alergie? *</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="yes" id="allergy_yes" />
-                        <Label htmlFor="allergy_yes">Tak</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="no" id="allergy_no" />
-                        <Label htmlFor="allergy_no">Nie</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {qAllergy === "yes" && (
-              <FormField
-                control={form.control}
-                name="allergy_text"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Wymień alergie *</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Np. pyłki, orzechy, penicylina..." maxLength={500} {...field} />
-                    </FormControl>
-                    <p className="text-sm text-muted-foreground">{field.value?.length || 0}/500</p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+              </CardContent>
+            </Card>
 
             {/* Leki */}
-            <FormField
-              control={form.control}
-              name="q_meds"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Czy bierzesz jakieś leki na stałe? *</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="yes" id="meds_yes" />
-                        <Label htmlFor="meds_yes">Tak</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="no" id="meds_no" />
-                        <Label htmlFor="meds_no">Nie</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Card>
+              <CardHeader>
+                <CardTitle>Leki</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="q_meds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Czy bierzesz jakieś leki na stałe? *</FormLabel>
+                      <FormControl>
+                        <RadioGroup onValueChange={field.onChange} value={field.value}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="yes" id="meds_yes" />
+                            <Label htmlFor="meds_yes">Tak</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="no" id="meds_no" />
+                            <Label htmlFor="meds_no">Nie</Label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {qMeds === "yes" && (
-              <FormField
-                control={form.control}
-                name="meds_list"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Wymień leki *</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Np. Acard, Concor, Euthyrox..." maxLength={500} {...field} />
-                    </FormControl>
-                    <p className="text-sm text-muted-foreground">{field.value?.length || 0}/500</p>
-                    <FormMessage />
-                  </FormItem>
+                {qMeds === "yes" && (
+                  <FormField
+                    control={form.control}
+                    name="meds_list"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Wymień leki *</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Np. Acard, Concor, Euthyrox..." maxLength={500} {...field} />
+                        </FormControl>
+                        <p className="text-sm text-muted-foreground">{field.value?.length || 0}/500</p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
-            )}
+              </CardContent>
+            </Card>
 
             {/* Długie zwolnienie */}
-            <FormField
-              control={form.control}
-              name="q_long_leave"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Czy byłeś na zwolnieniu dłuższym niż 2 tygodnie w ciągu ostatnich 3 miesięcy? *</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="yes" id="long_yes" />
-                        <Label htmlFor="long_yes">Tak</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="no" id="long_no" />
-                        <Label htmlFor="long_no">Nie</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Card>
+              <CardHeader>
+                <CardTitle>Poprzednie zwolnienia</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="q_long_leave"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Czy byłeś na zwolnieniu dłuższym niż 2 tygodnie w ciągu ostatnich 3 miesięcy? *</FormLabel>
+                      <FormControl>
+                        <RadioGroup onValueChange={field.onChange} value={field.value}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="yes" id="long_yes" />
+                            <Label htmlFor="long_yes">Tak</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="no" id="long_no" />
+                            <Label htmlFor="long_no">Nie</Label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {qLongLeave === "yes" && (
-              <FormField
-                control={form.control}
-                name="upload_prev_docs"
-                render={({ field: { onChange, value, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Dokumentacja poprzednich zwolnień *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        multiple
-                        onChange={(e) => onChange(e.target.files)}
-                        {...field}
-                      />
-                    </FormControl>
-                    <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)</p>
-                    <FormMessage />
-                  </FormItem>
+                {qLongLeave === "yes" && (
+                  <FormField
+                    control={form.control}
+                    name="upload_prev_docs"
+                    render={({ field: { onChange, value, ...field } }) => (
+                      <FormItem>
+                        <FormLabel>Dokumentacja poprzednich zwolnień *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            multiple
+                            onChange={(e) => onChange(e.target.files)}
+                            {...field}
+                          />
+                        </FormControl>
+                        <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)</p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
-            )}
+              </CardContent>
+            </Card>
 
             <div className="flex gap-4 pt-4">
               <Button type="button" variant="outline" onClick={() => navigate(-1)} className="flex-1">

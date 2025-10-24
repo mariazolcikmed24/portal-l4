@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -46,6 +46,8 @@ type RegistrationFormData = z.infer<typeof registrationSchema>;
 const Rejestracja = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isGuestMode = searchParams.get('guest') === 'true';
   
   const { register, handleSubmit, control, formState: { errors } } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
@@ -93,10 +95,13 @@ const Rejestracja = () => {
 
         <div className="bg-white p-8 md:p-12 rounded-2xl shadow-strong">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Rejestracja
+            {isGuestMode ? "Dane do e-ZLA" : "Rejestracja"}
           </h1>
           <p className="text-muted-foreground mb-8">
-            Wypełnij formularz, aby rozpocząć proces uzyskania zwolnienia lekarskiego online
+            {isGuestMode 
+              ? "Wypełnij formularz, aby przejść do procesu uzyskania zwolnienia lekarskiego online" 
+              : "Utwórz konto, aby rozpocząć proces uzyskania zwolnienia lekarskiego online"
+            }
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -437,19 +442,24 @@ const Rejestracja = () => {
                 </Button>
               </Link>
               <Button type="submit" size="lg" className="flex-1" disabled={isSubmitting}>
-                {isSubmitting ? "Rejestracja..." : "Zarejestruj się i przejdź dalej"}
+                {isSubmitting 
+                  ? (isGuestMode ? "Zapisywanie..." : "Rejestracja...") 
+                  : (isGuestMode ? "Zapisz i przejdź dalej" : "Zarejestruj się i przejdź dalej")
+                }
               </Button>
             </div>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Masz już konto?{" "}
-              <Link to="/logowanie" className="text-primary hover:underline font-medium">
-                Zaloguj się
-              </Link>
-            </p>
-          </div>
+          {!isGuestMode && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Masz już konto?{" "}
+                <Link to="/logowanie" className="text-primary hover:underline font-medium">
+                  Zaloguj się
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

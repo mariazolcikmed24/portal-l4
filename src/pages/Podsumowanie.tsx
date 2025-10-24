@@ -53,13 +53,13 @@ export default function Podsumowanie() {
     loadData();
   }, [user]);
 
-  const getRecipientTypeLabel = (type: string) => {
+  const getLeaveTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
-      'polish_employer': 'Polski pracodawca',
-      'zus': 'ZUS (własna działalność)',
-      'foreign_employer': 'Zagraniczny pracodawca',
+      'pl_employer': 'Polski pracodawca',
       'uniformed': 'Służby mundurowe',
-      'care_allowance': 'Zasiłek opiekuńczy'
+      'student': 'Student/Uczeń',
+      'foreign_employer': 'Pracodawca zagraniczny',
+      'care': 'Zwolnienie na opiekę'
     };
     return labels[type] || type;
   };
@@ -147,8 +147,8 @@ export default function Podsumowanie() {
             </CardHeader>
             <CardContent>
               <span className="font-medium">
-                {formData.rodzajZwolnienia?.recipient_type 
-                  ? getRecipientTypeLabel(formData.rodzajZwolnienia.recipient_type)
+                {formData.rodzajZwolnienia?.leave_type 
+                  ? getLeaveTypeLabel(formData.rodzajZwolnienia.leave_type)
                   : '-'}
               </span>
             </CardContent>

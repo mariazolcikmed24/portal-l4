@@ -2,25 +2,87 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Podsumowanie() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [profileData, setProfileData] = useState<any>(null);
+  const [formData, setFormData] = useState<any>({});
 
-  // W rzeczywistej aplikacji dane byłyby pobrane z contextu/state
-  const mockData = {
-    userData: {
-      firstName: "Jan",
-      lastName: "Kowalski",
-      email: "jan.kowalski@example.com",
-      pesel: "90010112345",
-    },
-    dates: {
-      start: "2025-01-20",
-      end: "2025-01-27",
-    },
-    leaveType: "Polski pracodawca",
-    price: "149 PLN",
+  useEffect(() => {
+    const loadData = async () => {
+      // Pobierz dane profilu z Supabase
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        setProfileData(data);
+      } else {
+        // Tryb gościa - spróbuj pobrać ostatni profil gościa
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('is_guest', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        setProfileData(data);
+      }
+
+      // Pobierz dane z localStorage
+      const datyChoroby = localStorage.getItem('formData_datyChoroby');
+      const rodzajZwolnienia = localStorage.getItem('formData_rodzajZwolnienia');
+      const wywiadOgolny = localStorage.getItem('formData_wywiadOgolny');
+      const wywiadObjawy = localStorage.getItem('formData_wywiadObjawy');
+
+      setFormData({
+        datyChoroby: datyChoroby ? JSON.parse(datyChoroby) : {},
+        rodzajZwolnienia: rodzajZwolnienia ? JSON.parse(rodzajZwolnienia) : {},
+        wywiadOgolny: wywiadOgolny ? JSON.parse(wywiadOgolny) : {},
+        wywiadObjawy: wywiadObjawy ? JSON.parse(wywiadObjawy) : {},
+      });
+    };
+
+    loadData();
+  }, [user]);
+
+  const getRecipientTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      'polish_employer': 'Polski pracodawca',
+      'zus': 'ZUS (własna działalność)',
+      'foreign_employer': 'Zagraniczny pracodawca',
+      'uniformed': 'Służby mundurowe',
+      'care_allowance': 'Zasiłek opiekuńczy'
+    };
+    return labels[type] || type;
   };
+
+  const getMainCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      'cold_pain': 'Przeziębienie / Ból',
+      'digestive': 'Problemy trawienne',
+      'injury': 'Uraz',
+      'mental': 'Zdrowie psychiczne',
+      'pregnancy': 'Ciąża',
+      'other': 'Inne'
+    };
+    return labels[category] || category;
+  };
+
+  if (!profileData) {
+    return (
+      <div className="min-h-screen bg-background py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <p>Ładowanie danych...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
@@ -40,15 +102,15 @@ export default function Podsumowanie() {
             <CardContent className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Imię i nazwisko:</span>
-                <span className="font-medium">{mockData.userData.firstName} {mockData.userData.lastName}</span>
+                <span className="font-medium">{profileData.first_name} {profileData.last_name}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Email:</span>
-                <span className="font-medium">{mockData.userData.email}</span>
+                <span className="font-medium">{profileData.email}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">PESEL:</span>
-                <span className="font-medium">{mockData.userData.pesel}</span>
+                <span className="font-medium">{profileData.pesel}</span>
               </div>
             </CardContent>
           </Card>
@@ -60,11 +122,11 @@ export default function Podsumowanie() {
             <CardContent className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Data rozpoczęcia:</span>
-                <span className="font-medium">{mockData.dates.start}</span>
+                <span className="font-medium">{formData.datyChoroby?.illness_start || '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Data zakończenia:</span>
-                <span className="font-medium">{mockData.dates.end}</span>
+                <span className="font-medium">{formData.datyChoroby?.illness_end || '-'}</span>
               </div>
             </CardContent>
           </Card>
@@ -74,7 +136,11 @@ export default function Podsumowanie() {
               <CardTitle>Typ zwolnienia</CardTitle>
             </CardHeader>
             <CardContent>
-              <span className="font-medium">{mockData.leaveType}</span>
+              <span className="font-medium">
+                {formData.rodzajZwolnienia?.recipient_type 
+                  ? getRecipientTypeLabel(formData.rodzajZwolnienia.recipient_type)
+                  : '-'}
+              </span>
             </CardContent>
           </Card>
 
@@ -82,8 +148,31 @@ export default function Podsumowanie() {
             <CardHeader>
               <CardTitle>Wywiad medyczny</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Wypełniony formularz wywiadu medycznego</p>
+            <CardContent className="space-y-3">
+              {formData.wywiadObjawy?.main_category && (
+                <div>
+                  <span className="text-muted-foreground">Kategoria: </span>
+                  <span className="font-medium">{getMainCategoryLabel(formData.wywiadObjawy.main_category)}</span>
+                </div>
+              )}
+              {formData.wywiadObjawy?.free_text_reason && (
+                <div>
+                  <span className="text-muted-foreground">Powód: </span>
+                  <span className="font-medium">{formData.wywiadObjawy.free_text_reason}</span>
+                </div>
+              )}
+              {formData.wywiadOgolny?.q_chronic === 'yes' && formData.wywiadOgolny?.chronic_list?.length > 0 && (
+                <div>
+                  <span className="text-muted-foreground">Choroby przewlekłe: </span>
+                  <span className="font-medium">Tak</span>
+                </div>
+              )}
+              {formData.wywiadOgolny?.q_meds === 'yes' && (
+                <div>
+                  <span className="text-muted-foreground">Przyjmowane leki: </span>
+                  <span className="font-medium">{formData.wywiadOgolny.meds_list}</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -94,7 +183,7 @@ export default function Podsumowanie() {
             <CardContent>
               <div className="flex justify-between items-center">
                 <span className="text-lg">E-konsultacja + e-ZLA:</span>
-                <span className="text-2xl font-bold text-primary">{mockData.price}</span>
+                <span className="text-2xl font-bold text-primary">149 PLN</span>
               </div>
             </CardContent>
           </Card>

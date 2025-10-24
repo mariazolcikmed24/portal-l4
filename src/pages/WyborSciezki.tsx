@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, UserPlus, LogIn, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const WyborSciezki = () => {
-  return (
-    <div className="min-h-screen gradient-subtle flex items-center justify-center p-4">
+  return <div className="min-h-screen gradient-subtle flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
         <Link to="/" className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
           <ArrowLeft className="w-4 h-4" />
@@ -71,9 +69,7 @@ const WyborSciezki = () => {
                     <ShoppingCart className="w-6 h-6" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      Kup jako gość
-                    </h2>
+                    <h2 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Zamawiam jako gość</h2>
                     <p className="text-muted-foreground text-sm">
                       Nie chcesz zakładać konta? Wypełnij formularz jednorazowo bez rejestracji
                     </p>
@@ -95,18 +91,16 @@ const WyborSciezki = () => {
                   Ważne informacje
                 </p>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Proces zajmuje około 10-15 minut</li>
-                  <li>• E-konsultacja nie gwarantuje wystawienia zwolnienia</li>
-                  <li>• Ostateczną decyzję podejmuje lekarz po analizie Twoich danych</li>
-                  <li>• Możliwy kontakt telefoniczny w celu weryfikacji</li>
+                  <li>• Proces zajmuje około 5 minut</li>
+                  <li>• wykupienie e-konsultacji nie gwarantuje otrzymania wnioskowanego e-ZLA.</li>
+                  <li>• Ostateczną decyzję podejmuje lekarz po analizie Twoich objawów</li>
+                  <li>• Lekarz zastrzega sobie prawo do wykonania połączenia telefonicznego, w celu pogłębienia wywiadu.</li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default WyborSciezki;

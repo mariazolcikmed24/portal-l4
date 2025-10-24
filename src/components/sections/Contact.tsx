@@ -1,56 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { z } from "zod";
-
-const contactSchema = z.object({
-  name: z.string().trim().min(1, "Imię jest wymagane").max(100, "Imię może mieć maksymalnie 100 znaków"),
-  email: z.string().trim().email("Nieprawidłowy adres e-mail").max(254, "E-mail może mieć maksymalnie 254 znaki"),
-  message: z.string().trim().min(1, "Wiadomość jest wymagana").max(1000, "Wiadomość może mieć maksymalnie 1000 znaków")
-});
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: ""
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Walidacja
-      contactSchema.parse(formData);
-
-      // Symulacja wysyłki (tutaj będzie integracja z backend)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      toast.success("Wiadomość wysłana pomyślnie!", {
-        description: "Odpowiemy na Twoje pytanie w ciągu 24 godzin."
-      });
-
-      // Reset formularza
-      setFormData({ name: "", email: "", message: "" });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        error.errors.forEach(err => {
-          toast.error(err.message);
-        });
-      } else {
-        toast.error("Wystąpił błąd. Spróbuj ponownie.");
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <section id="kontakt" className="py-16 md:py-24 gradient-subtle">
       <div className="container mx-auto px-4">
@@ -63,7 +13,7 @@ const Contact = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12 max-w-6xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           {/* Contact Info */}
           <div className="space-y-6">
             <div className="bg-white p-8 rounded-xl shadow-soft border border-border">
@@ -116,72 +66,6 @@ const Contact = () => {
                 Jesteśmy dostępni 24/7, aby zapewnić Ci pomoc w każdej chwili.
               </p>
             </div>
-          </div>
-
-          {/* Contact Form */}
-          <div className="bg-white p-8 rounded-xl shadow-soft border border-border">
-            <h3 className="text-2xl font-bold text-foreground mb-6">Wyślij wiadomość</h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <Label htmlFor="name">Imię i nazwisko *</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Jan Kowalski"
-                  required
-                  maxLength={100}
-                  className="mt-2"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="email">Adres e-mail *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="jan.kowalski@example.com"
-                  required
-                  maxLength={254}
-                  className="mt-2"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="message">Wiadomość *</Label>
-                <Textarea
-                  id="message"
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Opisz swoje pytanie lub problem..."
-                  required
-                  maxLength={1000}
-                  rows={5}
-                  className="mt-2 resize-none"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formData.message.length}/1000 znaków
-                </p>
-              </div>
-
-              <Button
-                type="submit"
-                variant="hero"
-                size="lg"
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Wysyłanie..." : "Wyślij wiadomość"}
-              </Button>
-
-              <p className="text-xs text-muted-foreground text-center">
-                * Pola wymagane. Twoje dane są chronione zgodnie z RODO.
-              </p>
-            </form>
           </div>
         </div>
       </div>

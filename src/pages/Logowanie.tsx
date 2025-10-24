@@ -2,12 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email("Nieprawidłowy adres e-mail").max(254, "E-mail jest za długi"),
@@ -18,19 +20,49 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const Logowanie = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/daty-choroby');
+    }
+  }, [user, navigate]);
+
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
-      // TODO: Implement authentication with Lovable Cloud
-      console.log("Login data:", data);
-      toast({
-        title: "Funkcja w budowie",
-        description: "Logowanie zostanie wkrótce aktywowane po włączeniu Lovable Cloud.",
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       });
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Błąd logowania",
+            description: "Nieprawidłowy e-mail lub hasło.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Błąd",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Zalogowano pomyślnie",
+          description: "Przekierowuję do formularza...",
+        });
+        navigate('/daty-choroby');
+      }
     } catch (error) {
       toast({
         title: "Błąd",

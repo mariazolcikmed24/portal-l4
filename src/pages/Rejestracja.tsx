@@ -9,7 +9,9 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Walidacja sumy kontrolnej PESEL
 const validatePesel = (pesel: string): boolean => {
@@ -21,17 +23,18 @@ const validatePesel = (pesel: string): boolean => {
 };
 
 const registrationSchema = z.object({
-  firstName: z.string().min(1, "Imię jest wymagane").max(50, "Imię jest za długie"),
-  lastName: z.string().min(1, "Nazwisko jest wymagane").max(50, "Nazwisko jest za długie"),
-  email: z.string().email("Nieprawidłowy adres e-mail").max(254, "E-mail jest za długi"),
+  firstName: z.string().trim().min(1, "Imię jest wymagane").max(50, "Imię jest za długie"),
+  lastName: z.string().trim().min(1, "Nazwisko jest wymagane").max(50, "Nazwisko jest za długie"),
+  email: z.string().trim().email("Nieprawidłowy adres e-mail").max(254, "E-mail jest za długi"),
   pesel: z.string().refine(validatePesel, "Nieprawidłowy numer PESEL"),
   phone: z.string().regex(/^\+?\d{9,15}$/, "Nieprawidłowy numer telefonu"),
-  street: z.string().min(1, "Ulica jest wymagana").max(100, "Ulica jest za długa"),
-  houseNo: z.string().min(1, "Nr domu jest wymagany").max(10, "Nr domu jest za długi"),
-  flatNo: z.string().max(10, "Nr mieszkania jest za długi").optional(),
+  street: z.string().trim().min(1, "Ulica jest wymagana").max(100, "Ulica jest za długa"),
+  houseNo: z.string().trim().min(1, "Nr domu jest wymagany").max(10, "Nr domu jest za długi"),
+  flatNo: z.string().trim().max(10, "Nr mieszkania jest za długi").optional(),
   postcode: z.string().regex(/^\d{2}-\d{3}$/, "Nieprawidłowy kod pocztowy (format: XX-XXX)"),
-  city: z.string().min(1, "Miasto jest wymagane").max(85, "Miasto jest za długie"),
+  city: z.string().trim().min(1, "Miasto jest wymagane").max(85, "Miasto jest za długie"),
   country: z.string().min(1, "Państwo jest wymagane"),
+  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków").or(z.literal('')).optional(),
   consentTerms: z.boolean().refine(val => val === true, "Musisz zaakceptować regulamin"),
   consentEmployment: z.boolean().refine(val => val === true, "Potwierdzenie zatrudnienia jest wymagane"),
   consentCall: z.boolean().refine(val => val === true, "Zgoda na kontakt telefoniczny jest wymagana"),
@@ -48,6 +51,7 @@ const Rejestracja = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuestMode = searchParams.get('guest') === 'true';
+  const { user } = useAuth();
   
   const { register, handleSubmit, control, formState: { errors } } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
@@ -63,21 +67,107 @@ const Rejestracja = () => {
     }
   });
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !isGuestMode) {
+      navigate('/daty-choroby');
+    }
+  }, [user, isGuestMode, navigate]);
+
   const onSubmit = async (data: RegistrationFormData) => {
     setIsSubmitting(true);
     try {
-      // TODO: Implement registration with Lovable Cloud
-      console.log("Registration data:", data);
-      toast({
-        title: "Rejestracja pomyślna",
-        description: "Przejdź do formularza medycznego.",
-      });
-      // Navigate to medical questionnaire (to be created)
-      // navigate("/ankieta-medyczna");
-    } catch (error) {
+      if (isGuestMode) {
+        // Guest mode: Save profile without creating auth account
+        const { error } = await supabase.from('profiles').insert({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          pesel: data.pesel,
+          phone: data.phone,
+          street: data.street,
+          house_no: data.houseNo,
+          flat_no: data.flatNo || null,
+          postcode: data.postcode,
+          city: data.city,
+          country: data.country,
+          consent_terms: data.consentTerms,
+          consent_employment: data.consentEmployment,
+          consent_call: data.consentCall,
+          consent_no_guarantee: data.consentNoGuarantee,
+          consent_truth: data.consentTruth,
+          consent_marketing_email: data.consentMarketingEmail || false,
+          consent_marketing_tel: data.consentMarketingTel || false,
+          is_guest: true,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Dane zapisane",
+          description: "Przejdź do formularza medycznego.",
+        });
+        navigate("/daty-choroby");
+      } else {
+        // Registration mode: Create auth account with profile
+        if (!data.password) {
+          toast({
+            title: "Błąd",
+            description: "Hasło jest wymagane do rejestracji.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const { error } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              first_name: data.firstName,
+              last_name: data.lastName,
+              pesel: data.pesel,
+              phone: data.phone,
+              street: data.street,
+              house_no: data.houseNo,
+              flat_no: data.flatNo || null,
+              postcode: data.postcode,
+              city: data.city,
+              country: data.country,
+              consent_terms: data.consentTerms,
+              consent_employment: data.consentEmployment,
+              consent_call: data.consentCall,
+              consent_no_guarantee: data.consentNoGuarantee,
+              consent_truth: data.consentTruth,
+              consent_marketing_email: data.consentMarketingEmail || false,
+              consent_marketing_tel: data.consentMarketingTel || false,
+            },
+          },
+        });
+
+        if (error) {
+          if (error.message.includes('already registered')) {
+            toast({
+              title: "Użytkownik już istnieje",
+              description: "Ten adres e-mail jest już zarejestrowany. Zaloguj się.",
+              variant: "destructive",
+            });
+          } else {
+            throw error;
+          }
+        } else {
+          toast({
+            title: "Rejestracja pomyślna",
+            description: "Przejdź do formularza medycznego.",
+          });
+          navigate("/daty-choroby");
+        }
+      }
+    } catch (error: any) {
       toast({
         title: "Błąd",
-        description: "Wystąpił problem podczas rejestracji. Spróbuj ponownie.",
+        description: error.message || "Wystąpił problem. Spróbuj ponownie.",
         variant: "destructive",
       });
     } finally {
@@ -147,6 +237,25 @@ const Rejestracja = () => {
                   <p className="text-sm text-destructive">{errors.email.message}</p>
                 )}
               </div>
+
+              {!isGuestMode && (
+                <div className="space-y-2">
+                  <Label htmlFor="reg_password">Hasło *</Label>
+                  <Input
+                    id="reg_password"
+                    type="password"
+                    {...register("password")}
+                    placeholder="Minimum 8 znaków"
+                    className={errors.password ? "border-destructive" : ""}
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-destructive">{errors.password.message}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Hasło pozwoli Ci zalogować się w przyszłości i zarządzać swoimi zwolnieniami
+                  </p>
+                </div>
+              )}
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">

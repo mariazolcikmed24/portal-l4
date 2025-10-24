@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,8 @@ type DatesFormData = z.infer<typeof datesSchema>;
 
 export default function DatyChoroby() {
   const navigate = useNavigate();
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
   
   const form = useForm<DatesFormData>({
     resolver: zodResolver(datesSchema),
@@ -85,7 +88,7 @@ export default function DatyChoroby() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Data zachorowania *</FormLabel>
-                  <Popover>
+                  <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -108,7 +111,10 @@ export default function DatyChoroby() {
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={field.onChange}
+                        onSelect={(date) => {
+                          field.onChange(date);
+                          setStartDateOpen(false);
+                        }}
                         disabled={(date) => {
                           const threeDaysAgo = new Date();
                           threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
@@ -131,7 +137,7 @@ export default function DatyChoroby() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Data zakończenia *</FormLabel>
-                  <Popover>
+                  <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -154,7 +160,10 @@ export default function DatyChoroby() {
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={field.onChange}
+                        onSelect={(date) => {
+                          field.onChange(date);
+                          setEndDateOpen(false);
+                        }}
                         disabled={(date) => {
                           if (!watchStart) return true;
                           const maxDate = new Date(watchStart);

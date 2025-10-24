@@ -107,7 +107,7 @@ const Logowanie = () => {
           </div>
 
           <div className="mt-6">
-            <Link to="/rejestracja" className="w-full">
+            <Link to="/daty-choroby" className="w-full">
               <Button variant="outline" size="lg" className="w-full">
                 Kup jako gość
               </Button>

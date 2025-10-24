@@ -7,6 +7,13 @@ import Index from "./pages/Index";
 import WyborSciezki from "./pages/WyborSciezki";
 import Rejestracja from "./pages/Rejestracja";
 import Logowanie from "./pages/Logowanie";
+import DatyChoroby from "./pages/DatyChoroby";
+import RodzajZwolnienia from "./pages/RodzajZwolnienia";
+import WywiadOgolny from "./pages/WywiadOgolny";
+import WywiadObjawy from "./pages/WywiadObjawy";
+import Podsumowanie from "./pages/Podsumowanie";
+import Platnosc from "./pages/Platnosc";
+import Potwierdzenie from "./pages/Potwierdzenie";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +29,13 @@ const App = () => (
           <Route path="/wybor-sciezki" element={<WyborSciezki />} />
           <Route path="/rejestracja" element={<Rejestracja />} />
           <Route path="/logowanie" element={<Logowanie />} />
+          <Route path="/daty-choroby" element={<DatyChoroby />} />
+          <Route path="/rodzaj-zwolnienia" element={<RodzajZwolnienia />} />
+          <Route path="/wywiad-ogolny" element={<WywiadOgolny />} />
+          <Route path="/wywiad-objawy" element={<WywiadObjawy />} />
+          <Route path="/podsumowanie" element={<Podsumowanie />} />
+          <Route path="/platnosc" element={<Platnosc />} />
+          <Route path="/potwierdzenie" element={<Potwierdzenie />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

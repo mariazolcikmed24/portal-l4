@@ -216,7 +216,7 @@ export default function WywiadOgolny() {
                       <FormField
                         control={form.control}
                         name="upload_preg_card"
-                        render={({ field: { onChange, value, ...field } }) => (
+                        render={({ field: { value, onChange, ...fieldProps } }) => (
                           <FormItem>
                             <FormLabel>Karta ciąży *</FormLabel>
                             <FormControl>
@@ -227,7 +227,6 @@ export default function WywiadOgolny() {
                                   onChange={(e) => onChange(e.target.files)}
                                   className="hidden"
                                   ref={pregCardInputRef}
-                                  {...field}
                                 />
                                 <Button
                                   type="button"
@@ -474,7 +473,7 @@ export default function WywiadOgolny() {
                   <FormField
                     control={form.control}
                     name="upload_prev_docs"
-                    render={({ field: { onChange, value, ...field } }) => (
+                    render={({ field: { value, onChange, ...fieldProps } }) => (
                       <FormItem>
                         <FormLabel>Dokumentacja poprzednich zwolnień *</FormLabel>
                         <FormControl>
@@ -486,7 +485,6 @@ export default function WywiadOgolny() {
                               onChange={(e) => onChange(e.target.files)}
                               className="hidden"
                               ref={prevDocsInputRef}
-                              {...field}
                             />
                             <Button
                               type="button"

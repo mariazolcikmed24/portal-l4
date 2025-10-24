@@ -316,7 +316,7 @@ export default function WywiadObjawy() {
             <FormField
               control={form.control}
               name="upload_docs"
-              render={({ field: { onChange, value, ...field } }) => (
+              render={({ field: { value, onChange, ...fieldProps } }) => (
                 <FormItem>
                   <FormLabel>Załącz dokumentację medyczną (opcjonalnie)</FormLabel>
                   <FormControl>
@@ -328,7 +328,6 @@ export default function WywiadObjawy() {
                         onChange={(e) => onChange(e.target.files)}
                         className="hidden"
                         ref={fileInputRef}
-                        {...field}
                       />
                       <Button
                         type="button"

@@ -5,6 +5,7 @@ import HowItWorks from "@/components/sections/HowItWorks";
 import Benefits from "@/components/sections/Benefits";
 import FAQ from "@/components/sections/FAQ";
 import Testimonials from "@/components/sections/Testimonials";
+import Contact from "@/components/sections/Contact";
 import { useEffect } from "react";
 
 const Index = () => {
@@ -77,6 +78,7 @@ const Index = () => {
         <Benefits />
         <Testimonials />
         <FAQ />
+        <Contact />
       </main>
       <Footer />
     </div>

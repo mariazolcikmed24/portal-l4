@@ -64,7 +64,7 @@ export default function Platnosc() {
             <CardContent>
               <div className="flex justify-between items-center">
                 <span className="text-lg">E-konsultacja + e-ZLA:</span>
-                <span className="text-3xl font-bold text-primary">149 PLN</span>
+                <span className="text-3xl font-bold text-primary">79 PLN</span>
               </div>
             </CardContent>
           </Card>
@@ -146,7 +146,7 @@ export default function Platnosc() {
                 Wstecz
               </Button>
               <Button type="submit" className="flex-1" disabled={isProcessing}>
-                {isProcessing ? "Przetwarzanie..." : "Zapłać 149 PLN"}
+                {isProcessing ? "Przetwarzanie..." : "Zapłać 79 PLN"}
               </Button>
             </div>
           </form>

@@ -21,6 +21,7 @@ export type Database = {
           care_first_name: string | null
           care_last_name: string | null
           care_pesel: string | null
+          case_number: string | null
           chronic_conditions: string[] | null
           chronic_other: string | null
           created_at: string
@@ -57,6 +58,7 @@ export type Database = {
           care_first_name?: string | null
           care_last_name?: string | null
           care_pesel?: string | null
+          case_number?: string | null
           chronic_conditions?: string[] | null
           chronic_other?: string | null
           created_at?: string
@@ -93,6 +95,7 @@ export type Database = {
           care_first_name?: string | null
           care_last_name?: string | null
           care_pesel?: string | null
+          case_number?: string | null
           chronic_conditions?: string[] | null
           chronic_other?: string | null
           created_at?: string
@@ -222,7 +225,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_case_number: { Args: never; Returns: string }
     }
     Enums: {
       case_status:

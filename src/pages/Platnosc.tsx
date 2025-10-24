@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const paymentSchema = z.object({
   payment_method: z.enum(["card", "blik", "transfer"], { required_error: "Wybierz metodę płatności" }),
@@ -21,6 +23,7 @@ type PaymentFormData = z.infer<typeof paymentSchema>;
 
 export default function Platnosc() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   
   const form = useForm<PaymentFormData>({
@@ -31,9 +34,72 @@ export default function Platnosc() {
     setIsProcessing(true);
     console.log("Płatność:", data);
     
-    // Symulacja przetwarzania płatności
-    setTimeout(() => {
-      setIsProcessing(false);
+    try {
+      // Pobierz dane z localStorage
+      const datyChoroby = JSON.parse(localStorage.getItem('formData_datyChoroby') || '{}');
+      const rodzajZwolnienia = JSON.parse(localStorage.getItem('formData_rodzajZwolnienia') || '{}');
+      const wywiadOgolny = JSON.parse(localStorage.getItem('formData_wywiadOgolny') || '{}');
+      const wywiadObjawy = JSON.parse(localStorage.getItem('formData_wywiadObjawy') || '{}');
+      
+      // Znajdź profil użytkownika
+      let profileId;
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+        profileId = profile?.id;
+      } else {
+        // Dla gościa, znajdź ostatni profil gościa
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('is_guest', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        profileId = profile?.id;
+      }
+
+      if (!profileId) {
+        throw new Error('Nie znaleziono profilu użytkownika');
+      }
+
+      // Zapisz sprawę do bazy danych
+      const { data: caseData, error } = await supabase
+        .from('cases')
+        .insert({
+          profile_id: profileId,
+          illness_start: datyChoroby.illness_start,
+          illness_end: datyChoroby.illness_end,
+          recipient_type: rodzajZwolnienia.leave_type === 'pl_employer' ? 'pl_employer' : 
+                         rodzajZwolnienia.leave_type === 'foreign_employer' ? 'foreign_employer' :
+                         rodzajZwolnienia.leave_type === 'uniformed' ? 'uniformed' :
+                         rodzajZwolnienia.leave_type === 'care' ? 'care' : 'student',
+          pregnant: wywiadOgolny.q_pregnant === 'yes',
+          pregnancy_leave: wywiadOgolny.q_preg_leave === 'yes',
+          has_allergy: wywiadOgolny.q_allergy === 'yes',
+          allergy_text: wywiadOgolny.allergy_text,
+          has_meds: wywiadOgolny.q_meds === 'yes',
+          meds_list: wywiadOgolny.meds_list,
+          chronic_conditions: wywiadOgolny.chronic_list || [],
+          chronic_other: wywiadOgolny.chronic_other,
+          long_leave: wywiadOgolny.q_long_leave === 'yes',
+          main_category: wywiadObjawy.main_category,
+          symptom_duration: wywiadObjawy.symptom_duration,
+          symptoms: wywiadObjawy.symptoms || [],
+          free_text_reason: wywiadObjawy.free_text_reason,
+          payment_method: data.payment_method,
+          payment_status: 'success',
+          status: 'submitted',
+          late_justification: datyChoroby.late_justification,
+        })
+        .select('case_number')
+        .single();
+
+      if (error) throw error;
+
       toast.success("Płatność zakończona pomyślnie");
       
       // Clear all form data from localStorage after successful payment
@@ -42,8 +108,14 @@ export default function Platnosc() {
       localStorage.removeItem('formData_wywiadOgolny');
       localStorage.removeItem('formData_wywiadObjawy');
       
-      navigate("/potwierdzenie");
-    }, 2000);
+      // Przekieruj z numerem sprawy
+      navigate(`/potwierdzenie?case=${caseData.case_number}`);
+    } catch (error: any) {
+      console.error('Błąd podczas zapisywania sprawy:', error);
+      toast.error("Wystąpił błąd podczas przetwarzania płatności");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (

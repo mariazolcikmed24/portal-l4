@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Phone, Menu } from "lucide-react";
+import { Shield, Phone, Menu, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -46,6 +48,12 @@ const Header = () => {
             >
               FAQ
             </button>
+            <Link
+              to="/status"
+              className="text-foreground hover:text-primary transition-smooth font-medium"
+            >
+              Sprawdź status sprawy
+            </Link>
             <button
               onClick={() => scrollToSection("kontakt")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
@@ -56,9 +64,18 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/logowanie">
-              <Button variant="ghost">Zaloguj się</Button>
-            </Link>
+            {user ? (
+              <Link to="/panel">
+                <Button variant="ghost">
+                  <User className="w-4 h-4 mr-2" />
+                  Moje konto
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/logowanie">
+                <Button variant="ghost">Zaloguj się</Button>
+              </Link>
+            )}
             <Link to="/wybor-sciezki">
               <Button variant="hero" size="lg">
                 Uzyskaj zwolnienie
@@ -98,6 +115,13 @@ const Header = () => {
             >
               FAQ
             </button>
+            <Link
+              to="/status"
+              className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Sprawdź status sprawy
+            </Link>
             <button
               onClick={() => scrollToSection("kontakt")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
@@ -105,9 +129,18 @@ const Header = () => {
               Kontakt
             </button>
             <div className="flex flex-col gap-2 pt-2">
-              <Link to="/logowanie" className="w-full">
-                <Button variant="outline" className="w-full">Zaloguj się</Button>
-              </Link>
+              {user ? (
+                <Link to="/panel" className="w-full">
+                  <Button variant="outline" className="w-full">
+                    <User className="w-4 h-4 mr-2" />
+                    Moje konto
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/logowanie" className="w-full">
+                  <Button variant="outline" className="w-full">Zaloguj się</Button>
+                </Link>
+              )}
               <Link to="/wybor-sciezki" className="w-full">
                 <Button variant="hero" size="lg" className="w-full">
                   Uzyskaj zwolnienie

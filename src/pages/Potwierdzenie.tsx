@@ -1,13 +1,12 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Potwierdzenie() {
   const navigate = useNavigate();
-
-  // W rzeczywistej aplikacji ID sprawy byłoby pobrane z API
-  const caseId = "EZ-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+  const [searchParams] = useSearchParams();
+  const caseId = searchParams.get('case') || "EZ-" + Math.random().toString(36).substr(2, 9).toUpperCase();
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">

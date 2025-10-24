@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
+import { Upload } from "lucide-react";
 
 const medicalSchema = z.object({
   q_pregnant: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
@@ -98,6 +99,8 @@ const chronicDiseases = [
 
 export default function WywiadOgolny() {
   const navigate = useNavigate();
+  const pregCardInputRef = useRef<HTMLInputElement>(null);
+  const prevDocsInputRef = useRef<HTMLInputElement>(null);
   
   const form = useForm<MedicalFormData>({
     resolver: zodResolver(medicalSchema),
@@ -110,6 +113,8 @@ export default function WywiadOgolny() {
   const qAllergy = form.watch("q_allergy");
   const qMeds = form.watch("q_meds");
   const qLongLeave = form.watch("q_long_leave");
+  const uploadPregCard = form.watch("upload_preg_card");
+  const uploadPrevDocs = form.watch("upload_prev_docs");
 
   const onSubmit = async (data: MedicalFormData) => {
     console.log("Wywiad ogólny:", data);
@@ -191,12 +196,30 @@ export default function WywiadOgolny() {
                           <FormItem>
                             <FormLabel>Karta ciąży *</FormLabel>
                             <FormControl>
-                              <Input
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={(e) => onChange(e.target.files)}
-                                {...field}
-                              />
+                              <div className="space-y-2">
+                                <Input
+                                  type="file"
+                                  accept=".pdf,.jpg,.jpeg,.png"
+                                  onChange={(e) => onChange(e.target.files)}
+                                  className="hidden"
+                                  ref={pregCardInputRef}
+                                  {...field}
+                                />
+                                <Button
+                                  type="button"
+                                  onClick={() => pregCardInputRef.current?.click()}
+                                  className="w-full"
+                                  size="lg"
+                                >
+                                  <Upload className="mr-2 h-4 w-4" />
+                                  Wybierz kartę ciąży
+                                </Button>
+                                {uploadPregCard && uploadPregCard.length > 0 && (
+                                  <div className="text-sm text-muted-foreground">
+                                    Wybrano: {uploadPregCard[0].name}
+                                  </div>
+                                )}
+                              </div>
                             </FormControl>
                             <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB)</p>
                             <FormMessage />
@@ -431,13 +454,36 @@ export default function WywiadOgolny() {
                       <FormItem>
                         <FormLabel>Dokumentacja poprzednich zwolnień *</FormLabel>
                         <FormControl>
-                          <Input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            multiple
-                            onChange={(e) => onChange(e.target.files)}
-                            {...field}
-                          />
+                          <div className="space-y-2">
+                            <Input
+                              type="file"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              multiple
+                              onChange={(e) => onChange(e.target.files)}
+                              className="hidden"
+                              ref={prevDocsInputRef}
+                              {...field}
+                            />
+                            <Button
+                              type="button"
+                              onClick={() => prevDocsInputRef.current?.click()}
+                              className="w-full"
+                              size="lg"
+                            >
+                              <Upload className="mr-2 h-4 w-4" />
+                              Wybierz dokumentację
+                            </Button>
+                            {uploadPrevDocs && uploadPrevDocs.length > 0 && (
+                              <div className="text-sm text-muted-foreground">
+                                Wybrano plików: {uploadPrevDocs.length}
+                                <ul className="list-disc list-inside mt-1">
+                                  {Array.from(uploadPrevDocs).map((file, idx) => (
+                                    <li key={idx}>{file.name}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
                         </FormControl>
                         <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)</p>
                         <FormMessage />

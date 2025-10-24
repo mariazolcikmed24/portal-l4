@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
+import { Upload } from "lucide-react";
 
 const symptomsSchema = z.object({
   main_category: z.enum([
@@ -151,12 +153,14 @@ const symptomsByCategory: Record<string, { id: string; label: string }[]> = {
 
 export default function WywiadObjawy() {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const form = useForm<SymptomsFormData>({
     resolver: zodResolver(symptomsSchema),
   });
 
   const mainCategory = form.watch("main_category");
+  const uploadDocs = form.watch("upload_docs");
 
   const onSubmit = async (data: SymptomsFormData) => {
     console.log("Wywiad objawy:", data);
@@ -294,13 +298,36 @@ export default function WywiadObjawy() {
                 <FormItem>
                   <FormLabel>Załącz dokumentację medyczną (opcjonalnie)</FormLabel>
                   <FormControl>
-                    <Input
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      multiple
-                      onChange={(e) => onChange(e.target.files)}
-                      {...field}
-                    />
+                    <div className="space-y-2">
+                      <Input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        multiple
+                        onChange={(e) => onChange(e.target.files)}
+                        className="hidden"
+                        ref={fileInputRef}
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full"
+                        size="lg"
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Wybierz pliki
+                      </Button>
+                      {uploadDocs && uploadDocs.length > 0 && (
+                        <div className="text-sm text-muted-foreground">
+                          Wybrano plików: {uploadDocs.length}
+                          <ul className="list-disc list-inside mt-1">
+                            {Array.from(uploadDocs).map((file, idx) => (
+                              <li key={idx}>{file.name}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </FormControl>
                   <p className="text-sm text-muted-foreground">
                     Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)

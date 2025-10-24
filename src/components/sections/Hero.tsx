@@ -45,7 +45,7 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Link to="/rejestracja">
+              <Link to="/wybor-sciezki">
                 <Button variant="hero" size="lg" className="w-full sm:w-auto shadow-strong hover:shadow-glow">
                   Uzyskaj zwolnienie online
                 </Button>

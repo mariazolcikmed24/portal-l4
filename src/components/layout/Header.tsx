@@ -59,7 +59,7 @@ const Header = () => {
             <Link to="/logowanie">
               <Button variant="ghost">Zaloguj się</Button>
             </Link>
-            <Link to="/rejestracja">
+            <Link to="/wybor-sciezki">
               <Button variant="hero" size="lg">
                 Uzyskaj zwolnienie
               </Button>
@@ -108,7 +108,7 @@ const Header = () => {
               <Link to="/logowanie" className="w-full">
                 <Button variant="outline" className="w-full">Zaloguj się</Button>
               </Link>
-              <Link to="/rejestracja" className="w-full">
+              <Link to="/wybor-sciezki" className="w-full">
                 <Button variant="hero" size="lg" className="w-full">
                   Uzyskaj zwolnienie
                 </Button>

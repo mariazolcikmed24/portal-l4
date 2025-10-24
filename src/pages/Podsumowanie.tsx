@@ -313,7 +313,7 @@ export default function Podsumowanie() {
             <CardContent>
               <div className="flex justify-between items-center">
                 <span className="text-lg">E-konsultacja + e-ZLA:</span>
-                <span className="text-2xl font-bold text-primary">149 PLN</span>
+                <span className="text-2xl font-bold text-primary">79 PLN</span>
               </div>
             </CardContent>
           </Card>

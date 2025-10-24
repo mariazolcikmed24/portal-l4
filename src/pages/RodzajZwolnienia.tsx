@@ -64,6 +64,7 @@ export default function RodzajZwolnienia() {
     resolver: zodResolver(leaveTypeSchema),
     defaultValues: {
       leave_type: "pl_employer",
+      nips: [],
     },
   });
 
@@ -81,15 +82,15 @@ export default function RodzajZwolnienia() {
 
   const removeEmployerNip = (index: number) => {
     const newNips = employerNips.filter((_, i) => i !== index);
-    setEmployerNips(newNips);
-    form.setValue("nips", newNips.filter(n => n));
+  setEmployerNips(newNips);
+  form.setValue("nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
   };
 
   const updateEmployerNip = (index: number, value: string) => {
     const newNips = [...employerNips];
     newNips[index] = value;
-    setEmployerNips(newNips);
-    form.setValue("nips", newNips.filter(n => n));
+  setEmployerNips(newNips);
+  form.setValue("nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
   };
 
   const addCareNip = () => {
@@ -98,15 +99,15 @@ export default function RodzajZwolnienia() {
 
   const removeCareNip = (index: number) => {
     const newNips = careNips.filter((_, i) => i !== index);
-    setCareNips(newNips);
-    form.setValue("care_nips", newNips.filter(n => n));
+  setCareNips(newNips);
+  form.setValue("care_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
   };
 
   const updateCareNip = (index: number, value: string) => {
     const newNips = [...careNips];
     newNips[index] = value;
-    setCareNips(newNips);
-    form.setValue("care_nips", newNips.filter(n => n));
+  setCareNips(newNips);
+  form.setValue("care_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
   };
 
   return (
@@ -172,8 +173,11 @@ export default function RodzajZwolnienia() {
                     )}
                   </div>
                 ))}
-                {'nips' in form.formState.errors && form.formState.errors.nips && (
-                  <p className="text-sm text-destructive">{String(form.formState.errors.nips.message)}</p>
+                {(form.formState.errors as any)?.nips?.root?.message && (
+                  <p className="text-sm text-destructive">{(form.formState.errors as any).nips.root.message}</p>
+                )}
+                {(form.formState.errors as any)?.nips?.[0]?.message && (
+                  <p className="text-sm text-destructive">{(form.formState.errors as any).nips[0].message}</p>
                 )}
                 <Button type="button" variant="outline" onClick={addEmployerNip} className="w-full">
                   <Plus className="h-4 w-4 mr-2" /> Dodaj pracodawcę
@@ -257,8 +261,11 @@ export default function RodzajZwolnienia() {
                       )}
                     </div>
                   ))}
-                  {'care_nips' in form.formState.errors && form.formState.errors.care_nips && (
-                    <p className="text-sm text-destructive">{String(form.formState.errors.care_nips.message)}</p>
+                  {(form.formState.errors as any)?.care_nips?.root?.message && (
+                    <p className="text-sm text-destructive">{(form.formState.errors as any).care_nips.root.message}</p>
+                  )}
+                  {(form.formState.errors as any)?.care_nips?.[0]?.message && (
+                    <p className="text-sm text-destructive">{(form.formState.errors as any).care_nips[0].message}</p>
                   )}
                   <Button type="button" variant="outline" onClick={addCareNip} className="w-full">
                     <Plus className="h-4 w-4 mr-2" /> Dodaj pracodawcę

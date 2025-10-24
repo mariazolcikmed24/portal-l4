@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -70,6 +70,30 @@ export default function RodzajZwolnienia() {
   });
 
   const leaveType = form.watch("leave_type");
+
+  // Load saved data from localStorage
+  useEffect(() => {
+    const savedData = localStorage.getItem('formData_rodzajZwolnienia');
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      form.reset(parsed);
+      if (parsed.nips && parsed.nips.length > 0) {
+        if (parsed.leave_type === "pl_employer") {
+          setEmployerNips(parsed.nips);
+        } else if (parsed.leave_type === "pl_care") {
+          setCareNips(parsed.nips);
+        }
+      }
+    }
+  }, []);
+
+  // Save data to localStorage on change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      localStorage.setItem('formData_rodzajZwolnienia', JSON.stringify(value));
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   const onSubmit = async (data: LeaveTypeFormData) => {
     console.log("Rodzaj zwolnienia:", data);

@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,29 @@ export default function DatyChoroby() {
 
   const watchStart = form.watch("illness_start");
   const needsJustification = watchStart && new Date(watchStart).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
+
+  // Load saved data from localStorage
+  useEffect(() => {
+    const savedData = localStorage.getItem('formData_datyChoroby');
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      if (parsed.illness_start) {
+        parsed.illness_start = new Date(parsed.illness_start);
+      }
+      if (parsed.illness_end) {
+        parsed.illness_end = new Date(parsed.illness_end);
+      }
+      form.reset(parsed);
+    }
+  }, []);
+
+  // Save data to localStorage on change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      localStorage.setItem('formData_datyChoroby', JSON.stringify(value));
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   const onSubmit = async (data: DatesFormData) => {
     console.log("Daty choroby:", data);

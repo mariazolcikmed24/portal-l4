@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -161,6 +161,28 @@ export default function WywiadObjawy() {
 
   const mainCategory = form.watch("main_category");
   const uploadDocs = form.watch("upload_docs");
+
+  // Load saved data from localStorage
+  useEffect(() => {
+    const savedData = localStorage.getItem('formData_wywiadObjawy');
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      // Don't restore file uploads
+      delete parsed.upload_docs;
+      form.reset(parsed);
+    }
+  }, []);
+
+  // Save data to localStorage on change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      // Don't save file uploads to localStorage
+      const dataToSave = { ...value };
+      delete dataToSave.upload_docs;
+      localStorage.setItem('formData_wywiadObjawy', JSON.stringify(dataToSave));
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   const onSubmit = async (data: SymptomsFormData) => {
     console.log("Wywiad objawy:", data);

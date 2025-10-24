@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -115,6 +115,30 @@ export default function WywiadOgolny() {
   const qLongLeave = form.watch("q_long_leave");
   const uploadPregCard = form.watch("upload_preg_card");
   const uploadPrevDocs = form.watch("upload_prev_docs");
+
+  // Load saved data from localStorage
+  useEffect(() => {
+    const savedData = localStorage.getItem('formData_wywiadOgolny');
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      // Don't restore file uploads
+      delete parsed.upload_preg_card;
+      delete parsed.upload_prev_docs;
+      form.reset(parsed);
+    }
+  }, []);
+
+  // Save data to localStorage on change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      // Don't save file uploads to localStorage
+      const dataToSave = { ...value };
+      delete dataToSave.upload_preg_card;
+      delete dataToSave.upload_prev_docs;
+      localStorage.setItem('formData_wywiadOgolny', JSON.stringify(dataToSave));
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   const onSubmit = async (data: MedicalFormData) => {
     console.log("Wywiad ogólny:", data);

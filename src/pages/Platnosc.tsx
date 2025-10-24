@@ -35,6 +35,13 @@ export default function Platnosc() {
     setTimeout(() => {
       setIsProcessing(false);
       toast.success("Płatność zakończona pomyślnie");
+      
+      // Clear all form data from localStorage after successful payment
+      localStorage.removeItem('formData_datyChoroby');
+      localStorage.removeItem('formData_rodzajZwolnienia');
+      localStorage.removeItem('formData_wywiadOgolny');
+      localStorage.removeItem('formData_wywiadObjawy');
+      
       navigate("/potwierdzenie");
     }, 2000);
   };

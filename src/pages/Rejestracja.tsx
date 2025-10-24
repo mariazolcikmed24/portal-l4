@@ -448,7 +448,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_call" className="text-sm font-normal cursor-pointer">
-                      Wyrażam zgodę na możliwy kontakt telefoniczny w celu weryfikacji danych medycznych *
+                      Oświadczam, że przyjmuję do wiadomości, iż lekarz może skontaktować się ze mną telefonicznie w celu pogłębienia wywiadu medycznego. *
                     </Label>
                     {errors.consentCall && (
                       <p className="text-sm text-destructive">{errors.consentCall.message}</p>

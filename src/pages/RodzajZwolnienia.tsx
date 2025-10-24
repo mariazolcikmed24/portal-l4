@@ -1,0 +1,334 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Plus, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+
+const validateNIP = (nip: string): boolean => {
+  if (!/^\d{10}$/.test(nip)) return false;
+  const weights = [6, 5, 7, 2, 3, 4, 5, 6, 7];
+  const sum = nip.split('').slice(0, 9).reduce((acc, digit, i) => acc + parseInt(digit) * weights[i], 0);
+  return sum % 11 === parseInt(nip[9]);
+};
+
+const validatePESEL = (pesel: string): boolean => {
+  if (!/^\d{11}$/.test(pesel)) return false;
+  const weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
+  const sum = pesel.split('').slice(0, 10).reduce((acc, digit, i) => acc + parseInt(digit) * weights[i], 0);
+  return (10 - (sum % 10)) % 10 === parseInt(pesel[10]);
+};
+
+const leaveTypeSchema = z.discriminatedUnion("leave_type", [
+  z.object({
+    leave_type: z.literal("pl_employer"),
+    nips: z.array(z.string().refine(validateNIP, "Nieprawidłowy NIP")).min(1, "Wymagany co najmniej jeden NIP"),
+  }),
+  z.object({
+    leave_type: z.literal("uniformed"),
+    uniformed_service_name: z.string().min(1, "Nazwa formacji jest wymagana").max(100),
+    uniformed_nip: z.string().refine(validateNIP, "Nieprawidłowy NIP"),
+  }),
+  z.object({
+    leave_type: z.literal("student"),
+    student_ack: z.literal(true, { errorMap: () => ({ message: "Potwierdzenie jest wymagane" }) }),
+  }),
+  z.object({
+    leave_type: z.literal("foreign_employer"),
+  }),
+  z.object({
+    leave_type: z.literal("care"),
+    care_nips: z.array(z.string().refine(validateNIP, "Nieprawidłowy NIP")).min(1, "Wymagany co najmniej jeden NIP"),
+    care_first_name: z.string().min(1, "Imię jest wymagane").max(50),
+    care_last_name: z.string().min(1, "Nazwisko jest wymagane").max(50),
+    care_pesel: z.string().refine(validatePESEL, "Nieprawidłowy PESEL"),
+  }),
+]);
+
+type LeaveTypeFormData = z.infer<typeof leaveTypeSchema>;
+
+export default function RodzajZwolnienia() {
+  const navigate = useNavigate();
+  const [employerNips, setEmployerNips] = useState<string[]>([""]);
+  const [careNips, setCareNips] = useState<string[]>([""]);
+  const [showStudentDialog, setShowStudentDialog] = useState(false);
+  
+  const form = useForm<LeaveTypeFormData>({
+    resolver: zodResolver(leaveTypeSchema),
+    defaultValues: {
+      leave_type: "pl_employer",
+    },
+  });
+
+  const leaveType = form.watch("leave_type");
+
+  const onSubmit = async (data: LeaveTypeFormData) => {
+    console.log("Rodzaj zwolnienia:", data);
+    toast.success("Dane zapisane");
+    navigate("/wywiad-ogolny");
+  };
+
+  const addEmployerNip = () => {
+    setEmployerNips([...employerNips, ""]);
+  };
+
+  const removeEmployerNip = (index: number) => {
+    const newNips = employerNips.filter((_, i) => i !== index);
+    setEmployerNips(newNips);
+    form.setValue("nips", newNips.filter(n => n));
+  };
+
+  const updateEmployerNip = (index: number, value: string) => {
+    const newNips = [...employerNips];
+    newNips[index] = value;
+    setEmployerNips(newNips);
+    form.setValue("nips", newNips.filter(n => n));
+  };
+
+  const addCareNip = () => {
+    setCareNips([...careNips, ""]);
+  };
+
+  const removeCareNip = (index: number) => {
+    const newNips = careNips.filter((_, i) => i !== index);
+    setCareNips(newNips);
+    form.setValue("care_nips", newNips.filter(n => n));
+  };
+
+  const updateCareNip = (index: number, value: string) => {
+    const newNips = [...careNips];
+    newNips[index] = value;
+    setCareNips(newNips);
+    form.setValue("care_nips", newNips.filter(n => n));
+  };
+
+  return (
+    <div className="min-h-screen bg-background py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Rodzaj zwolnienia</h1>
+          <p className="text-muted-foreground">Wybierz typ zwolnienia, którego potrzebujesz</p>
+        </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="leave_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Typ zwolnienia *</FormLabel>
+                  <FormControl>
+                    <RadioGroup onValueChange={field.onChange} value={field.value}>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="pl_employer" id="pl_employer" />
+                        <Label htmlFor="pl_employer">Polski pracodawca</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="uniformed" id="uniformed" />
+                        <Label htmlFor="uniformed">Służby mundurowe</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="student" id="student" />
+                        <Label htmlFor="student">Student/Uczeń</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="foreign_employer" id="foreign_employer" />
+                        <Label htmlFor="foreign_employer">Pracodawca zagraniczny</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="care" id="care" />
+                        <Label htmlFor="care">Zwolnienie na opiekę</Label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {leaveType === "pl_employer" && (
+              <div className="space-y-4">
+                <Label>NIP pracodawcy *</Label>
+                {employerNips.map((nip, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      placeholder="0000000000"
+                      maxLength={10}
+                      value={nip}
+                      onChange={(e) => updateEmployerNip(index, e.target.value.replace(/\D/g, ''))}
+                    />
+                    {employerNips.length > 1 && (
+                      <Button type="button" variant="outline" size="icon" onClick={() => removeEmployerNip(index)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button type="button" variant="outline" onClick={addEmployerNip} className="w-full">
+                  <Plus className="h-4 w-4 mr-2" /> Dodaj pracodawcę
+                </Button>
+              </div>
+            )}
+
+            {leaveType === "uniformed" && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="uniformed_service_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nazwa formacji *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Np. Policja, Straż Pożarna..." maxLength={100} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="uniformed_nip"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>NIP *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="0000000000" maxLength={10} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            {leaveType === "student" && (
+              <div className="p-4 border rounded-lg bg-muted/50">
+                <p className="text-sm mb-4">
+                  Zwolnienie nie zostanie wysłane do pracodawcy. Po akceptacji lekarza otrzymasz dokument PDF do pobrania.
+                </p>
+                <FormField
+                  control={form.control}
+                  name="student_ack"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          className="h-4 w-4"
+                        />
+                      </FormControl>
+                      <FormLabel className="!mt-0">Potwierdzam, że rozumiem *</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
+            {leaveType === "care" && (
+              <>
+                <div className="space-y-4">
+                  <Label>NIP pracodawcy *</Label>
+                  {careNips.map((nip, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        placeholder="0000000000"
+                        maxLength={10}
+                        value={nip}
+                        onChange={(e) => updateCareNip(index, e.target.value.replace(/\D/g, ''))}
+                      />
+                      {careNips.length > 1 && (
+                        <Button type="button" variant="outline" size="icon" onClick={() => removeCareNip(index)}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" onClick={addCareNip} className="w-full">
+                    <Plus className="h-4 w-4 mr-2" /> Dodaj pracodawcę
+                  </Button>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-semibold">Dane osoby chorej</h3>
+                  <FormField
+                    control={form.control}
+                    name="care_first_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Imię *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Jan" maxLength={50} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="care_last_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nazwisko *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Kowalski" maxLength={50} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="care_pesel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>PESEL *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="00000000000" maxLength={11} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="flex gap-4 pt-4">
+              <Button type="button" variant="outline" onClick={() => navigate(-1)} className="flex-1">
+                Wstecz
+              </Button>
+              <Button type="submit" className="flex-1">
+                Dalej
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+
+      <AlertDialog open={showStudentDialog} onOpenChange={setShowStudentDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Informacja dla studentów/uczniów</AlertDialogTitle>
+            <AlertDialogDescription>
+              Zwolnienie nie zostanie wysłane do pracodawcy. Po akceptacji lekarza otrzymasz dokument PDF, który możesz pobrać i wykorzystać według potrzeb.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button onClick={() => setShowStudentDialog(false)}>Rozumiem</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

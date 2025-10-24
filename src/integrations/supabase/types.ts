@@ -14,7 +14,209 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cases: {
+        Row: {
+          allergy_text: string | null
+          attachment_file_ids: string[] | null
+          care_first_name: string | null
+          care_last_name: string | null
+          care_pesel: string | null
+          chronic_conditions: string[] | null
+          chronic_other: string | null
+          created_at: string
+          employers: Json | null
+          free_text_reason: string
+          has_allergy: boolean | null
+          has_meds: boolean | null
+          id: string
+          illness_end: string
+          illness_start: string
+          late_justification: string | null
+          long_leave: boolean | null
+          long_leave_docs_file_id: string | null
+          main_category: Database["public"]["Enums"]["main_category"]
+          meds_list: string | null
+          payment_method: string | null
+          payment_psp_ref: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          pregnancy_card_file_id: string | null
+          pregnancy_leave: boolean | null
+          pregnant: boolean | null
+          profile_id: string
+          recipient_type: Database["public"]["Enums"]["recipient_type"]
+          status: Database["public"]["Enums"]["case_status"]
+          symptom_duration: Database["public"]["Enums"]["symptom_duration"]
+          symptoms: string[] | null
+          uniformed_nip: string | null
+          uniformed_service_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          allergy_text?: string | null
+          attachment_file_ids?: string[] | null
+          care_first_name?: string | null
+          care_last_name?: string | null
+          care_pesel?: string | null
+          chronic_conditions?: string[] | null
+          chronic_other?: string | null
+          created_at?: string
+          employers?: Json | null
+          free_text_reason: string
+          has_allergy?: boolean | null
+          has_meds?: boolean | null
+          id?: string
+          illness_end: string
+          illness_start: string
+          late_justification?: string | null
+          long_leave?: boolean | null
+          long_leave_docs_file_id?: string | null
+          main_category: Database["public"]["Enums"]["main_category"]
+          meds_list?: string | null
+          payment_method?: string | null
+          payment_psp_ref?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          pregnancy_card_file_id?: string | null
+          pregnancy_leave?: boolean | null
+          pregnant?: boolean | null
+          profile_id: string
+          recipient_type: Database["public"]["Enums"]["recipient_type"]
+          status?: Database["public"]["Enums"]["case_status"]
+          symptom_duration: Database["public"]["Enums"]["symptom_duration"]
+          symptoms?: string[] | null
+          uniformed_nip?: string | null
+          uniformed_service_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allergy_text?: string | null
+          attachment_file_ids?: string[] | null
+          care_first_name?: string | null
+          care_last_name?: string | null
+          care_pesel?: string | null
+          chronic_conditions?: string[] | null
+          chronic_other?: string | null
+          created_at?: string
+          employers?: Json | null
+          free_text_reason?: string
+          has_allergy?: boolean | null
+          has_meds?: boolean | null
+          id?: string
+          illness_end?: string
+          illness_start?: string
+          late_justification?: string | null
+          long_leave?: boolean | null
+          long_leave_docs_file_id?: string | null
+          main_category?: Database["public"]["Enums"]["main_category"]
+          meds_list?: string | null
+          payment_method?: string | null
+          payment_psp_ref?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          pregnancy_card_file_id?: string | null
+          pregnancy_leave?: boolean | null
+          pregnant?: boolean | null
+          profile_id?: string
+          recipient_type?: Database["public"]["Enums"]["recipient_type"]
+          status?: Database["public"]["Enums"]["case_status"]
+          symptom_duration?: Database["public"]["Enums"]["symptom_duration"]
+          symptoms?: string[] | null
+          uniformed_nip?: string | null
+          uniformed_service_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cases_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          city: string
+          consent_call: boolean
+          consent_employment: boolean
+          consent_ip: string | null
+          consent_marketing_email: boolean | null
+          consent_marketing_tel: boolean | null
+          consent_no_guarantee: boolean
+          consent_terms: boolean
+          consent_timestamp: string
+          consent_truth: boolean
+          country: string
+          created_at: string
+          email: string
+          first_name: string
+          flat_no: string | null
+          house_no: string
+          id: string
+          is_guest: boolean
+          last_name: string
+          pesel: string
+          phone: string
+          postcode: string
+          street: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          city: string
+          consent_call?: boolean
+          consent_employment?: boolean
+          consent_ip?: string | null
+          consent_marketing_email?: boolean | null
+          consent_marketing_tel?: boolean | null
+          consent_no_guarantee?: boolean
+          consent_terms?: boolean
+          consent_timestamp?: string
+          consent_truth?: boolean
+          country?: string
+          created_at?: string
+          email: string
+          first_name: string
+          flat_no?: string | null
+          house_no: string
+          id?: string
+          is_guest?: boolean
+          last_name: string
+          pesel: string
+          phone: string
+          postcode: string
+          street: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          city?: string
+          consent_call?: boolean
+          consent_employment?: boolean
+          consent_ip?: string | null
+          consent_marketing_email?: boolean | null
+          consent_marketing_tel?: boolean | null
+          consent_no_guarantee?: boolean
+          consent_terms?: boolean
+          consent_timestamp?: string
+          consent_truth?: boolean
+          country?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          flat_no?: string | null
+          house_no?: string
+          id?: string
+          is_guest?: boolean
+          last_name?: string
+          pesel?: string
+          phone?: string
+          postcode?: string
+          street?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +225,31 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      case_status:
+        | "draft"
+        | "submitted"
+        | "in_review"
+        | "completed"
+        | "rejected"
+      main_category:
+        | "cold_pain"
+        | "gastro"
+        | "bladder"
+        | "injury"
+        | "menstruation"
+        | "back_pain"
+        | "eye"
+        | "migraine"
+        | "acute_stress"
+        | "psych"
+      payment_status: "pending" | "success" | "fail"
+      recipient_type:
+        | "pl_employer"
+        | "uniformed"
+        | "student"
+        | "foreign_employer"
+        | "care"
+      symptom_duration: "today" | "yesterday" | "2_3" | "4_5" | "gt_5"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +376,29 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      case_status: ["draft", "submitted", "in_review", "completed", "rejected"],
+      main_category: [
+        "cold_pain",
+        "gastro",
+        "bladder",
+        "injury",
+        "menstruation",
+        "back_pain",
+        "eye",
+        "migraine",
+        "acute_stress",
+        "psych",
+      ],
+      payment_status: ["pending", "success", "fail"],
+      recipient_type: [
+        "pl_employer",
+        "uniformed",
+        "student",
+        "foreign_employer",
+        "care",
+      ],
+      symptom_duration: ["today", "yesterday", "2_3", "4_5", "gt_5"],
+    },
   },
 } as const

@@ -92,9 +92,10 @@ const WyborSciezki = () => {
                 </p>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• Proces zajmuje około 5 minut</li>
-                  <li>• wykupienie e-konsultacji nie gwarantuje otrzymania wnioskowanego e-ZLA.</li>
+                  <li>• Lekarz zastrzega sobie prawo do wykonania połączenia telefonicznego, w celu pogłębienia wywiadu.
+Wykupienie e-konsultacji nie gwarantuje otrzymania wnioskowanego e-ZLA.</li>
+                  <li>• Wykupienie e-konsultacji nie gwarantuje otrzymania wnioskowanego e-ZLA.</li>
                   <li>• Ostateczną decyzję podejmuje lekarz po analizie Twoich objawów</li>
-                  <li>• Lekarz zastrzega sobie prawo do wykonania połączenia telefonicznego, w celu pogłębienia wywiadu.</li>
                 </ul>
               </div>
             </div>

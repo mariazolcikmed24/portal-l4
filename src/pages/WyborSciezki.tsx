@@ -64,7 +64,7 @@ const WyborSciezki = () => {
             </Link>
 
             {/* Kup jako gość */}
-            <Link to="/rejestracja?guest=true" className="block">
+            <Link to="/daty-choroby" className="block">
               <div className="group p-6 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-soft cursor-pointer">
                 <div className="flex items-start gap-4">
                   <div className="p-3 rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors">

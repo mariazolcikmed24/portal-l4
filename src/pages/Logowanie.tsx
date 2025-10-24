@@ -139,7 +139,7 @@ const Logowanie = () => {
           </div>
 
           <div className="mt-6">
-            <Link to="/daty-choroby" className="w-full">
+            <Link to="/rejestracja?guest=true" className="w-full">
               <Button variant="outline" size="lg" className="w-full">
                 Kup jako gość
               </Button>

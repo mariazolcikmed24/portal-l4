@@ -27,7 +27,8 @@ const registrationSchema = z.object({
   lastName: z.string().trim().min(1, "Nazwisko jest wymagane").max(50, "Nazwisko jest za długie"),
   email: z.string().trim().email("Nieprawidłowy adres e-mail").max(254, "E-mail jest za długi"),
   pesel: z.string().refine(validatePesel, "Nieprawidłowy numer PESEL"),
-  phone: z.string().regex(/^\+?\d{9,15}$/, "Nieprawidłowy numer telefonu"),
+  phonePrefix: z.string().min(1, "Prefiks jest wymagany"),
+  phoneNumber: z.string().regex(/^\d{9,13}$/, "Nieprawidłowy numer telefonu (9-13 cyfr)"),
   street: z.string().trim().min(1, "Ulica jest wymagana").max(100, "Ulica jest za długa"),
   houseNo: z.string().trim().min(1, "Nr domu jest wymagany").max(10, "Nr domu jest za długi"),
   flatNo: z.string().trim().max(10, "Nr mieszkania jest za długi").optional(),
@@ -57,6 +58,7 @@ const Rejestracja = () => {
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       country: "PL",
+      phonePrefix: "+48",
       consentTerms: false,
       consentEmployment: false,
       consentCall: false,
@@ -77,6 +79,8 @@ const Rejestracja = () => {
   const onSubmit = async (data: RegistrationFormData) => {
     setIsSubmitting(true);
     try {
+      const fullPhone = data.phonePrefix + data.phoneNumber;
+      
       if (isGuestMode) {
         // Guest mode: Save profile without creating auth account
         const { error } = await supabase.from('profiles').insert({
@@ -84,7 +88,7 @@ const Rejestracja = () => {
           last_name: data.lastName,
           email: data.email,
           pesel: data.pesel,
-          phone: data.phone,
+          phone: fullPhone,
           street: data.street,
           house_no: data.houseNo,
           flat_no: data.flatNo || null,
@@ -128,7 +132,7 @@ const Rejestracja = () => {
               first_name: data.firstName,
               last_name: data.lastName,
               pesel: data.pesel,
-              phone: data.phone,
+              phone: fullPhone,
               street: data.street,
               house_no: data.houseNo,
               flat_no: data.flatNo || null,
@@ -274,14 +278,38 @@ const Rejestracja = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="reg_phone">Telefon *</Label>
-                  <Input
-                    id="reg_phone"
-                    {...register("phone")}
-                    placeholder="+48123456789"
-                    className={errors.phone ? "border-destructive" : ""}
-                  />
-                  {errors.phone && (
-                    <p className="text-sm text-destructive">{errors.phone.message}</p>
+                  <div className="flex gap-2">
+                    <Controller
+                      name="phonePrefix"
+                      control={control}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <SelectTrigger className={`w-[120px] ${errors.phonePrefix ? "border-destructive" : ""}`}>
+                            <SelectValue placeholder="Prefiks" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="+48">🇵🇱 +48</SelectItem>
+                            <SelectItem value="+49">🇩🇪 +49</SelectItem>
+                            <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                            <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                            <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                            <SelectItem value="+39">🇮🇹 +39</SelectItem>
+                            <SelectItem value="+34">🇪🇸 +34</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    <Input
+                      id="reg_phone"
+                      {...register("phoneNumber")}
+                      placeholder="123456789"
+                      className={`flex-1 ${errors.phoneNumber ? "border-destructive" : ""}`}
+                    />
+                  </div>
+                  {(errors.phonePrefix || errors.phoneNumber) && (
+                    <p className="text-sm text-destructive">
+                      {errors.phonePrefix?.message || errors.phoneNumber?.message}
+                    </p>
                   )}
                 </div>
               </div>

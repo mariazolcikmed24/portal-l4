@@ -3,10 +3,13 @@ import { Shield, Phone, Menu, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -34,51 +37,52 @@ const Header = () => {
               onClick={() => scrollToSection("jak-to-dziala")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              Jak to działa?
+              {t('nav.howItWorks')}
             </button>
             <button
               onClick={() => scrollToSection("zalety")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              Zalety
+              {t('nav.benefits')}
             </button>
             <button
               onClick={() => scrollToSection("faq")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              FAQ
+              {t('nav.faq')}
             </button>
             <Link
               to="/status"
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              Sprawdź status sprawy
+              {t('nav.checkStatus')}
             </Link>
             <button
               onClick={() => scrollToSection("kontakt")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              Kontakt
+              {t('nav.contact')}
             </button>
           </div>
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
+            <LanguageSwitcher />
             {user ? (
               <Link to="/panel">
                 <Button variant="ghost">
                   <User className="w-4 h-4 mr-2" />
-                  Moje konto
+                  {t('nav.myAccount')}
                 </Button>
               </Link>
             ) : (
               <Link to="/logowanie">
-                <Button variant="ghost">Zaloguj się</Button>
+                <Button variant="ghost">{t('nav.login')}</Button>
               </Link>
             )}
             <Link to="/wybor-sciezki">
               <Button variant="hero" size="lg">
-                Uzyskaj zwolnienie
+                {t('nav.getLeave')}
               </Button>
             </Link>
           </div>
@@ -97,53 +101,56 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border pt-4 space-y-3 animate-in fade-in slide-in-from-top-2">
+            <div className="px-4 pb-2">
+              <LanguageSwitcher />
+            </div>
             <button
               onClick={() => scrollToSection("jak-to-dziala")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
             >
-              Jak to działa?
+              {t('nav.howItWorks')}
             </button>
             <button
               onClick={() => scrollToSection("zalety")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
             >
-              Zalety
+              {t('nav.benefits')}
             </button>
             <button
               onClick={() => scrollToSection("faq")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
             >
-              FAQ
+              {t('nav.faq')}
             </button>
             <Link
               to="/status"
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Sprawdź status sprawy
+              {t('nav.checkStatus')}
             </Link>
             <button
               onClick={() => scrollToSection("kontakt")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
             >
-              Kontakt
+              {t('nav.contact')}
             </button>
             <div className="flex flex-col gap-2 pt-2">
               {user ? (
                 <Link to="/panel" className="w-full">
                   <Button variant="outline" className="w-full">
                     <User className="w-4 h-4 mr-2" />
-                    Moje konto
+                    {t('nav.myAccount')}
                   </Button>
                 </Link>
               ) : (
                 <Link to="/logowanie" className="w-full">
-                  <Button variant="outline" className="w-full">Zaloguj się</Button>
+                  <Button variant="outline" className="w-full">{t('nav.login')}</Button>
                 </Link>
               )}
               <Link to="/wybor-sciezki" className="w-full">
                 <Button variant="hero" size="lg" className="w-full">
-                  Uzyskaj zwolnienie
+                  {t('nav.getLeave')}
                 </Button>
               </Link>
             </div>

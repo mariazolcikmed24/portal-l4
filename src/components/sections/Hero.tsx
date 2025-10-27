@@ -2,11 +2,8 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Shield, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-doctor.jpg";
-import { useTranslation } from "react-i18next";
 
 const Hero = () => {
-  const { t } = useTranslation();
-  
   return (
     <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden gradient-subtle">
       {/* Background decoration */}
@@ -18,30 +15,31 @@ const Hero = () => {
           <div className="space-y-6 md:space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium shadow-soft">
               <Shield className="w-4 h-4" aria-hidden="true" />
-              <span>{t('hero.legal')}</span>
+              <span>100% legalne i zgodne z przepisami</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              {t('hero.title')}
+              Zwolnienia lekarskie online
+              <span className="block text-primary mt-2">szybko i bez wychodzenia z domu</span>
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl">
-              {t('hero.subtitle')}
+              Skonsultuj się z lekarzem online i otrzymaj e-ZLA w kilka minut. Profesjonalnie, bezpiecznie i zgodnie z RODO.
             </p>
 
             {/* Trust indicators */}
             <div className="flex flex-col sm:flex-row gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">{t('hero.realDoctors')}</span>
+                <span className="text-foreground">Prawdziwi lekarze</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">{t('hero.legal')}</span>
+                <span className="text-foreground">Pełna poufność</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">{t('hero.fast')}</span>
+                <span className="text-foreground">Do 30 minut</span>
               </div>
             </div>
 
@@ -49,19 +47,19 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link to="/wybor-sciezki">
                 <Button variant="hero" size="lg" className="w-full sm:w-auto shadow-strong hover:shadow-glow">
-                  {t('hero.cta')}
+                  Uzyskaj zwolnienie online
                 </Button>
               </Link>
               <a href="#jak-to-dziala">
                 <Button variant="medical" size="lg" className="w-full sm:w-auto">
-                  {t('hero.howItWorks')}
+                  Zobacz jak to działa
                 </Button>
               </a>
             </div>
 
             {/* Trust badge */}
             <p className="text-sm text-muted-foreground">
-              ✓ {t('hero.trustSubtitle')}
+              ✓ Ponad <strong className="text-foreground">10 000+</strong> zadowolonych pacjentów
             </p>
           </div>
 
@@ -84,8 +82,8 @@ const Hero = () => {
                   <Shield className="w-6 h-6 text-white" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">{t('hero.trustTitle')}</p>
-                  <p className="text-sm text-muted-foreground">{t('hero.legal')}</p>
+                  <p className="font-semibold text-foreground">Certyfikowani lekarze</p>
+                  <p className="text-sm text-muted-foreground">Zgodne z prawem polskim</p>
                 </div>
               </div>
             </div>

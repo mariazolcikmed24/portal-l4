@@ -6,8 +6,8 @@ const steps = [{
   step: "01"
 }, {
   icon: Video,
-  title: "Konsultacja z lekarzem",
-  description: "Lekarz skontaktuje się z Tobą i przeprowadzi profesjonalną konsultację medyczną.",
+  title: "Weryfikacja przez lekarza",
+  description: "Lekarz weryfikuje dane z wypełnionego formularza medycznego i w razie potrzeby kontaktuje się z Tobą.",
   step: "02"
 }, {
   icon: Download,

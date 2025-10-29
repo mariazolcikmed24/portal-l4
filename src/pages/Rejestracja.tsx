@@ -169,9 +169,129 @@ const phonePrefixes = [
   { country: "Wietnam", code: "+84", flag: "🇻🇳" },
 ];
 
+const countries = [
+  { code: "PL", name: "Polska", flag: "🇵🇱" },
+  { code: "AF", name: "Afganistan", flag: "🇦🇫" },
+  { code: "AL", name: "Albania", flag: "🇦🇱" },
+  { code: "DZ", name: "Algieria", flag: "🇩🇿" },
+  { code: "AD", name: "Andora", flag: "🇦🇩" },
+  { code: "AO", name: "Angola", flag: "🇦🇴" },
+  { code: "AR", name: "Argentyna", flag: "🇦🇷" },
+  { code: "AM", name: "Armenia", flag: "🇦🇲" },
+  { code: "AU", name: "Australia", flag: "🇦🇺" },
+  { code: "AT", name: "Austria", flag: "🇦🇹" },
+  { code: "AZ", name: "Azerbejdżan", flag: "🇦🇿" },
+  { code: "BH", name: "Bahrajn", flag: "🇧🇭" },
+  { code: "BD", name: "Bangladesz", flag: "🇧🇩" },
+  { code: "BY", name: "Białoruś", flag: "🇧🇾" },
+  { code: "BE", name: "Belgia", flag: "🇧🇪" },
+  { code: "BZ", name: "Belize", flag: "🇧🇿" },
+  { code: "BJ", name: "Benin", flag: "🇧🇯" },
+  { code: "BT", name: "Bhutan", flag: "🇧🇹" },
+  { code: "BO", name: "Boliwia", flag: "🇧🇴" },
+  { code: "BA", name: "Bośnia i Hercegowina", flag: "🇧🇦" },
+  { code: "BW", name: "Botswana", flag: "🇧🇼" },
+  { code: "BR", name: "Brazylia", flag: "🇧🇷" },
+  { code: "BN", name: "Brunei", flag: "🇧🇳" },
+  { code: "BG", name: "Bułgaria", flag: "🇧🇬" },
+  { code: "BF", name: "Burkina Faso", flag: "🇧🇫" },
+  { code: "BI", name: "Burundi", flag: "🇧🇮" },
+  { code: "KH", name: "Kambodża", flag: "🇰🇭" },
+  { code: "CM", name: "Kamerun", flag: "🇨🇲" },
+  { code: "CA", name: "Kanada", flag: "🇨🇦" },
+  { code: "CV", name: "Republika Zielonego Przylądka", flag: "🇨🇻" },
+  { code: "CF", name: "Republika Środkowoafrykańska", flag: "🇨🇫" },
+  { code: "TD", name: "Czad", flag: "🇹🇩" },
+  { code: "CL", name: "Chile", flag: "🇨🇱" },
+  { code: "CN", name: "Chiny", flag: "🇨🇳" },
+  { code: "CO", name: "Kolumbia", flag: "🇨🇴" },
+  { code: "KM", name: "Komory", flag: "🇰🇲" },
+  { code: "CG", name: "Kongo", flag: "🇨🇬" },
+  { code: "CR", name: "Kostaryka", flag: "🇨🇷" },
+  { code: "HR", name: "Chorwacja", flag: "🇭🇷" },
+  { code: "CU", name: "Kuba", flag: "🇨🇺" },
+  { code: "CY", name: "Cypr", flag: "🇨🇾" },
+  { code: "CZ", name: "Czechy", flag: "🇨🇿" },
+  { code: "DK", name: "Dania", flag: "🇩🇰" },
+  { code: "DJ", name: "Dżibuti", flag: "🇩🇯" },
+  { code: "EC", name: "Ekwador", flag: "🇪🇨" },
+  { code: "EG", name: "Egipt", flag: "🇪🇬" },
+  { code: "SV", name: "Salwador", flag: "🇸🇻" },
+  { code: "GQ", name: "Gwinea Równikowa", flag: "🇬🇶" },
+  { code: "ER", name: "Erytrea", flag: "🇪🇷" },
+  { code: "EE", name: "Estonia", flag: "🇪🇪" },
+  { code: "ET", name: "Etiopia", flag: "🇪🇹" },
+  { code: "FJ", name: "Fidżi", flag: "🇫🇯" },
+  { code: "FI", name: "Finlandia", flag: "🇫🇮" },
+  { code: "FR", name: "Francja", flag: "🇫🇷" },
+  { code: "GA", name: "Gabon", flag: "🇬🇦" },
+  { code: "GM", name: "Gambia", flag: "🇬🇲" },
+  { code: "GE", name: "Gruzja", flag: "🇬🇪" },
+  { code: "DE", name: "Niemcy", flag: "🇩🇪" },
+  { code: "GH", name: "Ghana", flag: "🇬🇭" },
+  { code: "GR", name: "Grecja", flag: "🇬🇷" },
+  { code: "GT", name: "Gwatemala", flag: "🇬🇹" },
+  { code: "GN", name: "Gwinea", flag: "🇬🇳" },
+  { code: "GW", name: "Gwinea Bissau", flag: "🇬🇼" },
+  { code: "GY", name: "Gujana", flag: "🇬🇾" },
+  { code: "HT", name: "Haiti", flag: "🇭🇹" },
+  { code: "HN", name: "Honduras", flag: "🇭🇳" },
+  { code: "HK", name: "Hongkong", flag: "🇭🇰" },
+  { code: "HU", name: "Węgry", flag: "🇭🇺" },
+  { code: "IS", name: "Islandia", flag: "🇮🇸" },
+  { code: "IN", name: "Indie", flag: "🇮🇳" },
+  { code: "ID", name: "Indonezja", flag: "🇮🇩" },
+  { code: "IR", name: "Iran", flag: "🇮🇷" },
+  { code: "IQ", name: "Irak", flag: "🇮🇶" },
+  { code: "IE", name: "Irlandia", flag: "🇮🇪" },
+  { code: "IL", name: "Izrael", flag: "🇮🇱" },
+  { code: "IT", name: "Włochy", flag: "🇮🇹" },
+  { code: "JP", name: "Japonia", flag: "🇯🇵" },
+  { code: "JO", name: "Jordania", flag: "🇯🇴" },
+  { code: "KZ", name: "Kazachstan", flag: "🇰🇿" },
+  { code: "KE", name: "Kenia", flag: "🇰🇪" },
+  { code: "KR", name: "Korea Południowa", flag: "🇰🇷" },
+  { code: "KW", name: "Kuwejt", flag: "🇰🇼" },
+  { code: "KG", name: "Kirgistan", flag: "🇰🇬" },
+  { code: "LA", name: "Laos", flag: "🇱🇦" },
+  { code: "LV", name: "Łotwa", flag: "🇱🇻" },
+  { code: "LB", name: "Liban", flag: "🇱🇧" },
+  { code: "LT", name: "Litwa", flag: "🇱🇹" },
+  { code: "LU", name: "Luksemburg", flag: "🇱🇺" },
+  { code: "MY", name: "Malezja", flag: "🇲🇾" },
+  { code: "MX", name: "Meksyk", flag: "🇲🇽" },
+  { code: "MA", name: "Maroko", flag: "🇲🇦" },
+  { code: "NL", name: "Holandia", flag: "🇳🇱" },
+  { code: "NZ", name: "Nowa Zelandia", flag: "🇳🇿" },
+  { code: "NO", name: "Norwegia", flag: "🇳🇴" },
+  { code: "PK", name: "Pakistan", flag: "🇵🇰" },
+  { code: "PH", name: "Filipiny", flag: "🇵🇭" },
+  { code: "PT", name: "Portugalia", flag: "🇵🇹" },
+  { code: "QA", name: "Katar", flag: "🇶🇦" },
+  { code: "RO", name: "Rumunia", flag: "🇷🇴" },
+  { code: "RU", name: "Rosja", flag: "🇷🇺" },
+  { code: "SA", name: "Arabia Saudyjska", flag: "🇸🇦" },
+  { code: "SG", name: "Singapur", flag: "🇸🇬" },
+  { code: "SK", name: "Słowacja", flag: "🇸🇰" },
+  { code: "SI", name: "Słowenia", flag: "🇸🇮" },
+  { code: "ZA", name: "Republika Południowej Afryki", flag: "🇿🇦" },
+  { code: "ES", name: "Hiszpania", flag: "🇪🇸" },
+  { code: "SE", name: "Szwecja", flag: "🇸🇪" },
+  { code: "CH", name: "Szwajcaria", flag: "🇨🇭" },
+  { code: "TW", name: "Tajwan", flag: "🇹🇼" },
+  { code: "TH", name: "Tajlandia", flag: "🇹🇭" },
+  { code: "TR", name: "Turcja", flag: "🇹🇷" },
+  { code: "UA", name: "Ukraina", flag: "🇺🇦" },
+  { code: "AE", name: "Zjednoczone Emiraty Arabskie", flag: "🇦🇪" },
+  { code: "GB", name: "Wielka Brytania", flag: "🇬🇧" },
+  { code: "US", name: "Stany Zjednoczone", flag: "🇺🇸" },
+  { code: "VN", name: "Wietnam", flag: "🇻🇳" },
+];
+
 const Rejestracja = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openPhonePrefix, setOpenPhonePrefix] = useState(false);
+  const [openCountry, setOpenCountry] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuestMode = searchParams.get('guest') === 'true';
@@ -548,129 +668,53 @@ const Rejestracja = () => {
                   name="country"
                   control={control}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger id="reg_country" className={errors.country ? "border-destructive" : ""}>
-                        <SelectValue placeholder="Wybierz państwo" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[300px]">
-                        <SelectItem value="PL">🇵🇱 Polska</SelectItem>
-                        <SelectItem value="AF">🇦🇫 Afganistan</SelectItem>
-                        <SelectItem value="AL">🇦🇱 Albania</SelectItem>
-                        <SelectItem value="DZ">🇩🇿 Algieria</SelectItem>
-                        <SelectItem value="AD">🇦🇩 Andora</SelectItem>
-                        <SelectItem value="AO">🇦🇴 Angola</SelectItem>
-                        <SelectItem value="AR">🇦🇷 Argentyna</SelectItem>
-                        <SelectItem value="AM">🇦🇲 Armenia</SelectItem>
-                        <SelectItem value="AU">🇦🇺 Australia</SelectItem>
-                        <SelectItem value="AT">🇦🇹 Austria</SelectItem>
-                        <SelectItem value="AZ">🇦🇿 Azerbejdżan</SelectItem>
-                        <SelectItem value="BH">🇧🇭 Bahrajn</SelectItem>
-                        <SelectItem value="BD">🇧🇩 Bangladesz</SelectItem>
-                        <SelectItem value="BY">🇧🇾 Białoruś</SelectItem>
-                        <SelectItem value="BE">🇧🇪 Belgia</SelectItem>
-                        <SelectItem value="BZ">🇧🇿 Belize</SelectItem>
-                        <SelectItem value="BJ">🇧🇯 Benin</SelectItem>
-                        <SelectItem value="BT">🇧🇹 Bhutan</SelectItem>
-                        <SelectItem value="BO">🇧🇴 Boliwia</SelectItem>
-                        <SelectItem value="BA">🇧🇦 Bośnia i Hercegowina</SelectItem>
-                        <SelectItem value="BW">🇧🇼 Botswana</SelectItem>
-                        <SelectItem value="BR">🇧🇷 Brazylia</SelectItem>
-                        <SelectItem value="BN">🇧🇳 Brunei</SelectItem>
-                        <SelectItem value="BG">🇧🇬 Bułgaria</SelectItem>
-                        <SelectItem value="BF">🇧🇫 Burkina Faso</SelectItem>
-                        <SelectItem value="BI">🇧🇮 Burundi</SelectItem>
-                        <SelectItem value="KH">🇰🇭 Kambodża</SelectItem>
-                        <SelectItem value="CM">🇨🇲 Kamerun</SelectItem>
-                        <SelectItem value="CA">🇨🇦 Kanada</SelectItem>
-                        <SelectItem value="CV">🇨🇻 Republika Zielonego Przylądka</SelectItem>
-                        <SelectItem value="CF">🇨🇫 Republika Środkowoafrykańska</SelectItem>
-                        <SelectItem value="TD">🇹🇩 Czad</SelectItem>
-                        <SelectItem value="CL">🇨🇱 Chile</SelectItem>
-                        <SelectItem value="CN">🇨🇳 Chiny</SelectItem>
-                        <SelectItem value="CO">🇨🇴 Kolumbia</SelectItem>
-                        <SelectItem value="KM">🇰🇲 Komory</SelectItem>
-                        <SelectItem value="CG">🇨🇬 Kongo</SelectItem>
-                        <SelectItem value="CR">🇨🇷 Kostaryka</SelectItem>
-                        <SelectItem value="HR">🇭🇷 Chorwacja</SelectItem>
-                        <SelectItem value="CU">🇨🇺 Kuba</SelectItem>
-                        <SelectItem value="CY">🇨🇾 Cypr</SelectItem>
-                        <SelectItem value="CZ">🇨🇿 Czechy</SelectItem>
-                        <SelectItem value="DK">🇩🇰 Dania</SelectItem>
-                        <SelectItem value="DJ">🇩🇯 Dżibuti</SelectItem>
-                        <SelectItem value="EC">🇪🇨 Ekwador</SelectItem>
-                        <SelectItem value="EG">🇪🇬 Egipt</SelectItem>
-                        <SelectItem value="SV">🇸🇻 Salwador</SelectItem>
-                        <SelectItem value="GQ">🇬🇶 Gwinea Równikowa</SelectItem>
-                        <SelectItem value="ER">🇪🇷 Erytrea</SelectItem>
-                        <SelectItem value="EE">🇪🇪 Estonia</SelectItem>
-                        <SelectItem value="ET">🇪🇹 Etiopia</SelectItem>
-                        <SelectItem value="FJ">🇫🇯 Fidżi</SelectItem>
-                        <SelectItem value="FI">🇫🇮 Finlandia</SelectItem>
-                        <SelectItem value="FR">🇫🇷 Francja</SelectItem>
-                        <SelectItem value="GA">🇬🇦 Gabon</SelectItem>
-                        <SelectItem value="GM">🇬🇲 Gambia</SelectItem>
-                        <SelectItem value="GE">🇬🇪 Gruzja</SelectItem>
-                        <SelectItem value="DE">🇩🇪 Niemcy</SelectItem>
-                        <SelectItem value="GH">🇬🇭 Ghana</SelectItem>
-                        <SelectItem value="GR">🇬🇷 Grecja</SelectItem>
-                        <SelectItem value="GT">🇬🇹 Gwatemala</SelectItem>
-                        <SelectItem value="GN">🇬🇳 Gwinea</SelectItem>
-                        <SelectItem value="GW">🇬🇼 Gwinea Bissau</SelectItem>
-                        <SelectItem value="GY">🇬🇾 Gujana</SelectItem>
-                        <SelectItem value="HT">🇭🇹 Haiti</SelectItem>
-                        <SelectItem value="HN">🇭🇳 Honduras</SelectItem>
-                        <SelectItem value="HK">🇭🇰 Hongkong</SelectItem>
-                        <SelectItem value="HU">🇭🇺 Węgry</SelectItem>
-                        <SelectItem value="IS">🇮🇸 Islandia</SelectItem>
-                        <SelectItem value="IN">🇮🇳 Indie</SelectItem>
-                        <SelectItem value="ID">🇮🇩 Indonezja</SelectItem>
-                        <SelectItem value="IR">🇮🇷 Iran</SelectItem>
-                        <SelectItem value="IQ">🇮🇶 Irak</SelectItem>
-                        <SelectItem value="IE">🇮🇪 Irlandia</SelectItem>
-                        <SelectItem value="IL">🇮🇱 Izrael</SelectItem>
-                        <SelectItem value="IT">🇮🇹 Włochy</SelectItem>
-                        <SelectItem value="JP">🇯🇵 Japonia</SelectItem>
-                        <SelectItem value="JO">🇯🇴 Jordania</SelectItem>
-                        <SelectItem value="KZ">🇰🇿 Kazachstan</SelectItem>
-                        <SelectItem value="KE">🇰🇪 Kenia</SelectItem>
-                        <SelectItem value="KR">🇰🇷 Korea Południowa</SelectItem>
-                        <SelectItem value="KW">🇰🇼 Kuwejt</SelectItem>
-                        <SelectItem value="KG">🇰🇬 Kirgistan</SelectItem>
-                        <SelectItem value="LA">🇱🇦 Laos</SelectItem>
-                        <SelectItem value="LV">🇱🇻 Łotwa</SelectItem>
-                        <SelectItem value="LB">🇱🇧 Liban</SelectItem>
-                        <SelectItem value="LT">🇱🇹 Litwa</SelectItem>
-                        <SelectItem value="LU">🇱🇺 Luksemburg</SelectItem>
-                        <SelectItem value="MY">🇲🇾 Malezja</SelectItem>
-                        <SelectItem value="MX">🇲🇽 Meksyk</SelectItem>
-                        <SelectItem value="MA">🇲🇦 Maroko</SelectItem>
-                        <SelectItem value="NL">🇳🇱 Holandia</SelectItem>
-                        <SelectItem value="NZ">🇳🇿 Nowa Zelandia</SelectItem>
-                        <SelectItem value="NO">🇳🇴 Norwegia</SelectItem>
-                        <SelectItem value="PK">🇵🇰 Pakistan</SelectItem>
-                        <SelectItem value="PH">🇵🇭 Filipiny</SelectItem>
-                        <SelectItem value="PT">🇵🇹 Portugalia</SelectItem>
-                        <SelectItem value="QA">🇶🇦 Katar</SelectItem>
-                        <SelectItem value="RO">🇷🇴 Rumunia</SelectItem>
-                        <SelectItem value="RU">🇷🇺 Rosja</SelectItem>
-                        <SelectItem value="SA">🇸🇦 Arabia Saudyjska</SelectItem>
-                        <SelectItem value="SG">🇸🇬 Singapur</SelectItem>
-                        <SelectItem value="SK">🇸🇰 Słowacja</SelectItem>
-                        <SelectItem value="SI">🇸🇮 Słowenia</SelectItem>
-                        <SelectItem value="ZA">🇿🇦 Republika Południowej Afryki</SelectItem>
-                        <SelectItem value="ES">🇪🇸 Hiszpania</SelectItem>
-                        <SelectItem value="SE">🇸🇪 Szwecja</SelectItem>
-                        <SelectItem value="CH">🇨🇭 Szwajcaria</SelectItem>
-                        <SelectItem value="TW">🇹🇼 Tajwan</SelectItem>
-                        <SelectItem value="TH">🇹🇭 Tajlandia</SelectItem>
-                        <SelectItem value="TR">🇹🇷 Turcja</SelectItem>
-                        <SelectItem value="UA">🇺🇦 Ukraina</SelectItem>
-                        <SelectItem value="AE">🇦🇪 Zjednoczone Emiraty Arabskie</SelectItem>
-                        <SelectItem value="GB">🇬🇧 Wielka Brytania</SelectItem>
-                        <SelectItem value="US">🇺🇸 Stany Zjednoczone</SelectItem>
-                        <SelectItem value="VN">🇻🇳 Wietnam</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Popover open={openCountry} onOpenChange={setOpenCountry}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openCountry}
+                          className={cn(
+                            "w-full justify-between",
+                            errors.country && "border-destructive"
+                          )}
+                        >
+                          {field.value
+                            ? countries.find((country) => country.code === field.value)?.flag + " " + countries.find((country) => country.code === field.value)?.name
+                            : "Wybierz państwo"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                          <CommandInput placeholder="Szukaj państwa..." />
+                          <CommandList>
+                            <CommandEmpty>Nie znaleziono państwa.</CommandEmpty>
+                            <CommandGroup>
+                              {countries.map((country) => (
+                                <CommandItem
+                                  key={country.code}
+                                  value={`${country.name} ${country.code}`}
+                                  onSelect={() => {
+                                    field.onChange(country.code);
+                                    setOpenCountry(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === country.code ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  <span className="mr-2">{country.flag}</span>
+                                  <span>{country.name}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   )}
                 />
                 {errors.country && (

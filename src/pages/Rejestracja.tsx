@@ -843,44 +843,38 @@ const Rejestracja = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Zgody marketingowe (opcjonalne)</p>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <Controller
-                        name="consentMarketingEmail"
-                        control={control}
-                        render={({ field }) => (
-                          <Checkbox
-                            id="consent_marketing_email"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        )}
+                <div className="flex items-start space-x-3">
+                  <Controller
+                    name="consentMarketingEmail"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="consent_marketing_email"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                       />
-                      <Label htmlFor="consent_marketing_email" className="text-sm font-normal cursor-pointer">
-                        Wyrażam zgodę na otrzymywanie informacji marketingowych drogą elektroniczną
-                      </Label>
-                    </div>
+                    )}
+                  />
+                  <Label htmlFor="consent_marketing_email" className="text-sm font-normal cursor-pointer">
+                    Wyrażam zgodę na otrzymywanie informacji marketingowych drogą elektroniczną (opcjonalne)
+                  </Label>
+                </div>
 
-                    <div className="flex items-start space-x-3">
-                      <Controller
-                        name="consentMarketingTel"
-                        control={control}
-                        render={({ field }) => (
-                          <Checkbox
-                            id="consent_marketing_tel"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        )}
+                <div className="flex items-start space-x-3">
+                  <Controller
+                    name="consentMarketingTel"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="consent_marketing_tel"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                       />
-                      <Label htmlFor="consent_marketing_tel" className="text-sm font-normal cursor-pointer">
-                        Wyrażam zgodę na kontakt telefoniczny/SMS/MMS w celach marketingowych
-                      </Label>
-                    </div>
-                  </div>
+                    )}
+                  />
+                  <Label htmlFor="consent_marketing_tel" className="text-sm font-normal cursor-pointer">
+                    Wyrażam zgodę na kontakt telefoniczny/SMS/MMS w celach marketingowych (opcjonalne)
+                  </Label>
                 </div>
               </div>
             </div>

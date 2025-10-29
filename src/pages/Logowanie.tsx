@@ -141,7 +141,7 @@ const Logowanie = () => {
           <div className="mt-6">
             <Link to="/rejestracja?guest=true" className="w-full">
               <Button variant="outline" size="lg" className="w-full">
-                Kup jako gość
+                Zamawiam jako gość
               </Button>
             </Link>
           </div>

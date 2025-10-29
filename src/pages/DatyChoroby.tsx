@@ -30,7 +30,7 @@ const datesSchema = z.object({
   late_justification: z.string().max(500, "Uzasadnienie nie może przekraczać 500 znaków").optional(),
 }).refine((data) => {
   const maxEndDate = new Date(data.illness_start);
-  maxEndDate.setDate(maxEndDate.getDate() + 7);
+  maxEndDate.setDate(maxEndDate.getDate() + 6);
   return data.illness_end <= maxEndDate;
 }, {
   message: "Data zakończenia nie może być późniejsza niż 7 dni od daty zachorowania",
@@ -190,7 +190,7 @@ export default function DatyChoroby() {
                         disabled={(date) => {
                           if (!watchStart) return true;
                           const maxDate = new Date(watchStart);
-                          maxDate.setDate(maxDate.getDate() + 7);
+                          maxDate.setDate(maxDate.getDate() + 6);
                           return date < watchStart || date > maxDate;
                         }}
                         initialFocus

@@ -1,4 +1,11 @@
 import { Shield, Clock, Lock, CheckCircle, Smartphone, FileCheck } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const benefits = [
   {
@@ -46,7 +53,40 @@ const Benefits = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+        {/* Mobile: Carousel */}
+        <div className="md:hidden max-w-sm mx-auto px-8">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {benefits.map((benefit, index) => {
+                const Icon = benefit.icon;
+                return (
+                  <CarouselItem key={index}>
+                    <article className="bg-white p-6 rounded-xl shadow-soft border border-border">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-semibold text-foreground mb-2">
+                            {benefit.title}
+                          </h3>
+                          <p className="text-muted-foreground leading-relaxed">
+                            {benefit.description}
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  </CarouselItem>
+                );
+              })}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+
+        {/* Desktop: Grid */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
           {benefits.map((benefit, index) => {
             const Icon = benefit.icon;
             return (

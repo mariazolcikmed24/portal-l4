@@ -297,7 +297,7 @@ const Rejestracja = () => {
   const isGuestMode = searchParams.get('guest') === 'true';
   const { user } = useAuth();
   
-  const { register, handleSubmit, control, formState: { errors } } = useForm<RegistrationFormData>({
+  const { register, handleSubmit, control, formState: { errors }, setValue, watch } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       country: "PL",
@@ -311,6 +311,28 @@ const Rejestracja = () => {
       consentMarketingTel: false,
     }
   });
+
+  const allConsents = watch([
+    'consentTerms',
+    'consentEmployment', 
+    'consentCall',
+    'consentNoGuarantee',
+    'consentTruth',
+    'consentMarketingEmail',
+    'consentMarketingTel'
+  ]);
+
+  const allChecked = allConsents.every(consent => consent === true);
+
+  const handleSelectAll = (checked: boolean) => {
+    setValue('consentTerms', checked);
+    setValue('consentEmployment', checked);
+    setValue('consentCall', checked);
+    setValue('consentNoGuarantee', checked);
+    setValue('consentTruth', checked);
+    setValue('consentMarketingEmail', checked);
+    setValue('consentMarketingTel', checked);
+  };
 
   // Redirect if already logged in
   useEffect(() => {
@@ -728,6 +750,17 @@ const Rejestracja = () => {
               <h2 className="text-xl font-semibold text-foreground">Zgody i potwierdzenia</h2>
               
               <div className="space-y-4">
+                <div className="flex items-start space-x-3 pb-3 border-b">
+                  <Checkbox
+                    id="select_all"
+                    checked={allChecked}
+                    onCheckedChange={handleSelectAll}
+                  />
+                  <Label htmlFor="select_all" className="text-sm font-medium cursor-pointer">
+                    Zaznacz wszystkie zgody
+                  </Label>
+                </div>
+
                 <div className="flex items-start space-x-3">
                   <Controller
                     name="consentTerms"

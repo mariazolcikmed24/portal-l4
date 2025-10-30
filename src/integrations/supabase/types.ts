@@ -36,6 +36,13 @@ export type Database = {
           long_leave: boolean | null
           long_leave_docs_file_id: string | null
           main_category: Database["public"]["Enums"]["main_category"]
+          med24_booking_intent: string | null
+          med24_channel_kind: string | null
+          med24_external_tag: string | null
+          med24_last_sync_at: string | null
+          med24_service_id: string | null
+          med24_visit_id: string | null
+          med24_visit_status: Json | null
           meds_list: string | null
           payment_method: string | null
           payment_psp_ref: string | null
@@ -73,6 +80,13 @@ export type Database = {
           long_leave?: boolean | null
           long_leave_docs_file_id?: string | null
           main_category: Database["public"]["Enums"]["main_category"]
+          med24_booking_intent?: string | null
+          med24_channel_kind?: string | null
+          med24_external_tag?: string | null
+          med24_last_sync_at?: string | null
+          med24_service_id?: string | null
+          med24_visit_id?: string | null
+          med24_visit_status?: Json | null
           meds_list?: string | null
           payment_method?: string | null
           payment_psp_ref?: string | null
@@ -110,6 +124,13 @@ export type Database = {
           long_leave?: boolean | null
           long_leave_docs_file_id?: string | null
           main_category?: Database["public"]["Enums"]["main_category"]
+          med24_booking_intent?: string | null
+          med24_channel_kind?: string | null
+          med24_external_tag?: string | null
+          med24_last_sync_at?: string | null
+          med24_service_id?: string | null
+          med24_visit_id?: string | null
+          med24_visit_status?: Json | null
           meds_list?: string | null
           payment_method?: string | null
           payment_psp_ref?: string | null

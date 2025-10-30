@@ -171,6 +171,7 @@ export type Database = {
           consent_truth: boolean
           country: string
           created_at: string
+          date_of_birth: string | null
           email: string
           first_name: string
           flat_no: string | null
@@ -198,6 +199,7 @@ export type Database = {
           consent_truth?: boolean
           country?: string
           created_at?: string
+          date_of_birth?: string | null
           email: string
           first_name: string
           flat_no?: string | null
@@ -225,6 +227,7 @@ export type Database = {
           consent_truth?: boolean
           country?: string
           created_at?: string
+          date_of_birth?: string | null
           email?: string
           first_name?: string
           flat_no?: string | null

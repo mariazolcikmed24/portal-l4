@@ -30,6 +30,7 @@ const registrationSchema = z.object({
   lastName: z.string().trim().min(1, "Nazwisko jest wymagane").max(50, "Nazwisko jest za długie"),
   email: z.string().trim().email("Nieprawidłowy adres e-mail").max(254, "E-mail jest za długi"),
   pesel: z.string().refine(validatePesel, "Nieprawidłowy numer PESEL"),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Nieprawidłowa data (format: RRRR-MM-DD)"),
   phonePrefix: z.string().min(1, "Prefiks jest wymagany"),
   phoneNumber: z.string().regex(/^\d{9,13}$/, "Nieprawidłowy numer telefonu (9-13 cyfr)"),
   street: z.string().trim().min(1, "Ulica jest wymagana").max(100, "Ulica jest za długa"),
@@ -353,6 +354,7 @@ const Rejestracja = () => {
           last_name: data.lastName,
           email: data.email,
           pesel: data.pesel,
+          date_of_birth: data.dateOfBirth,
           phone: fullPhone,
           street: data.street,
           house_no: data.houseNo,
@@ -397,6 +399,7 @@ const Rejestracja = () => {
               first_name: data.firstName,
               last_name: data.lastName,
               pesel: data.pesel,
+              date_of_birth: data.dateOfBirth,
               phone: fullPhone,
               street: data.street,
               house_no: data.houseNo,
@@ -541,6 +544,21 @@ const Rejestracja = () => {
                   )}
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="reg_dob">Data urodzenia *</Label>
+                  <Input
+                    id="reg_dob"
+                    type="date"
+                    {...register("dateOfBirth")}
+                    className={errors.dateOfBirth ? "border-destructive" : ""}
+                  />
+                  {errors.dateOfBirth && (
+                    <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="reg_phone">Telefon *</Label>
                   <div className="flex gap-2">

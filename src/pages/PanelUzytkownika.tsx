@@ -168,7 +168,7 @@ export default function PanelUzytkownika() {
             <div className="flex justify-between items-center">
               <CardTitle>Twoje wizyty</CardTitle>
               <Button onClick={() => navigate('/daty-choroby')}>
-                Nowe zgłoszenie
+                Nowa wizyta
               </Button>
             </div>
           </CardHeader>

@@ -166,7 +166,7 @@ export default function PanelUzytkownika() {
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>Twoje sprawy</CardTitle>
+              <CardTitle>Twoje wizyty</CardTitle>
               <Button onClick={() => navigate('/daty-choroby')}>
                 Nowe zgłoszenie
               </Button>

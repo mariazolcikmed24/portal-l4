@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cases: {
         Row: {
           allergy_text: string | null
@@ -249,7 +282,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_user_data: { Args: { target_user_id: string }; Returns: Json }
       generate_case_number: { Args: never; Returns: string }
+      log_data_access: {
+        Args: {
+          p_action: string
+          p_ip_address?: string
+          p_record_id?: string
+          p_table_name: string
+          p_user_agent?: string
+          p_user_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       case_status:

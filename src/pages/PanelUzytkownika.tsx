@@ -7,10 +7,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
+import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
+import { useAuditLog } from "@/hooks/useAuditLog";
 
 export default function PanelUzytkownika() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { logAccess } = useAuditLog();
   const [cases, setCases] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
@@ -54,7 +57,14 @@ export default function PanelUzytkownika() {
 
         setProfile(profileData);
 
+        // Loguj dostęp do profilu
         if (profileData) {
+          await logAccess({
+            action: 'SELECT',
+            tableName: 'profiles',
+            recordId: profileData.id,
+          });
+
           // Pobierz sprawy użytkownika
           const { data: casesData } = await supabase
             .from('cases')
@@ -63,6 +73,14 @@ export default function PanelUzytkownika() {
             .order('created_at', { ascending: false });
 
           setCases(casesData || []);
+          
+          // Loguj dostęp do spraw
+          if (casesData && casesData.length > 0) {
+            await logAccess({
+              action: 'SELECT',
+              tableName: 'cases',
+            });
+          }
         }
       } catch (error) {
         console.error('Błąd podczas pobierania danych:', error);
@@ -113,7 +131,10 @@ export default function PanelUzytkownika() {
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Twoje dane</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle>Twoje dane</CardTitle>
+              {user && <DeleteAccountDialog userEmail={user.email || ''} />}
+            </div>
           </CardHeader>
           <CardContent className="space-y-2">
             {profile && (

@@ -23,7 +23,7 @@ const endpoints: ApiEndpoint[] = [
   {
     method: "POST",
     path: "/api-auth-register",
-    description: "Rejestracja nowego użytkownika wraz z zgodami marketingowymi",
+    description: "Register a new user with marketing consents",
     requestBody: JSON.stringify({
       email: "jan.kowalski@example.com",
       password: "bezpieczne_haslo123",
@@ -51,7 +51,7 @@ const endpoints: ApiEndpoint[] = [
   {
     method: "POST",
     path: "/api-auth-login",
-    description: "Logowanie użytkownika i otrzymanie tokenów dostępu",
+    description: "User login and access token retrieval",
     requestBody: JSON.stringify({
       email: "jan.kowalski@example.com",
       password: "bezpieczne_haslo123"
@@ -66,7 +66,7 @@ const endpoints: ApiEndpoint[] = [
   {
     method: "POST",
     path: "/api-cases-create",
-    description: "Utworzenie nowej sprawy medycznej/wizyty",
+    description: "Create a new medical case/visit",
     requestBody: JSON.stringify({
       profile_id: "uuid-user-profile",
       illness_start_date: "2025-01-15",
@@ -87,7 +87,7 @@ const endpoints: ApiEndpoint[] = [
   {
     method: "GET",
     path: "/api-cases-get/{case_id}",
-    description: "Pobranie szczegółów sprawy wraz z profilem pacjenta",
+    description: "Retrieve case details with patient profile",
     responseExample: JSON.stringify({
       id: "case-uuid",
       profile_id: "user-uuid",
@@ -105,7 +105,7 @@ const endpoints: ApiEndpoint[] = [
   {
     method: "PATCH",
     path: "/api-cases-update-status/{case_id}/status",
-    description: "Aktualizacja statusu sprawy i danych Med24",
+    description: "Update case status and Med24 visit data",
     requestBody: JSON.stringify({
       status: "completed",
       payment_status: "paid",
@@ -123,7 +123,7 @@ const endpoints: ApiEndpoint[] = [
   {
     method: "POST",
     path: "/api-consent-save",
-    description: "Zapisanie zgód marketingowych dla użytkownika lub gościa",
+    description: "Save marketing consents for user or guest",
     requestBody: JSON.stringify({
       profile_id: "uuid-or-guest-identifier",
       consent_marketing: true,
@@ -159,7 +159,7 @@ const DokumentacjaAPI = () => {
 
   const handleTestEndpoint = async () => {
     if (!apiKey.trim()) {
-      toast.error("Wprowadź klucz API");
+      toast.error("Enter API key");
       return;
     }
 
@@ -173,7 +173,7 @@ const DokumentacjaAPI = () => {
       // Replace {case_id} with actual caseId
       if (url.includes("{case_id}")) {
         if (!caseId.trim()) {
-          toast.error("Wprowadź ID sprawy");
+          toast.error("Enter case ID");
           setLoading(false);
           return;
         }
@@ -199,15 +199,15 @@ const DokumentacjaAPI = () => {
       setResponseStatus(res.ok ? "success" : "error");
       
       if (res.ok) {
-        toast.success("Zapytanie wykonane pomyślnie");
+        toast.success("Request executed successfully");
       } else {
-        toast.error(`Błąd: ${res.status} ${res.statusText}`);
+        toast.error(`Error: ${res.status} ${res.statusText}`);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Nieznany błąd";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       setResponse(JSON.stringify({ error: errorMessage }, null, 2));
       setResponseStatus("error");
-      toast.error("Błąd wykonania zapytania");
+      toast.error("Request execution error");
     } finally {
       setLoading(false);
     }
@@ -215,7 +215,7 @@ const DokumentacjaAPI = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Skopiowano do schowka");
+    toast.success("Copied to clipboard");
   };
 
   return (
@@ -226,25 +226,25 @@ const DokumentacjaAPI = () => {
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-foreground">Dokumentacja API e-ZLA</h1>
+            <h1 className="text-4xl font-bold text-foreground">e-ZLA API Documentation</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Interaktywna dokumentacja REST API dla integracji z systemem Med24
+              Interactive REST API documentation for Med24 system integration
             </p>
           </div>
 
           {/* API Key Input */}
           <Card>
             <CardHeader>
-              <CardTitle>Klucz API</CardTitle>
+              <CardTitle>API Key</CardTitle>
               <CardDescription>
-                Wprowadź swój klucz API aby testować endpointy
+                Enter your API key to test endpoints
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex gap-2">
                 <Input
                   type="password"
-                  placeholder="Wklej klucz API..."
+                  placeholder="Paste API key..."
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   className="font-mono"
@@ -259,7 +259,7 @@ const DokumentacjaAPI = () => {
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                Klucz API znajduje się w bazie danych w tabeli <code className="text-xs bg-muted px-1 py-0.5 rounded">api_keys</code>
+                API key can be found in the database in the <code className="text-xs bg-muted px-1 py-0.5 rounded">api_keys</code> table
               </p>
             </CardContent>
           </Card>
@@ -270,9 +270,9 @@ const DokumentacjaAPI = () => {
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Dostępne endpointy</CardTitle>
+                  <CardTitle>Available Endpoints</CardTitle>
                   <CardDescription>
-                    Wybierz endpoint do testowania
+                    Select an endpoint to test
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -330,10 +330,10 @@ const DokumentacjaAPI = () => {
                   {/* Case ID Input for GET/PATCH endpoints */}
                   {selectedEndpoint.path.includes("{case_id}") && (
                     <div className="space-y-2">
-                      <Label htmlFor="caseId">ID Sprawy</Label>
+                      <Label htmlFor="caseId">Case ID</Label>
                       <Input
                         id="caseId"
-                        placeholder="Wprowadź UUID sprawy..."
+                        placeholder="Enter case UUID..."
                         value={caseId}
                         onChange={(e) => setCaseId(e.target.value)}
                         className="font-mono"
@@ -346,7 +346,7 @@ const DokumentacjaAPI = () => {
                     <Tabs defaultValue="request" className="w-full">
                       <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="request">Request Body</TabsTrigger>
-                        <TabsTrigger value="example">Przykład odpowiedzi</TabsTrigger>
+                        <TabsTrigger value="example">Response Example</TabsTrigger>
                       </TabsList>
                       
                       <TabsContent value="request" className="space-y-2">
@@ -358,19 +358,19 @@ const DokumentacjaAPI = () => {
                             onClick={() => copyToClipboard(requestBody)}
                           >
                             <Copy className="w-3 h-3 mr-1" />
-                            Kopiuj
+                            Copy
                           </Button>
                         </div>
                         <Textarea
                           value={requestBody}
                           onChange={(e) => setRequestBody(e.target.value)}
                           className="font-mono text-xs min-h-[300px]"
-                          placeholder="Wprowadź JSON..."
+                          placeholder="Enter JSON..."
                         />
                       </TabsContent>
 
                       <TabsContent value="example" className="space-y-2">
-                        <Label>Przykładowa odpowiedź</Label>
+                        <Label>Example Response</Label>
                         <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[300px] text-xs">
                           {selectedEndpoint.responseExample}
                         </pre>
@@ -381,7 +381,7 @@ const DokumentacjaAPI = () => {
                   {/* GET endpoint example */}
                   {selectedEndpoint.method === "GET" && (
                     <div className="space-y-2">
-                      <Label>Przykładowa odpowiedź</Label>
+                      <Label>Example Response</Label>
                       <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[300px] text-xs">
                         {selectedEndpoint.responseExample}
                       </pre>
@@ -398,12 +398,12 @@ const DokumentacjaAPI = () => {
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Wykonywanie...
+                        Executing...
                       </>
                     ) : (
                       <>
                         <Play className="w-4 h-4 mr-2" />
-                        Wykonaj zapytanie
+                        Execute Request
                       </>
                     )}
                   </Button>
@@ -413,7 +413,7 @@ const DokumentacjaAPI = () => {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Label className="flex items-center gap-2">
-                          Odpowiedź
+                          Response
                           {responseStatus === "success" && (
                             <CheckCircle2 className="w-4 h-4 text-green-500" />
                           )}
@@ -427,7 +427,7 @@ const DokumentacjaAPI = () => {
                           onClick={() => copyToClipboard(response)}
                         >
                           <Copy className="w-3 h-3 mr-1" />
-                          Kopiuj
+                          Copy
                         </Button>
                       </div>
                       <pre
@@ -447,7 +447,7 @@ const DokumentacjaAPI = () => {
               {/* Info Card */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Informacje</CardTitle>
+                  <CardTitle className="text-base">Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <div>
@@ -457,18 +457,18 @@ const DokumentacjaAPI = () => {
                     </code>
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Uwierzytelnianie:</p>
+                    <p className="font-medium text-foreground">Authentication:</p>
                     <p className="text-muted-foreground mt-1">
-                      Wszystkie zapytania wymagają nagłówka <code className="text-xs bg-muted px-1 py-0.5 rounded">x-api-key</code>
+                      All requests require the <code className="text-xs bg-muted px-1 py-0.5 rounded">x-api-key</code> header
                     </p>
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Kody błędów:</p>
+                    <p className="font-medium text-foreground">Error Codes:</p>
                     <ul className="text-muted-foreground mt-1 space-y-1">
-                      <li>• 400 - Nieprawidłowe dane wejściowe</li>
-                      <li>• 401 - Brak autoryzacji (nieprawidłowy klucz API)</li>
-                      <li>• 404 - Nie znaleziono zasobu</li>
-                      <li>• 500 - Błąd serwera</li>
+                      <li>• 400 - Invalid input data</li>
+                      <li>• 401 - Unauthorized (invalid API key)</li>
+                      <li>• 404 - Resource not found</li>
+                      <li>• 500 - Server error</li>
                     </ul>
                   </div>
                 </CardContent>

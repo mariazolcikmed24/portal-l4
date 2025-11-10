@@ -17,6 +17,7 @@ import Platnosc from "./pages/Platnosc";
 import Potwierdzenie from "./pages/Potwierdzenie";
 import StatusSprawy from "./pages/StatusSprawy";
 import PanelUzytkownika from "./pages/PanelUzytkownika";
+import DokumentacjaAPI from "./pages/DokumentacjaAPI";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/potwierdzenie" element={<Potwierdzenie />} />
             <Route path="/status" element={<StatusSprawy />} />
             <Route path="/panel" element={<PanelUzytkownika />} />
+            <Route path="/api-docs" element={<DokumentacjaAPI />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -54,6 +54,12 @@ const Header = () => {
             >
               Sprawdź status sprawy
             </Link>
+            <Link
+              to="/api-docs"
+              className="text-foreground hover:text-primary transition-smooth font-medium"
+            >
+              API
+            </Link>
             <button
               onClick={() => scrollToSection("kontakt")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
@@ -121,6 +127,13 @@ const Header = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Sprawdź status sprawy
+            </Link>
+            <Link
+              to="/api-docs"
+              className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              API
             </Link>
             <button
               onClick={() => scrollToSection("kontakt")}

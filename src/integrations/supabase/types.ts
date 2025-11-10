@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          allowed_endpoints: string[] | null
+          api_key: string
+          created_at: string
+          id: string
+          is_active: boolean
+          key_name: string
+          last_used_at: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          allowed_endpoints?: string[] | null
+          api_key: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_name: string
+          last_used_at?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          allowed_endpoints?: string[] | null
+          api_key?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_name?: string
+          last_used_at?: string | null
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -284,6 +317,7 @@ export type Database = {
     Functions: {
       delete_user_data: { Args: { target_user_id: string }; Returns: Json }
       generate_case_number: { Args: never; Returns: string }
+      log_api_key_usage: { Args: { p_api_key: string }; Returns: undefined }
       log_data_access: {
         Args: {
           p_action: string
@@ -295,6 +329,7 @@ export type Database = {
         }
         Returns: string
       }
+      verify_api_key: { Args: { p_api_key: string }; Returns: boolean }
     }
     Enums: {
       case_status:

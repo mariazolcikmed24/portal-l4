@@ -27,13 +27,13 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Pobierz token z nagłówka
+    // Get token from header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       throw new Error('Missing authorization header');
     }
 
-    // Zweryfikuj użytkownika
+    // Verify user
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
@@ -45,14 +45,14 @@ Deno.serve(async (req) => {
 
     const { confirmEmail }: DeleteAccountRequest = await req.json();
 
-    // Sprawdź, czy email się zgadza (dodatkowe bezpieczeństwo)
+    // Check if email matches (additional security)
     if (confirmEmail !== user.email) {
       throw new Error('Email confirmation does not match');
     }
 
     console.log(`Deleting account for user: ${user.id}, email: ${user.email}`);
 
-    // Wywołaj funkcję bazodanową do usunięcia danych
+    // Call database function to delete data
     const { data: deletedData, error: deleteError } = await supabase.rpc(
       'delete_user_data',
       { target_user_id: user.id }

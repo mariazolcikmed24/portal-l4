@@ -1,4 +1,4 @@
-// Med24 API Types - zgodne z zewnętrzną dokumentacją API
+// Med24 API Types - compatible with external API documentation
 // https://med24-stage.b.live.udev.se/api/v2/external/docs
 
 export type Med24ChannelKind = "video_call" | "text_message" | "phone_call";
@@ -54,7 +54,7 @@ export interface Med24ServiceSchema {
   duration_seconds: number | null;
 }
 
-// Helper functions do mapowania naszych danych na strukturę Med24
+// Helper functions for mapping our data to Med24 structure
 
 export function mapProfileToMed24Patient(profile: {
   first_name: string;

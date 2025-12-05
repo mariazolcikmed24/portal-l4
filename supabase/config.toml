@@ -2,3 +2,6 @@ project_id = "ftejarickpnxucpungck"
 
 [functions.delete-user-account]
 verify_jwt = true
+
+[functions.autopay-webhook]
+verify_jwt = false

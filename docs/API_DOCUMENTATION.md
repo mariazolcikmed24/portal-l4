@@ -2,26 +2,26 @@
 
 ## Overview
 
-REST API dla systemu Ezwolnienia umożliwiające integrację zewnętrznych serwisów (np. Med24).
+REST API for the Ezwolnienia system enabling integration with external services (e.g., Med24).
 
 **Base URL:** `https://ftejarickpnxucpungck.supabase.co/functions/v1`
 
-**Uwierzytelnianie:** Wszystkie endpointy wymagają API key w nagłówku `x-api-key`.
+**Authentication:** All endpoints require an API key in the `x-api-key` header.
 
-## Uwierzytelnianie
+## Authentication
 
-Każde żądanie musi zawierać nagłówek:
+Every request must include the header:
 ```
-x-api-key: twoj_klucz_api
+x-api-key: your_api_key
 ```
 
-## Endpointy
+## Endpoints
 
-### 1. Rejestracja użytkownika
+### 1. User Registration
 
 **POST** `/api-auth-register`
 
-Tworzy nowe konto użytkownika z wszystkimi danymi osobowymi i zgodami marketingowymi.
+Creates a new user account with all personal data and marketing consents.
 
 #### Request Body
 
@@ -34,11 +34,11 @@ Tworzy nowe konto użytkownika z wszystkimi danymi osobowymi i zgodami marketing
   "pesel": "12345678901",
   "date_of_birth": "1990-01-01",
   "phone": "+48123456789",
-  "street": "Główna",
+  "street": "Main Street",
   "house_no": "10",
   "flat_no": "5",
   "postcode": "00-001",
-  "city": "Warszawa",
+  "city": "Warsaw",
   "country": "PL",
   "consent_terms": true,
   "consent_employment": true,
@@ -62,11 +62,11 @@ Tworzy nowe konto użytkownika z wszystkimi danymi osobowymi i zgodami marketing
 
 ---
 
-### 2. Logowanie użytkownika
+### 2. User Login
 
 **POST** `/api-auth-login`
 
-Uwierzytelnia użytkownika i zwraca token dostępu.
+Authenticates a user and returns an access token.
 
 #### Request Body
 
@@ -95,11 +95,11 @@ Uwierzytelnia użytkownika i zwraca token dostępu.
       "pesel": "12345678901",
       "date_of_birth": "1990-01-01",
       "phone": "+48123456789",
-      "street": "Główna",
+      "street": "Main Street",
       "house_no": "10",
       "flat_no": "5",
       "postcode": "00-001",
-      "city": "Warszawa",
+      "city": "Warsaw",
       "country": "PL",
       "consent_marketing_email": false,
       "consent_marketing_tel": false
@@ -110,11 +110,11 @@ Uwierzytelnia użytkownika i zwraca token dostępu.
 
 ---
 
-### 3. Utworzenie nowej wizyty/sprawy
+### 3. Create New Visit/Case
 
 **POST** `/api-cases-create`
 
-Tworzy nową sprawę medyczną z pełnymi danymi z formularza pacjenta.
+Creates a new medical case with complete patient form data.
 
 #### Request Body
 
@@ -126,16 +126,16 @@ Tworzy nową sprawę medyczną z pełnymi danymi z formularza pacjenta.
   "recipient_type": "zus",
   "main_category": "musculoskeletal",
   "symptom_duration": "1-3_days",
-  "free_text_reason": "Ból pleców uniemożliwiający pracę",
+  "free_text_reason": "Back pain preventing work",
   "symptoms": ["back_pain", "muscle_pain"],
   "employers": [
     {
       "nip": "1234567890",
-      "name": "Firma ABC Sp. z o.o.",
-      "street": "Biznesowa",
+      "name": "ABC Company Ltd.",
+      "street": "Business Street",
       "house_no": "1",
       "postcode": "00-001",
-      "city": "Warszawa"
+      "city": "Warsaw"
     }
   ],
   "pregnant": false,
@@ -144,11 +144,11 @@ Tworzy nową sprawę medyczną z pełnymi danymi z formularza pacjenta.
   "care_last_name": "Kowalska",
   "care_pesel": "98765432109",
   "has_allergy": true,
-  "allergy_text": "Penicylina",
+  "allergy_text": "Penicillin",
   "has_meds": true,
   "meds_list": "Ibuprofen 400mg",
   "chronic_conditions": ["diabetes", "hypertension"],
-  "chronic_other": "Astma oskrzelowa",
+  "chronic_other": "Bronchial asthma",
   "long_leave": false,
   "late_justification": "",
   "med24_channel_kind": "text_message",
@@ -173,12 +173,12 @@ Tworzy nową sprawę medyczną z pełnymi danymi z formularza pacjenta.
     "recipient_type": "zus",
     "main_category": "musculoskeletal",
     "symptom_duration": "1-3_days",
-    "free_text_reason": "Ból pleców uniemożliwiający pracę",
+    "free_text_reason": "Back pain preventing work",
     "symptoms": ["back_pain", "muscle_pain"],
     "employers": [...],
     "pregnant": false,
     "has_allergy": true,
-    "allergy_text": "Penicylina",
+    "allergy_text": "Penicillin",
     "has_meds": true,
     "meds_list": "Ibuprofen 400mg",
     "chronic_conditions": ["diabetes", "hypertension"],
@@ -191,15 +191,15 @@ Tworzy nową sprawę medyczną z pełnymi danymi z formularza pacjenta.
 
 ---
 
-### 4. Pobranie szczegółów wizyty
+### 4. Get Visit Details
 
 **GET** `/api-cases-get/{case_id}`
 
-Pobiera pełne dane sprawy wraz z danymi profilu pacjenta.
+Retrieves complete case data along with patient profile information.
 
 #### Path Parameters
 
-- `case_id` (uuid) - ID sprawy
+- `case_id` (uuid) - Case ID
 
 #### Response (200 OK)
 
@@ -216,7 +216,7 @@ Pobiera pełne dane sprawy wraz z danymi profilu pacjenta.
     "recipient_type": "zus",
     "main_category": "musculoskeletal",
     "symptom_duration": "1-3_days",
-    "free_text_reason": "Ból pleców uniemożliwiający pracę",
+    "free_text_reason": "Back pain preventing work",
     "symptoms": ["back_pain", "muscle_pain"],
     "employers": [...],
     "pregnant": false,
@@ -225,11 +225,11 @@ Pobiera pełne dane sprawy wraz z danymi profilu pacjenta.
     "care_last_name": "Kowalska",
     "care_pesel": "98765432109",
     "has_allergy": true,
-    "allergy_text": "Penicylina",
+    "allergy_text": "Penicillin",
     "has_meds": true,
     "meds_list": "Ibuprofen 400mg",
     "chronic_conditions": ["diabetes", "hypertension"],
-    "chronic_other": "Astma oskrzelowa",
+    "chronic_other": "Bronchial asthma",
     "long_leave": false,
     "attachment_file_ids": [],
     "payment_status": "pending",
@@ -252,11 +252,11 @@ Pobiera pełne dane sprawy wraz z danymi profilu pacjenta.
       "pesel": "12345678901",
       "date_of_birth": "1990-01-01",
       "phone": "+48123456789",
-      "street": "Główna",
+      "street": "Main Street",
       "house_no": "10",
       "flat_no": "5",
       "postcode": "00-001",
-      "city": "Warszawa",
+      "city": "Warsaw",
       "country": "PL",
       "consent_terms": true,
       "consent_employment": true,
@@ -277,15 +277,15 @@ Pobiera pełne dane sprawy wraz z danymi profilu pacjenta.
 
 ---
 
-### 5. Aktualizacja statusu wizyty
+### 5. Update Visit Status
 
 **PATCH** `/api-cases-update-status/{case_id}/status`
 
-Aktualizuje status sprawy i dane dotyczące wizyty Med24.
+Updates case status and Med24 visit data.
 
 #### Path Parameters
 
-- `case_id` (uuid) - ID sprawy
+- `case_id` (uuid) - Case ID
 
 #### Request Body
 
@@ -328,11 +328,11 @@ Aktualizuje status sprawy i dane dotyczące wizyty Med24.
 
 ---
 
-### 6. Zapisanie zgód marketingowych
+### 6. Save Marketing Consents
 
 **POST** `/api-consent-save`
 
-Aktualizuje zgody marketingowe dla użytkownika (dla zarejestrowanych i gości).
+Updates marketing consents for a user (for both registered users and guests).
 
 #### Request Body
 
@@ -364,16 +364,16 @@ Aktualizuje zgody marketingowe dla użytkownika (dla zarejestrowanych i gości).
 
 ---
 
-## Kody błędów
+## Error Codes
 
-- **400 Bad Request** - Nieprawidłowe dane wejściowe
-- **401 Unauthorized** - Brak lub nieprawidłowy API key
-- **404 Not Found** - Zasób nie został znaleziony
-- **500 Internal Server Error** - Błąd serwera
+- **400 Bad Request** - Invalid input data
+- **401 Unauthorized** - Missing or invalid API key
+- **404 Not Found** - Resource not found
+- **500 Internal Server Error** - Server error
 
-## Przykłady użycia
+## Usage Examples
 
-### cURL - Rejestracja użytkownika
+### cURL - User Registration
 
 ```bash
 curl -X POST \
@@ -388,10 +388,10 @@ curl -X POST \
     "pesel": "12345678901",
     "date_of_birth": "1990-01-01",
     "phone": "+48123456789",
-    "street": "Główna",
+    "street": "Main Street",
     "house_no": "10",
     "postcode": "00-001",
-    "city": "Warszawa",
+    "city": "Warsaw",
     "country": "PL",
     "consent_terms": true,
     "consent_employment": true,
@@ -401,7 +401,7 @@ curl -X POST \
   }'
 ```
 
-### cURL - Pobranie szczegółów wizyty
+### cURL - Get Visit Details
 
 ```bash
 curl -X GET \
@@ -411,8 +411,8 @@ curl -X GET \
 
 ---
 
-## Zarządzanie kluczami API
+## API Key Management
 
-Aby uzyskać klucz API dla Med24, skontaktuj się z administratorem systemu Ezwolnienia.
+To obtain an API key for Med24, contact the Ezwolnienia system administrator.
 
-Klucze API są przechowywane w bazie danych w tabeli `api_keys` i wymagają ręcznej aktywacji przez administratora.
+API keys are stored in the database in the `api_keys` table and require manual activation by an administrator.

@@ -1,80 +1,80 @@
-# Integracja Med24 API
+# Med24 API Integration
 
-## Przegląd
+## Overview
 
-Aplikacja została przygotowana do integracji z Med24 External API. Struktura danych została dostosowana do wymagań API, aby ułatwić przyszłą implementację.
+The application has been prepared for integration with the Med24 External API. The data structure has been adapted to API requirements to facilitate future implementation.
 
-## Dokumentacja API Med24
+## Med24 API Documentation
 
 - **Base URL**: `https://med24-stage.b.live.udev.se`
-- **Dokumentacja**: https://med24-stage.b.live.udev.se/api/v2/external/docs
+- **Documentation**: https://med24-stage.b.live.udev.se/api/v2/external/docs
 - **OpenAPI JSON**: https://med24-stage.b.live.udev.se/api/v2/external/openapi.json
-- **Autoryzacja**: Basic Auth (username + password)
+- **Authorization**: Basic Auth (username + password)
 
-## Zmiany w bazie danych
+## Database Changes
 
-### Tabela `cases`
+### `cases` Table
 
-Dodano pola do przechowywania informacji o integracji z Med24:
+Fields added to store Med24 integration information:
 
 ```sql
--- ID wizyty w systemie Med24
+-- Visit ID in the Med24 system
 med24_visit_id UUID
 
--- Status wizyty: {is_booking_finalized, is_cancelled, is_resolved}
+-- Visit status: {is_booking_finalized, is_cancelled, is_resolved}
 med24_visit_status JSONB DEFAULT '{"is_booking_finalized": false, "is_cancelled": false, "is_resolved": false}'
 
--- Tag zewnętrzny do identyfikacji w Med24
+-- External tag for identification in Med24
 med24_external_tag TEXT
 
--- Typ komunikacji: video_call, text_message, phone_call
+-- Communication type: video_call, text_message, phone_call
 med24_channel_kind TEXT DEFAULT 'text_message'
 
--- ID usługi w Med24
+-- Service ID in Med24
 med24_service_id UUID
 
--- Intent rezerwacji: reserve lub finalize
+-- Booking intent: reserve or finalize
 med24_booking_intent TEXT DEFAULT 'finalize'
 
--- Ostatnia synchronizacja statusu z Med24
+-- Last status sync with Med24
 med24_last_sync_at TIMESTAMP WITH TIME ZONE
 ```
 
-### Tabela `profiles`
+### `profiles` Table
 
-Dodano pole wymagane przez Med24 API:
+Field required by the Med24 API added:
 
 ```sql
--- Data urodzenia użytkownika
+-- User's date of birth
 date_of_birth DATE
 ```
 
-## Typy TypeScript
+## TypeScript Types
 
-Utworzono plik `src/types/med24.ts` z typami zgodnymi z API Med24:
+Created file `src/types/med24.ts` with types compatible with the Med24 API:
 
-### Główne typy
+### Main Types
 
-- `Med24BookVisitPatientSchema` - dane pacjenta
-- `Med24BookVisitUrgentSchema` - wizyta urgent (bez terminu)
-- `Med24VisitStatusSchema` - status wizyty
-- `Med24VisitSchema` - pełne dane wizyty
-- `Med24UpdateVisit` - aktualizacja wizyty
-- `Med24ServiceSchema` - usługa medyczna
+- `Med24BookVisitPatientSchema` - patient data
+- `Med24BookVisitUrgentSchema` - urgent visit (without appointment)
+- `Med24VisitStatusSchema` - visit status
+- `Med24VisitSchema` - complete visit data
+- `Med24UpdateVisit` - visit update
+- `Med24ServiceSchema` - medical service
 
-### Funkcje pomocnicze
+### Helper Functions
 
 ```typescript
-// Mapowanie profilu użytkownika na format Med24
+// Map user profile to Med24 format
 mapProfileToMed24Patient(profile)
 
-// Utworzenie payload dla wizyty urgent
+// Create payload for urgent visit
 createUrgentVisitPayload(patient, options)
 ```
 
-## Endpointy Med24 API
+## Med24 API Endpoints
 
-### 1. Tworzenie wizyty urgent
+### 1. Create Urgent Visit
 
 **POST** `/api/v2/external/visit`
 
@@ -90,11 +90,11 @@ Payload:
     "date_of_birth": "1990-01-01",
     "email": "jan@example.com",
     "phone_number": "+48123456789",
-    "address": "ul. Testowa",
+    "address": "Test Street",
     "house_number": "10",
     "flat_number": "5",
     "postal_code": "00-001",
-    "city": "Warszawa"
+    "city": "Warsaw"
   },
   "external_tag": "EZ-XXXXX",
   "booking_intent": "finalize",
@@ -112,7 +112,7 @@ Response:
 }
 ```
 
-### 2. Pobieranie statusu wizyty
+### 2. Get Visit Status
 
 **GET** `/api/v2/external/visit/{visit_id}`
 
@@ -127,7 +127,7 @@ Response:
 }
 ```
 
-### 3. Aktualizacja wizyty
+### 3. Update Visit
 
 **PUT** `/api/v2/external/visit/{visit_id}`
 
@@ -140,14 +140,14 @@ Payload:
 }
 ```
 
-### 4. Upload pliku do wizyty
+### 4. Upload File to Visit
 
 **POST** `/api/v2/external/visit/{visit_id}/files`
 
 Content-Type: `multipart/form-data`
 
 Form data:
-- `file`: plik (PDF, JPG, PNG)
+- `file`: file (PDF, JPG, PNG)
 
 Response:
 ```json
@@ -156,7 +156,7 @@ Response:
 }
 ```
 
-### 5. Lista usług
+### 5. List Services
 
 **GET** `/api/v2/external/services`
 
@@ -171,7 +171,7 @@ Response:
   "items": [
     {
       "id": "service-uuid",
-      "title": "E-konsultacja",
+      "title": "E-consultation",
       "queue": "urgent",
       "duration_seconds": 900
     }
@@ -180,12 +180,12 @@ Response:
 }
 ```
 
-## Mapowanie danych
+## Data Mapping
 
-### Profil użytkownika → Med24 Patient
+### User Profile → Med24 Patient
 
-| Nasze pole | Med24 pole | Typ |
-|------------|------------|-----|
+| Our Field | Med24 Field | Type |
+|-----------|-------------|------|
 | first_name | first_name | string (required) |
 | last_name | last_name | string (required) |
 | pesel | pesel | string (optional) |
@@ -198,73 +198,73 @@ Response:
 | postcode | postal_code | string (optional) |
 | city | city | string (optional) |
 
-### Dane medyczne → Med24 Files
+### Medical Data → Med24 Files
 
-Wszystkie pliki i dane medyczne z formularzy należy przesłać jako załączniki do wizyty:
+All files and medical data from forms should be sent as attachments to the visit:
 
-- Karta ciąży (pregnancy_card_file_id)
-- Dokumentacja poprzednich zwolnień (long_leave_docs_file_id)
-- Dodatkowe załączniki (attachment_file_ids)
-- Wywiad medyczny jako dokument tekstowy/PDF
+- Pregnancy card (pregnancy_card_file_id)
+- Previous sick leave documentation (long_leave_docs_file_id)
+- Additional attachments (attachment_file_ids)
+- Medical interview as text/PDF document
 
-## Następne kroki implementacji
+## Next Implementation Steps
 
-1. **Dodanie sekretów Med24**
+1. **Add Med24 Secrets**
    - MED24_API_USERNAME
    - MED24_API_PASSWORD
    - MED24_API_BASE_URL
 
-2. **Utworzenie Edge Function**
-   - Endpoint do tworzenia wizyty urgent
-   - Endpoint do synchronizacji statusu
-   - Endpoint do uploadu plików
+2. **Create Edge Function**
+   - Endpoint for creating urgent visit
+   - Endpoint for status synchronization
+   - Endpoint for file upload
 
-3. **Aktualizacja procesu płatności**
-   - Po pomyślnej płatności wywoływać Edge Function
-   - Zapisywać med24_visit_id w bazie danych
-   - Aktualizować status sprawy
+3. **Update Payment Process**
+   - After successful payment, call Edge Function
+   - Save med24_visit_id in database
+   - Update case status
 
-4. **Synchronizacja statusu**
-   - Okresowe sprawdzanie statusu wizyty
-   - Aktualizacja pola med24_visit_status
-   - Powiadomienia dla użytkownika o zmianach statusu
+4. **Status Synchronization**
+   - Periodic visit status check
+   - Update med24_visit_status field
+   - User notifications about status changes
 
-5. **Upload dokumentacji medycznej**
-   - Konwersja danych z formularzy na dokumenty
-   - Upload plików do Med24
-   - Powiązanie z wizytą
+5. **Medical Documentation Upload**
+   - Convert form data to documents
+   - Upload files to Med24
+   - Link to visit
 
-## Przykład użycia w kodzie
+## Code Usage Example
 
 ```typescript
 import { mapProfileToMed24Patient, createUrgentVisitPayload } from '@/types/med24';
 
-// Po pobraniu profilu użytkownika
+// After fetching user profile
 const med24Patient = mapProfileToMed24Patient(profileData);
 
-// Utworzenie payload dla wizyty
+// Create visit payload
 const visitPayload = createUrgentVisitPayload(med24Patient, {
   channelKind: 'text_message',
   externalTag: caseNumber,
   bookingIntent: 'finalize'
 });
 
-// Wywołanie Edge Function (do implementacji)
+// Call Edge Function (to be implemented)
 // const { data, error } = await supabase.functions.invoke('med24-create-visit', {
 //   body: visitPayload
 // });
 ```
 
-## Testowanie
+## Testing
 
-API Med24 ma środowisko stage:
+Med24 API has a staging environment:
 - URL: `https://med24-stage.b.live.udev.se`
-- Należy używać testowych danych
-- Sprawdzić wszystkie endpointy przed wdrożeniem produkcyjnym
+- Use test data
+- Check all endpoints before production deployment
 
-## Bezpieczeństwo
+## Security
 
-- Dane autoryzacyjne przechowywane jako sekrety Supabase
-- Wszystkie wywołania API przez Edge Functions
-- Nigdy nie eksponować sekretów w kodzie frontend
-- Walidacja danych przed wysłaniem do Med24
+- Authorization data stored as Supabase secrets
+- All API calls through Edge Functions
+- Never expose secrets in frontend code
+- Data validation before sending to Med24

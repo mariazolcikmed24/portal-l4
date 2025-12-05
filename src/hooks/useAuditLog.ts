@@ -18,14 +18,14 @@ export const useAuditLog = () => {
       if (!user) return;
 
       try {
-        // Pobierz IP użytkownika (przybliżone - można używać zewnętrznej usługi)
+        // Get user IP (approximate - can use external service)
         const ipResponse = await fetch('https://api.ipify.org?format=json').catch(() => null);
         const ipData = ipResponse ? await ipResponse.json() : null;
         const ipAddress = ipData?.ip || 'unknown';
 
         const userAgent = navigator.userAgent;
 
-        // Wywołaj funkcję bazodanową do logowania
+        // Call database function to log access
         const { error } = await supabase.rpc('log_data_access', {
           p_user_id: user.id,
           p_action: action,

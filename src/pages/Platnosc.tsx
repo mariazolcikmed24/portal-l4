@@ -135,7 +135,7 @@ export default function Platnosc() {
             </CardHeader>
             <CardContent>
               <div className="flex justify-between items-center">
-                <span className="text-lg">E-konsultacja + e-ZLA:</span>
+                <span className="text-lg">E-konsultacja + e-zwolnienie:</span>
                 <span className="text-3xl font-bold text-primary">79 PLN</span>
               </div>
             </CardContent>
@@ -207,7 +207,7 @@ export default function Platnosc() {
               <p className="text-sm font-medium">Ważne informacje:</p>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                 <li>Lekarz może skontaktować się z Tobą telefonicznie</li>
-                <li>E-konsultacja nie gwarantuje wystawienia e-ZLA</li>
+                <li>E-konsultacja nie gwarantuje wystawienia e-zwolnienia</li>
                 <li>Ostateczną decyzję podejmuje lekarz</li>
                 <li>Data początkowa zwolnienia to data przez Ciebie zadeklarowana</li>
               </ul>

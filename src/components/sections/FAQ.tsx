@@ -9,11 +9,11 @@ import { HelpCircle } from "lucide-react";
 const faqs = [
   {
     question: "Czy zwolnienie lekarskie online jest legalne?",
-    answer: "Tak, zwolnienia lekarskie wystawiane online są w pełni legalne i zgodne z polskim prawem. Konsultacje prowadzą licencjonowani lekarze posiadający prawo wykonywania zawodu. e-ZLA jest akceptowane przez ZUS i pracodawców na takich samych zasadach jak tradycyjne zwolnienie."
+    answer: "Tak, zwolnienia lekarskie wystawiane online są w pełni legalne i zgodne z polskim prawem. Konsultacje prowadzą licencjonowani lekarze posiadający prawo wykonywania zawodu. e-zwolnienie jest akceptowane przez ZUS i pracodawców na takich samych zasadach jak tradycyjne zwolnienie."
   },
   {
     question: "Jak szybko otrzymam zwolnienie lekarskie?",
-    answer: "Zwolnienie możesz otrzymać w ciągu 30 minut od zakończenia konsultacji z lekarzem. e-ZLA jest automatycznie wysyłane do ZUS i Twojego pracodawcy, więc nie musisz niczego dodatkowo załatwiać."
+    answer: "Zwolnienie możesz otrzymać w ciągu 30 minut od zakończenia konsultacji z lekarzem. e-zwolnienie jest automatycznie wysyłane do ZUS i Twojego pracodawcy, więc nie musisz niczego dodatkowo załatwiać."
   },
   {
     question: "Czy lekarz na pewno wystawi mi zwolnienie?",
@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     question: "Na ile dni mogę otrzymać zwolnienie online?",
-    answer: "e-ZLA może być wystawione na okres do 7 dni. Data początkowa może być maksymalnie 3 dni wstecz od dnia konsultacji. W przypadku konieczności dłuższego zwolnienia, lekarz może zalecić wizytę stacjonarną."
+    answer: "e-zwolnienie może być wystawione na okres do 7 dni. Data początkowa może być maksymalnie 3 dni wstecz od dnia konsultacji. W przypadku konieczności dłuższego zwolnienia, lekarz może zalecić wizytę stacjonarną."
   },
   {
     question: "Czy moje dane są bezpieczne?",
@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     question: "Jak wygląda proces uzyskania zwolnienia?",
-    answer: "Proces składa się z trzech prostych kroków: 1) Wypełnij formularz medyczny online (5 minut), 2) Lekarz przeprowadzi konsultację telefoniczną, 3) Otrzymasz e-ZLA, które automatycznie trafi do ZUS i pracodawcy. Cały proces zajmuje maksymalnie 30 minut."
+    answer: "Proces składa się z trzech prostych kroków: 1) Wypełnij formularz medyczny online (5 minut), 2) Lekarz przeprowadzi konsultację telefoniczną, 3) Otrzymasz e-zwolnienie, które automatycznie trafi do ZUS i pracodawcy. Cały proces zajmuje maksymalnie 30 minut."
   },
   {
     question: "Czy mogę uzyskać zwolnienie na opiekę nad dzieckiem?",

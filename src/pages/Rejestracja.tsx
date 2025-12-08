@@ -457,7 +457,7 @@ const Rejestracja = () => {
 
         <div className="bg-white p-8 md:p-12 rounded-2xl shadow-strong">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {isGuestMode ? "Dane do e-ZLA" : "Rejestracja"}
+            {isGuestMode ? "Dane do e-zwolnienia" : "Rejestracja"}
           </h1>
           <p className="text-muted-foreground mb-8">
             {isGuestMode 
@@ -863,7 +863,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_no_guarantee" className="text-sm font-normal cursor-pointer">
-                      Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego e-ZLA. Diagnoza oraz decyzja o zasadności i długości e-ZLA należą wyłącznie do lekarza, który podejmuje je na podstawie przekazanych przeze mnie informacji i objawów. Data początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy. *
+                      Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego e-zwolnienia. Diagnoza oraz decyzja o zasadności i długości e-zwolnienia należą wyłącznie do lekarza, który podejmuje je na podstawie przekazanych przeze mnie informacji i objawów. Data początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy. *
                     </Label>
                     {errors.consentNoGuarantee && (
                       <p className="text-sm text-destructive">{errors.consentNoGuarantee.message}</p>

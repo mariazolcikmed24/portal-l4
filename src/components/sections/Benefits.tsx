@@ -31,7 +31,7 @@ const benefits = [
   {
     icon: FileCheck,
     title: "Automatyczne wysłanie",
-    description: "e-ZLA trafia bezpośrednio do ZUS i Twojego pracodawcy. Nie musisz nic załatwiać."
+    description: "e-zwolnienie trafia bezpośrednio do ZUS i Twojego pracodawcy. Nie musisz nic załatwiać."
   },
   {
     icon: CheckCircle,
@@ -46,7 +46,7 @@ const Benefits = () => {
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Dlaczego <span className="text-primary">e-ZLA online?</span>
+            Dlaczego <span className="text-primary">e-zwolnienie online?</span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground">
             Nowoczesne podejście do zwolnień lekarskich. Bezpiecznie, szybko i zgodnie z prawem.

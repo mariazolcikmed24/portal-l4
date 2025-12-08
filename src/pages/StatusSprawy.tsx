@@ -153,7 +153,7 @@ export default function StatusSprawy() {
               <Card className="bg-green-50 border-green-200">
                 <CardContent className="pt-6">
                   <p className="text-sm">
-                    <strong>Gratulacje!</strong> E-ZLA zostało wystawione i wysłane do systemu ZUS oraz do Twojego pracodawcy. Potwierdzenie zostało wysłane na Twój adres email.
+                    <strong>Gratulacje!</strong> E-zwolnienie zostało wystawione i wysłane do systemu ZUS oraz do Twojego pracodawcy. Potwierdzenie zostało wysłane na Twój adres email.
                   </p>
                 </CardContent>
               </Card>

@@ -58,7 +58,7 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Decyzja lekarza</h3>
                   <p className="text-sm text-muted-foreground">
-                    Na podstawie wywiadu medycznego lekarz podejmie decyzję o wystawieniu e-ZLA. Pamiętaj, że e-konsultacja nie gwarantuje wystawienia zwolnienia.
+                    Na podstawie wywiadu medycznego lekarz podejmie decyzję o wystawieniu e-zwolnienia. Pamiętaj, że e-konsultacja nie gwarantuje wystawienia zwolnienia.
                   </p>
                 </div>
               </div>
@@ -68,9 +68,9 @@ export default function Potwierdzenie() {
                   3
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Wysyłka e-ZLA</h3>
+                  <h3 className="font-semibold mb-1">Wysyłka e-zwolnienia</h3>
                   <p className="text-sm text-muted-foreground">
-                    Jeśli lekarz podejmie pozytywną decyzję, e-ZLA zostanie automatycznie wysłane do systemu ZUS i do Twojego pracodawcy.
+                    Jeśli lekarz podejmie pozytywną decyzję, e-zwolnienie zostanie automatycznie wysłane do systemu ZUS i do Twojego pracodawcy.
                   </p>
                 </div>
               </div>

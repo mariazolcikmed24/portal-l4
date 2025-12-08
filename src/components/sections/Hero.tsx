@@ -24,7 +24,7 @@ const Hero = () => {
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl">
-              Skonsultuj się z lekarzem online i otrzymaj e-ZLA w kilka minut. Profesjonalnie, bezpiecznie i zgodnie z RODO.
+              Skonsultuj się z lekarzem online i otrzymaj e-zwolnienie w kilka minut. Profesjonalnie, bezpiecznie i zgodnie z RODO.
             </p>
 
             {/* Trust indicators */}
@@ -68,7 +68,7 @@ const Hero = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-strong">
               <img
                 src={heroImage}
-                alt="Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-ZLA"
+                alt="Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-zwolnienie"
                 className="w-full h-auto object-cover"
                 loading="eager"
               />

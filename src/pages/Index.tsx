@@ -19,7 +19,7 @@ const Index = () => {
           "@type": "ListItem",
           "position": 1,
           "name": "Strona główna",
-          "item": "https://e-zla.lovable.app/"
+          "item": "https://e-zwolnienie.com.pl/"
         }
       ]
     };
@@ -29,18 +29,18 @@ const Index = () => {
       "@type": "MedicalWebPage",
       "name": "Zwolnienie lekarskie online – szybko, legalnie i bez wychodzenia z domu",
       "description": "Zdobądź zwolnienie lekarskie online w kilka minut. Konsultacja z lekarzem, legalne L4, bez wizyty. Wygodnie, bezpiecznie, profesjonalnie.",
-      "url": "https://e-zla.lovable.app/",
+      "url": "https://e-zwolnienie.com.pl/",
       "inLanguage": "pl",
       "isPartOf": {
         "@type": "WebSite",
-        "name": "e-ZLA",
-        "url": "https://e-zla.lovable.app/"
+        "name": "e-zwolnienie",
+        "url": "https://e-zwolnienie.com.pl/"
       },
       "about": {
         "@type": "MedicalProcedure",
         "name": "Telemedyczna konsultacja lekarska",
         "procedureType": "Zdalna konsultacja medyczna",
-        "followup": "Wystawienie zwolnienia lekarskiego e-ZLA"
+        "followup": "Wystawienie elektronicznego zwolnienia lekarskiego"
       },
       "mainEntity": {
         "@type": "MedicalWebPage",

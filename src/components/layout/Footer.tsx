@@ -14,7 +14,7 @@ const Footer = () => {
               <div className="w-10 h-10 gradient-hero rounded-lg flex items-center justify-center">
                 <Shield className="w-6 h-6 text-white" aria-hidden="true" />
               </div>
-              <span className="text-xl font-bold">e-<span className="text-primary">ZLA</span></span>
+              <span className="text-xl font-bold">e-<span className="text-primary">zwolnienie</span></span>
             </Link>
             <p className="text-sm text-gray-300 leading-relaxed">
               Profesjonalne zwolnienia lekarskie online. Szybko, bezpiecznie i zgodnie z prawem.
@@ -80,8 +80,8 @@ const Footer = () => {
             <h3 className="font-semibold text-lg mb-4">Kontakt</h3>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <a href="mailto:kontakt@e-zla.pl" className="hover:text-primary transition-smooth">
-                  kontakt@e-zla.pl
+                <a href="mailto:kontakt@e-zwolnienie.com.pl" className="hover:text-primary transition-smooth">
+                  kontakt@e-zwolnienie.com.pl
                 </a>
               </li>
               <li>
@@ -98,7 +98,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
-            <p>&copy; {currentYear} e-ZLA. Wszelkie prawa zastrzeżone.</p>
+            <p>&copy; {currentYear} e-zwolnienie. Wszelkie prawa zastrzeżone.</p>
             <p>Zwolnienia lekarskie online zgodne z przepisami ZUS</p>
           </div>
         </div>
@@ -109,12 +109,12 @@ const Footer = () => {
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MedicalOrganization",
-          "name": "e-ZLA - Zwolnienia Lekarskie Online",
-          "description": "Profesjonalna platforma medyczna oferująca zwolnienia lekarskie online. Konsultacje z licencjonowanymi lekarzami, legalne e-ZLA zgodne z przepisami ZUS.",
-          "url": "https://e-zla.lovable.app/",
-          "logo": "https://e-zla.lovable.app/logo.png",
+          "name": "e-zwolnienie - Zwolnienia Lekarskie Online",
+          "description": "Profesjonalna platforma medyczna oferująca zwolnienia lekarskie online. Konsultacje z licencjonowanymi lekarzami, legalne e-zwolnienia zgodne z przepisami ZUS.",
+          "url": "https://e-zwolnienie.com.pl/",
+          "logo": "https://e-zwolnienie.com.pl/logo.png",
           "telephone": "+48123456789",
-          "email": "kontakt@e-zla.pl",
+          "email": "kontakt@e-zwolnienie.com.pl",
           "address": {
             "@type": "PostalAddress",
             "streetAddress": "ul. Medyczna 1",

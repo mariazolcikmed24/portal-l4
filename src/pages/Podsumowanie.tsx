@@ -312,7 +312,7 @@ export default function Podsumowanie() {
             </CardHeader>
             <CardContent>
               <div className="flex justify-between items-center">
-                <span className="text-lg">E-konsultacja + e-ZLA:</span>
+                <span className="text-lg">E-konsultacja + e-zwolnienie:</span>
                 <span className="text-2xl font-bold text-primary">79 PLN</span>
               </div>
             </CardContent>
@@ -321,7 +321,7 @@ export default function Podsumowanie() {
           <div className="bg-muted/50 p-4 rounded-lg">
             <p className="text-sm text-muted-foreground">
               <strong>Ważne:</strong> Lekarz może skontaktować się z Tobą telefonicznie w celu pogłębienia wywiadu medycznego. 
-              E-konsultacja nie gwarantuje wystawienia e-ZLA - ostateczną decyzję podejmuje lekarz na podstawie 
+              E-konsultacja nie gwarantuje wystawienia e-zwolnienia - ostateczną decyzję podejmuje lekarz na podstawie 
               wywiadu medycznego i obowiązujących przepisów.
             </p>
           </div>

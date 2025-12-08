@@ -11,7 +11,7 @@ const steps = [{
   step: "02"
 }, {
   icon: Download,
-  title: "Otrzymaj e-ZLA",
+  title: "Otrzymaj e-zwolnienie",
   description: "Zwolnienie lekarskie zostanie automatycznie wysłane do ZUS i Twojego pracodawcy.",
   step: "03"
 }];

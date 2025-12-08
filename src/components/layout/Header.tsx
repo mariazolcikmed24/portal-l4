@@ -25,7 +25,7 @@ const Header = () => {
             <div className="w-10 h-10 gradient-hero rounded-lg flex items-center justify-center shadow-soft">
               <Shield className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
-            <span className="text-xl font-bold text-foreground">e-<span className="text-primary">ZLA</span></span>
+            <span className="text-xl font-bold text-foreground">e-<span className="text-primary">zwolnienie</span></span>
           </Link>
 
           {/* Desktop Menu */}

@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.med24-upload-files]
 verify_jwt = false
+
+[functions.generate-case-pdf]
+verify_jwt = false

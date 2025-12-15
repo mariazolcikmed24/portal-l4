@@ -113,11 +113,21 @@ serve(async (req) => {
         // Get file name from path
         const fileName = filePath.split('/').pop() || 'attachment';
         
+        // Determine MIME type from file extension
+        const extension = fileName.split('.').pop()?.toLowerCase();
+        let mimeType = 'application/octet-stream';
+        if (extension === 'pdf') mimeType = 'application/pdf';
+        else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
+        else if (extension === 'png') mimeType = 'image/png';
+        
+        // Create a new Blob with explicit MIME type
+        const typedBlob = new Blob([await fileData.arrayBuffer()], { type: mimeType });
+        
         // Create FormData for Med24 upload
         const formData = new FormData();
-        formData.append('file', fileData, fileName);
+        formData.append('file', typedBlob, fileName);
 
-        console.log(`Uploading file ${fileName} to Med24 visit ${visit_id}`);
+        console.log(`Uploading file ${fileName} (${mimeType}, ${typedBlob.size} bytes) to Med24 visit ${visit_id}`);
 
         // Upload to Med24
         const med24Response = await fetch(`${med24ApiUrl}/api/v2/external/visit/${visit_id}/files`, {

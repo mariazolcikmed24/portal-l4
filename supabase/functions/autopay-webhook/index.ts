@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
       pspRef: remoteID,
     });
 
-    // If payment successful, update case status to submitted
+    // If payment successful, update case status to submitted and create Med24 visit
     if (dbPaymentStatus === "success" && updatedCase.status === "draft") {
       await supabase
         .from("cases")
@@ -117,6 +117,87 @@ Deno.serve(async (req) => {
         .eq("id", orderID);
       
       console.log("Case status updated to submitted");
+
+      // Create Med24 visit
+      try {
+        const med24ApiUrl = Deno.env.get("MED24_API_URL");
+        const med24Username = Deno.env.get("MED24_API_USERNAME");
+        const med24Password = Deno.env.get("MED24_API_PASSWORD");
+        const med24ServiceId = Deno.env.get("MED24_SERVICE_ID");
+
+        if (med24ApiUrl && med24Username && med24Password) {
+          // Fetch profile data for the case
+          const { data: caseWithProfile } = await supabase
+            .from("cases")
+            .select("*, profile:profiles(*)")
+            .eq("id", orderID)
+            .single();
+
+          if (caseWithProfile?.profile) {
+            const profile = caseWithProfile.profile;
+            
+            const visitPayload = {
+              channel_kind: "text_message",
+              service_id: med24ServiceId || null,
+              patient: {
+                first_name: profile.first_name,
+                last_name: profile.last_name,
+                pesel: profile.pesel || null,
+                date_of_birth: profile.date_of_birth || null,
+                email: profile.email || null,
+                phone_number: profile.phone || null,
+                address: profile.street || null,
+                house_number: profile.house_no || null,
+                flat_number: profile.flat_no || null,
+                postal_code: profile.postcode || null,
+                city: profile.city || null,
+              },
+              external_tag: caseWithProfile.case_number || orderID,
+              booking_intent: "finalize",
+              queue: "urgent",
+            };
+
+            console.log("Creating Med24 visit:", JSON.stringify(visitPayload, null, 2));
+
+            const basicAuth = btoa(`${med24Username}:${med24Password}`);
+            const med24Response = await fetch(`${med24ApiUrl}/api/v2/external/visit`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Basic ${basicAuth}`,
+              },
+              body: JSON.stringify(visitPayload),
+            });
+
+            const med24Data = await med24Response.json();
+            console.log("Med24 API response:", med24Response.status, JSON.stringify(med24Data, null, 2));
+
+            if (med24Response.ok) {
+              // Update case with Med24 visit data
+              await supabase
+                .from("cases")
+                .update({
+                  med24_visit_id: med24Data.id,
+                  med24_visit_status: med24Data,
+                  med24_external_tag: caseWithProfile.case_number || orderID,
+                  med24_channel_kind: "text_message",
+                  med24_booking_intent: "finalize",
+                  med24_last_sync_at: new Date().toISOString(),
+                })
+                .eq("id", orderID);
+
+              console.log("Med24 visit created successfully:", med24Data.id);
+            } else {
+              console.error("Med24 API error:", med24Data);
+            }
+          }
+        } else {
+          console.log("Med24 API not configured, skipping visit creation");
+        }
+      } catch (med24Error) {
+        console.error("Error creating Med24 visit:", med24Error);
+        // Don't fail the webhook, payment was still successful
+      }
     }
 
     // Return OK response (Autopay expects this)

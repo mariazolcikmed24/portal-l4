@@ -191,16 +191,41 @@ serve(async (req) => {
 
     console.log(`Successfully created Med24 visit: ${med24Data.id}`);
 
-    // Upload files to Med24 if any exist
-    const hasFiles = caseData.attachment_file_ids?.length > 0 || 
-                     caseData.pregnancy_card_file_id || 
-                     caseData.long_leave_docs_file_id;
+    // Generate PDF summary first
+    let pdfResult = null;
+    console.log('Generating PDF summary for case...');
+    try {
+      const pdfResponse = await fetch(`${supabaseUrl}/functions/v1/generate-case-pdf`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseServiceKey}`,
+        },
+        body: JSON.stringify({ case_id }),
+      });
+      pdfResult = await pdfResponse.json();
+      console.log('PDF generation result:', pdfResult);
+    } catch (pdfError) {
+      console.error('Failed to generate PDF:', pdfError);
+      pdfResult = { error: 'PDF generation failed', details: String(pdfError) };
+    }
+
+    // Re-fetch case to get updated attachment_file_ids (including PDF)
+    const { data: updatedCase } = await supabase
+      .from('cases')
+      .select('attachment_file_ids, pregnancy_card_file_id, long_leave_docs_file_id')
+      .eq('id', case_id)
+      .single();
+
+    // Upload files to Med24
+    const hasFiles = updatedCase?.attachment_file_ids?.length > 0 || 
+                     updatedCase?.pregnancy_card_file_id || 
+                     updatedCase?.long_leave_docs_file_id;
     
     let uploadResult = null;
     if (hasFiles) {
       console.log('Uploading files to Med24 visit...');
       try {
-        // Call the upload files function
         const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/med24-upload-files`, {
           method: 'POST',
           headers: {
@@ -222,6 +247,7 @@ serve(async (req) => {
         success: true, 
         visit_id: med24Data.id,
         visit_data: med24Data,
+        pdf_generated: pdfResult,
         files_uploaded: uploadResult
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

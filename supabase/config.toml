@@ -5,3 +5,9 @@ verify_jwt = true
 
 [functions.autopay-webhook]
 verify_jwt = false
+
+[functions.med24-create-visit]
+verify_jwt = false
+
+[functions.med24-get-visit]
+verify_jwt = false

@@ -25,23 +25,43 @@ serve(async (req) => {
       );
     }
 
-    // Get visit_id from URL path
-    const url = new URL(req.url);
-    const pathParts = url.pathname.split('/');
-    const visitId = pathParts[pathParts.length - 1];
-
-    if (!visitId || visitId === 'med24-get-visit') {
-      // Try to get from query params
-      const queryVisitId = url.searchParams.get('visit_id');
-      if (!queryVisitId) {
-        return new Response(
-          JSON.stringify({ error: 'visit_id is required' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+    // Get visit_id from multiple sources: body, URL path, or query params
+    let finalVisitId: string | null = null;
+    
+    // Try to get from request body (POST)
+    if (req.method === 'POST') {
+      try {
+        const body = await req.json();
+        if (body.visit_id) {
+          finalVisitId = body.visit_id;
+        }
+      } catch {
+        // Body parsing failed, continue to other methods
       }
     }
+    
+    // Try URL path
+    if (!finalVisitId) {
+      const url = new URL(req.url);
+      const pathParts = url.pathname.split('/');
+      const pathVisitId = pathParts[pathParts.length - 1];
+      if (pathVisitId && pathVisitId !== 'med24-get-visit') {
+        finalVisitId = pathVisitId;
+      }
+    }
+    
+    // Try query params
+    if (!finalVisitId) {
+      const url = new URL(req.url);
+      finalVisitId = url.searchParams.get('visit_id');
+    }
 
-    const finalVisitId = visitId !== 'med24-get-visit' ? visitId : url.searchParams.get('visit_id');
+    if (!finalVisitId) {
+      return new Response(
+        JSON.stringify({ error: 'visit_id is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     console.log(`Fetching Med24 visit: ${finalVisitId}`);
 

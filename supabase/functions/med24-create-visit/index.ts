@@ -116,7 +116,6 @@ serve(async (req) => {
       channel_kind,
       service_id: med24ServiceId || null,
       patient,
-      external_tag: caseData.case_number || case_id,
       booking_intent,
       queue: "urgent",
     };

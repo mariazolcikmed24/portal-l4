@@ -127,7 +127,10 @@ serve(async (req) => {
     const basicAuth = btoa(`${med24Username}:${med24Password}`);
 
     // Call Med24 API
-    const med24Response = await fetch(`${med24ApiUrl}/api/v2/external/visit`, {
+    const apiEndpoint = `${med24ApiUrl}/api/v2/external/visit`;
+    console.log('Calling Med24 API endpoint:', apiEndpoint);
+    
+    const med24Response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -136,10 +139,26 @@ serve(async (req) => {
       body: JSON.stringify(visitPayload),
     });
 
-    const med24Data = await med24Response.json();
-
     console.log('Med24 API response status:', med24Response.status);
-    console.log('Med24 API response:', JSON.stringify(med24Data, null, 2));
+    console.log('Med24 API response headers:', JSON.stringify(Object.fromEntries(med24Response.headers.entries())));
+    
+    const responseText = await med24Response.text();
+    console.log('Med24 API raw response (first 500 chars):', responseText.substring(0, 500));
+    
+    let med24Data;
+    try {
+      med24Data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse Med24 response as JSON:', parseError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Med24 API returned non-JSON response', 
+          status: med24Response.status,
+          responsePreview: responseText.substring(0, 200)
+        }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!med24Response.ok) {
       console.error('Med24 API error:', med24Data);

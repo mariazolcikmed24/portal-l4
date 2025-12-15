@@ -24,44 +24,17 @@ export default function StatusSprawy() {
   const [caseData, setCaseData] = useState<any>(null);
   const [med24Status, setMed24Status] = useState<Med24VisitStatus | null>(null);
 
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      'draft': 'Robocza',
-      'submitted': 'Złożona',
-      'in_review': 'W trakcie weryfikacji',
-      'completed': 'Zakończona',
-      'rejected': 'Odrzucona'
-    };
-    return labels[status] || status;
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      'draft': 'text-muted-foreground',
-      'submitted': 'text-blue-500',
-      'in_review': 'text-yellow-500',
-      'completed': 'text-green-500',
-      'rejected': 'text-destructive'
-    };
-    return colors[status] || 'text-muted-foreground';
-  };
-
   const fetchMed24Status = async (visitId: string) => {
     setIsFetchingMed24(true);
     try {
-      console.log('Fetching Med24 status for visit:', visitId);
-      
       const { data, error } = await supabase.functions.invoke('med24-get-visit', {
         body: { visit_id: visitId }
       });
 
       if (error) {
         console.error('Error fetching Med24 status:', error);
-        toast.error("Błąd podczas pobierania statusu z systemu medycznego");
         return null;
       }
-
-      console.log('Med24 status response:', data);
       
       if (data?.visit) {
         setMed24Status(data.visit);
@@ -71,7 +44,6 @@ export default function StatusSprawy() {
       return null;
     } catch (error) {
       console.error('Error fetching Med24 status:', error);
-      toast.error("Błąd podczas pobierania statusu");
       return null;
     } finally {
       setIsFetchingMed24(false);
@@ -109,7 +81,6 @@ export default function StatusSprawy() {
 
       setCaseData(data);
       
-      // Automatically fetch Med24 status if visit_id exists
       if (data.med24_visit_id) {
         await fetchMed24Status(data.med24_visit_id);
       }
@@ -121,54 +92,64 @@ export default function StatusSprawy() {
     }
   };
 
-  const handleRefreshMed24 = async () => {
+  const handleRefresh = async () => {
     if (caseData?.med24_visit_id) {
       await fetchMed24Status(caseData.med24_visit_id);
       toast.success("Status zaktualizowany");
     }
   };
 
-  const getMed24StatusInfo = () => {
-    if (!med24Status) return null;
-
-    if (med24Status.is_cancelled) {
+  // Unified status logic
+  const getUnifiedStatus = () => {
+    // If case is rejected locally
+    if (caseData?.status === 'rejected') {
       return {
-        label: "Anulowana",
+        label: "Odrzucona",
+        description: "Lekarz po analizie wywiadu medycznego podjął decyzję o niewystawieniu zwolnienia lekarskiego.",
         icon: XCircle,
         color: "text-destructive",
         bgColor: "bg-destructive/10",
         borderColor: "border-destructive/20"
       };
     }
-    
-    if (med24Status.is_resolved) {
-      return {
-        label: "Zakończona",
-        icon: CheckCircle,
-        color: "text-green-500",
-        bgColor: "bg-green-50",
-        borderColor: "border-green-200"
-      };
+
+    // If Med24 status is available, use it
+    if (med24Status) {
+      if (med24Status.is_cancelled) {
+        return {
+          label: "Anulowana",
+          description: "Wizyta została anulowana.",
+          icon: XCircle,
+          color: "text-destructive",
+          bgColor: "bg-destructive/10",
+          borderColor: "border-destructive/20"
+        };
+      }
+      
+      if (med24Status.is_resolved) {
+        return {
+          label: "Zakończona",
+          description: "E-zwolnienie zostało wystawione i wysłane do systemu ZUS oraz do Twojego pracodawcy.",
+          icon: CheckCircle,
+          color: "text-green-500",
+          bgColor: "bg-green-50",
+          borderColor: "border-green-200"
+        };
+      }
     }
-    
-    if (med24Status.is_booking_finalized) {
-      return {
-        label: "W trakcie realizacji",
-        icon: Clock,
-        color: "text-yellow-500",
-        bgColor: "bg-yellow-50",
-        borderColor: "border-yellow-200"
-      };
-    }
-    
+
+    // Default: in progress
     return {
-      label: "Oczekuje na przyjęcie",
+      label: "W trakcie realizacji",
+      description: "Twoja wizyta jest obecnie weryfikowana przez lekarza. Możesz otrzymać telefon w celu potwierdzenia danych.",
       icon: Clock,
-      color: "text-blue-500",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-50",
+      borderColor: "border-yellow-200"
     };
   };
+
+  const status = caseData ? getUnifiedStatus() : null;
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
@@ -203,96 +184,63 @@ export default function StatusSprawy() {
           </CardContent>
         </Card>
 
-        {caseData && (
+        {caseData && status && (
           <div className="space-y-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Informacje o wizycie</CardTitle>
-                {caseData.med24_visit_id && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handleRefreshMed24}
-                    disabled={isFetchingMed24}
-                  >
-                    {isFetchingMed24 ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                    )}
-                    Odśwież status
-                  </Button>
-                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleRefresh}
+                  disabled={isFetchingMed24 || !caseData.med24_visit_id}
+                >
+                  {isFetchingMed24 ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                  )}
+                  Odśwież
+                </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Status lokalny</p>
-                    <p className={`text-2xl font-bold ${getStatusColor(caseData.status)}`}>
-                      {getStatusLabel(caseData.status)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Numer wizyty</p>
-                    <p className="text-xl font-mono font-bold">{caseData.case_number}</p>
+                {/* Unified Status Display */}
+                <div className={`p-6 rounded-lg border ${status.bgColor} ${status.borderColor}`}>
+                  <div className="flex items-start gap-4">
+                    <div className={status.color}>
+                      <status.icon className="w-8 h-8" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className={`text-2xl font-bold ${status.color}`}>
+                          {status.label}
+                        </p>
+                        <p className="text-lg font-mono font-bold text-muted-foreground">
+                          {caseData.case_number}
+                        </p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {status.description}
+                      </p>
+                      
+                      {med24Status?.documentation_download_url && (
+                        <div className="mt-4">
+                          <a 
+                            href={med24Status.documentation_download_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+                          >
+                            Pobierz dokumentację medyczną
+                          </a>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Med24 Status Section */}
-                {caseData.med24_visit_id && (
-                  <div className="space-y-3">
-                    <p className="text-sm font-medium text-muted-foreground">Status w systemie medycznym</p>
-                    
-                    {isFetchingMed24 ? (
-                      <div className="flex items-center gap-2 p-4 bg-muted/30 rounded-lg">
-                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                        <span className="text-muted-foreground">Pobieranie statusu...</span>
-                      </div>
-                    ) : med24Status ? (
-                      <div className={`p-4 rounded-lg border ${getMed24StatusInfo()?.bgColor} ${getMed24StatusInfo()?.borderColor}`}>
-                        <div className="flex items-center gap-3">
-                          {getMed24StatusInfo()?.icon && (
-                            <div className={getMed24StatusInfo()?.color}>
-                              {(() => {
-                                const Icon = getMed24StatusInfo()?.icon;
-                                return Icon ? <Icon className="w-6 h-6" /> : null;
-                              })()}
-                            </div>
-                          )}
-                          <div>
-                            <p className={`text-lg font-semibold ${getMed24StatusInfo()?.color}`}>
-                              {getMed24StatusInfo()?.label}
-                            </p>
-                            <div className="text-sm text-muted-foreground space-y-1 mt-1">
-                              <p>Rezerwacja: {med24Status.is_booking_finalized ? "Potwierdzona" : "W trakcie"}</p>
-                              <p>Wizyta: {med24Status.is_resolved ? "Zakończona" : "W trakcie"}</p>
-                              {med24Status.is_cancelled && <p className="text-destructive">Wizyta została anulowana</p>}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {med24Status.documentation_download_url && (
-                          <div className="mt-4 pt-4 border-t">
-                            <a 
-                              href={med24Status.documentation_download_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-primary hover:underline"
-                            >
-                              Pobierz dokumentację medyczną
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="p-4 bg-muted/30 rounded-lg text-muted-foreground">
-                        Nie udało się pobrać statusu z systemu medycznego
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="grid md:grid-cols-2 gap-4">
+                {/* Visit Details */}
+                <div className="grid md:grid-cols-2 gap-4 pt-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Data rozpoczęcia zwolnienia</p>
                     <p className="font-medium">{format(new Date(caseData.illness_start), 'dd.MM.yyyy', { locale: pl })}</p>
@@ -312,36 +260,6 @@ export default function StatusSprawy() {
                 </div>
               </CardContent>
             </Card>
-
-            {caseData.status === 'in_review' && (
-              <Card className="bg-blue-50 border-blue-200">
-                <CardContent className="pt-6">
-                  <p className="text-sm">
-                    <strong>Status:</strong> Twoja wizyta jest obecnie weryfikowana przez lekarza. Możesz otrzymać telefon w celu potwierdzenia danych.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
-            {caseData.status === 'completed' && (
-              <Card className="bg-green-50 border-green-200">
-                <CardContent className="pt-6">
-                  <p className="text-sm">
-                    <strong>Gratulacje!</strong> E-zwolnienie zostało wystawione i wysłane do systemu ZUS oraz do Twojego pracodawcy. Potwierdzenie zostało wysłane na Twój adres email.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
-            {caseData.status === 'rejected' && (
-              <Card className="bg-destructive/10 border-destructive/20">
-                <CardContent className="pt-6">
-                  <p className="text-sm">
-                    <strong>Odmowa wystawienia e-ZLA:</strong> Lekarz po analizie wywiadu medycznego podjął decyzję o niewystawieniu zwolnienia lekarskiego. Szczegółowe informacje zostały wysłane na Twój adres email.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
           </div>
         )}
       </div>

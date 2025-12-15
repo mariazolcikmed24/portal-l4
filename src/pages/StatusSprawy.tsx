@@ -129,7 +129,7 @@ export default function StatusSprawy() {
       if (med24Status.is_resolved) {
         return {
           label: "Zakończona",
-          description: "E-zwolnienie zostało wystawione i wysłane do systemu ZUS oraz do Twojego pracodawcy.",
+          description: "",
           icon: CheckCircle,
           color: "text-green-500",
           bgColor: "bg-green-50",

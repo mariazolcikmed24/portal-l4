@@ -45,6 +45,7 @@ serve(async (req) => {
     const med24ApiUrl = Deno.env.get('MED24_API_URL');
     const med24Username = Deno.env.get('MED24_API_USERNAME');
     const med24Password = Deno.env.get('MED24_API_PASSWORD');
+    const med24ServiceId = Deno.env.get('MED24_SERVICE_ID');
 
     if (!med24ApiUrl || !med24Username || !med24Password) {
       console.error('Missing Med24 API configuration');
@@ -113,7 +114,7 @@ serve(async (req) => {
     // Create Med24 visit payload
     const visitPayload: Med24BookVisitUrgentSchema = {
       channel_kind,
-      service_id: null,
+      service_id: med24ServiceId || null,
       patient,
       external_tag: caseData.case_number || case_id,
       booking_intent,

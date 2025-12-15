@@ -61,7 +61,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Parse request body
-    const { case_id, channel_kind = "text_message", booking_intent = "finalize" }: CreateVisitRequest = await req.json();
+    const { case_id, channel_kind = "phone_call", booking_intent = "finalize" }: CreateVisitRequest = await req.json();
 
     if (!case_id) {
       return new Response(

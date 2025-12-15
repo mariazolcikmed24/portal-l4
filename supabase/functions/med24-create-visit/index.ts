@@ -191,11 +191,38 @@ serve(async (req) => {
 
     console.log(`Successfully created Med24 visit: ${med24Data.id}`);
 
+    // Upload files to Med24 if any exist
+    const hasFiles = caseData.attachment_file_ids?.length > 0 || 
+                     caseData.pregnancy_card_file_id || 
+                     caseData.long_leave_docs_file_id;
+    
+    let uploadResult = null;
+    if (hasFiles) {
+      console.log('Uploading files to Med24 visit...');
+      try {
+        // Call the upload files function
+        const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/med24-upload-files`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify({ case_id, visit_id: med24Data.id }),
+        });
+        uploadResult = await uploadResponse.json();
+        console.log('File upload result:', uploadResult);
+      } catch (uploadError) {
+        console.error('Failed to upload files to Med24:', uploadError);
+        uploadResult = { error: 'File upload failed', details: String(uploadError) };
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         visit_id: med24Data.id,
-        visit_data: med24Data 
+        visit_data: med24Data,
+        files_uploaded: uploadResult
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

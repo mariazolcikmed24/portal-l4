@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.med24-get-visit]
 verify_jwt = false
+
+[functions.med24-upload-files]
+verify_jwt = false

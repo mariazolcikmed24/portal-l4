@@ -41,6 +41,10 @@ export default function Platnosc() {
       const wywiadOgolny = JSON.parse(localStorage.getItem('formData_wywiadOgolny') || '{}');
       const wywiadObjawy = JSON.parse(localStorage.getItem('formData_wywiadObjawy') || '{}');
       
+      // Pobierz przesłane pliki z localStorage
+      const uploadedAttachments = JSON.parse(localStorage.getItem('uploadedFiles_attachments') || '[]');
+      const attachmentPaths = uploadedAttachments.map((f: { path: string }) => f.path);
+      
       // Znajdź profil użytkownika
       let profileId;
       if (user) {
@@ -90,23 +94,41 @@ export default function Platnosc() {
           symptom_duration: wywiadObjawy.symptom_duration,
           symptoms: wywiadObjawy.symptoms || [],
           free_text_reason: wywiadObjawy.free_text_reason,
+          attachment_file_ids: attachmentPaths,
           payment_method: data.payment_method,
           payment_status: 'success',
           status: 'submitted',
           late_justification: datyChoroby.late_justification,
         })
-        .select('case_number')
+        .select('case_number, id')
         .single();
 
       if (error) throw error;
 
       toast.success("Płatność zakończona pomyślnie");
       
+      // Utwórz wizytę w Med24
+      console.log('Creating Med24 visit for case:', caseData.id);
+      try {
+        const { data: med24Result, error: med24Error } = await supabase.functions.invoke('med24-create-visit', {
+          body: { case_id: caseData.id }
+        });
+        
+        if (med24Error) {
+          console.error('Med24 visit creation error:', med24Error);
+        } else {
+          console.log('Med24 visit created:', med24Result);
+        }
+      } catch (med24Err) {
+        console.error('Failed to create Med24 visit:', med24Err);
+      }
+      
       // Clear all form data from localStorage after successful payment
       localStorage.removeItem('formData_datyChoroby');
       localStorage.removeItem('formData_rodzajZwolnienia');
       localStorage.removeItem('formData_wywiadOgolny');
       localStorage.removeItem('formData_wywiadObjawy');
+      localStorage.removeItem('uploadedFiles_attachments');
       
       // Przekieruj z numerem sprawy
       navigate(`/potwierdzenie?case=${caseData.case_number}`);

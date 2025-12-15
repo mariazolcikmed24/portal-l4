@@ -64,6 +64,7 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
+            {/* Login/Account buttons hidden for initial launch - uncomment when ready
             {user ? (
               <Link to="/panel">
                 <Button variant="ghost">
@@ -76,7 +77,8 @@ const Header = () => {
                 <Button variant="ghost">Zaloguj się</Button>
               </Link>
             )}
-            <Link to="/wybor-sciezki">
+            */}
+            <Link to="/rejestracja?guest=true">
               <Button variant="hero" size="lg">
                 Uzyskaj zwolnienie
               </Button>
@@ -129,6 +131,7 @@ const Header = () => {
               Kontakt
             </button>
             <div className="flex flex-col gap-2 pt-2">
+              {/* Login/Account buttons hidden for initial launch - uncomment when ready
               {user ? (
                 <Link to="/panel" className="w-full">
                   <Button variant="outline" className="w-full">
@@ -141,7 +144,8 @@ const Header = () => {
                   <Button variant="outline" className="w-full">Zaloguj się</Button>
                 </Link>
               )}
-              <Link to="/wybor-sciezki" className="w-full">
+              */}
+              <Link to="/rejestracja?guest=true" className="w-full">
                 <Button variant="hero" size="lg" className="w-full">
                   Uzyskaj zwolnienie
                 </Button>

@@ -18,7 +18,7 @@ const WyborSciezki = () => {
           </p>
 
           <div className="space-y-4">
-            {/* Zaloguj się */}
+            {/* Login/Register options hidden for initial launch - uncomment when ready
             <Link to="/logowanie" className="block">
               <div className="group p-6 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-soft cursor-pointer">
                 <div className="flex items-start gap-4">
@@ -37,7 +37,6 @@ const WyborSciezki = () => {
               </div>
             </Link>
 
-            {/* Zarejestruj się */}
             <Link to="/rejestracja" className="block">
               <div className="group p-6 rounded-xl border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-all hover:shadow-soft cursor-pointer">
                 <div className="flex items-start gap-4">
@@ -60,18 +59,19 @@ const WyborSciezki = () => {
                 </div>
               </div>
             </Link>
+            */}
 
-            {/* Kup jako gość */}
+            {/* Kup jako gość - teraz jedyna opcja */}
             <Link to="/rejestracja?guest=true" className="block">
-              <div className="group p-6 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-soft cursor-pointer">
+              <div className="group p-6 rounded-xl border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-all hover:shadow-soft cursor-pointer">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors">
+                  <div className="p-3 rounded-lg bg-primary text-white">
                     <ShoppingCart className="w-6 h-6" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Zamawiam jako gość</h2>
+                    <h2 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Rozpocznij wypełnianie formularza</h2>
                     <p className="text-muted-foreground text-sm">
-                      Nie chcesz zakładać konta? Wypełnij formularz jednorazowo bez rejestracji
+                      Wypełnij formularz, aby uzyskać e-zwolnienie online
                     </p>
                   </div>
                 </div>

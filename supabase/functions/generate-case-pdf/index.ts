@@ -49,6 +49,22 @@ serve(async (req) => {
 
     const profile = caseData.profile;
     
+    // Helper to remove Polish diacritics (StandardFonts don't support them)
+    const removeDiacritics = (text: string): string => {
+      const polishMap: Record<string, string> = {
+        'ą': 'a', 'Ą': 'A',
+        'ć': 'c', 'Ć': 'C',
+        'ę': 'e', 'Ę': 'E',
+        'ł': 'l', 'Ł': 'L',
+        'ń': 'n', 'Ń': 'N',
+        'ó': 'o', 'Ó': 'O',
+        'ś': 's', 'Ś': 'S',
+        'ź': 'z', 'Ź': 'Z',
+        'ż': 'z', 'Ż': 'Z',
+      };
+      return text.split('').map(char => polishMap[char] || char).join('');
+    };
+    
     // Create PDF document
     const pdfDoc = await PDFDocument.create();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -66,7 +82,9 @@ serve(async (req) => {
         page = pdfDoc.addPage([595, 842]);
         y = height - 50;
       }
-      page.drawText(text, {
+      // Remove Polish diacritics before rendering
+      const safeText = removeDiacritics(text);
+      page.drawText(safeText, {
         x: leftMargin,
         y,
         size,

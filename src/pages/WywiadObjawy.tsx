@@ -2,18 +2,18 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
-import { Upload } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const symptomsSchema = z.object({
   main_category: z.enum([
@@ -36,11 +36,14 @@ const symptomsSchema = z.object({
   free_text_reason: z.string()
     .min(1, "Opis jest wymagany")
     .max(1500, "Opis nie może przekraczać 1500 znaków"),
-  
-  upload_docs: z.instanceof(FileList).optional(),
 });
 
 type SymptomsFormData = z.infer<typeof symptomsSchema>;
+
+interface UploadedFile {
+  path: string;
+  name: string;
+}
 
 const categories = [
   { value: "cold_pain", label: "Przeziębienie lub bóle" },
@@ -154,35 +157,106 @@ const symptomsByCategory: Record<string, { id: string; label: string }[]> = {
 export default function WywiadObjawy() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   
   const form = useForm<SymptomsFormData>({
     resolver: zodResolver(symptomsSchema),
   });
 
   const mainCategory = form.watch("main_category");
-  const uploadDocs = form.watch("upload_docs");
 
   // Load saved data from localStorage
   useEffect(() => {
     const savedData = localStorage.getItem('formData_wywiadObjawy');
     if (savedData) {
       const parsed = JSON.parse(savedData);
-      // Don't restore file uploads
-      delete parsed.upload_docs;
       form.reset(parsed);
+    }
+    
+    // Load uploaded files from localStorage
+    const savedFiles = localStorage.getItem('uploadedFiles_attachments');
+    if (savedFiles) {
+      setUploadedFiles(JSON.parse(savedFiles));
     }
   }, []);
 
   // Save data to localStorage on change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      // Don't save file uploads to localStorage
-      const dataToSave = { ...value };
-      delete dataToSave.upload_docs;
-      localStorage.setItem('formData_wywiadObjawy', JSON.stringify(dataToSave));
+      localStorage.setItem('formData_wywiadObjawy', JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
+
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    
+    if (uploadedFiles.length + files.length > 3) {
+      toast.error("Maksymalnie możesz załączyć 3 pliki");
+      return;
+    }
+    
+    setIsUploading(true);
+    const newUploadedFiles: UploadedFile[] = [];
+    
+    for (const file of Array.from(files)) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`Plik ${file.name} jest za duży (max 10MB)`);
+        continue;
+      }
+      
+      try {
+        // Generate unique path
+        const timestamp = Date.now();
+        const randomId = Math.random().toString(36).substring(7);
+        const filePath = `attachments/${timestamp}-${randomId}-${file.name}`;
+        
+        console.log(`Uploading file: ${file.name} to ${filePath}`);
+        
+        const { error: uploadError } = await supabase.storage
+          .from('case-attachments')
+          .upload(filePath, file);
+        
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          toast.error(`Błąd przesyłania pliku ${file.name}`);
+          continue;
+        }
+        
+        newUploadedFiles.push({ path: filePath, name: file.name });
+        console.log(`Successfully uploaded: ${file.name}`);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        toast.error(`Błąd przesyłania pliku ${file.name}`);
+      }
+    }
+    
+    if (newUploadedFiles.length > 0) {
+      const allFiles = [...uploadedFiles, ...newUploadedFiles];
+      setUploadedFiles(allFiles);
+      localStorage.setItem('uploadedFiles_attachments', JSON.stringify(allFiles));
+      toast.success(`Przesłano ${newUploadedFiles.length} plik(ów)`);
+    }
+    
+    setIsUploading(false);
+  };
+
+  const handleRemoveFile = async (filePath: string) => {
+    try {
+      await supabase.storage
+        .from('case-attachments')
+        .remove([filePath]);
+      
+      const updatedFiles = uploadedFiles.filter(f => f.path !== filePath);
+      setUploadedFiles(updatedFiles);
+      localStorage.setItem('uploadedFiles_attachments', JSON.stringify(updatedFiles));
+      toast.success("Plik usunięty");
+    } catch (error) {
+      console.error('Error removing file:', error);
+      toast.error("Błąd usuwania pliku");
+    }
+  };
 
   const onSubmit = async (data: SymptomsFormData) => {
     console.log("Wywiad objawy:", data);
@@ -313,56 +387,68 @@ export default function WywiadObjawy() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="upload_docs"
-              render={({ field: { value, onChange, ...fieldProps } }) => (
-                <FormItem>
-                  <FormLabel>Załącz dokumentację medyczną (opcjonalnie)</FormLabel>
-                  <FormControl>
-                    <div className="space-y-2">
-                      <Input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        multiple
-                        onChange={(e) => onChange(e.target.files)}
-                        className="hidden"
-                        ref={fileInputRef}
-                      />
-                      <Button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-full"
-                        size="lg"
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        Wybierz pliki
-                      </Button>
-                      {uploadDocs && uploadDocs.length > 0 && (
-                        <div className="text-sm text-muted-foreground">
-                          Wybrano plików: {uploadDocs.length}
-                          <ul className="list-disc list-inside mt-1">
-                            {Array.from(uploadDocs).map((file, idx) => (
-                              <li key={idx}>{file.name}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </FormControl>
-                  <p className="text-sm text-muted-foreground">
-                    Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)
-                  </p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormItem>
+              <FormLabel>Załącz dokumentację medyczną (opcjonalnie)</FormLabel>
+              <div className="space-y-2">
+                <Input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  multiple
+                  onChange={(e) => handleFileUpload(e.target.files)}
+                  className="hidden"
+                  ref={fileInputRef}
+                  disabled={isUploading}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full"
+                  size="lg"
+                  disabled={isUploading || uploadedFiles.length >= 3}
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Przesyłanie...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Wybierz pliki
+                    </>
+                  )}
+                </Button>
+                
+                {uploadedFiles.length > 0 && (
+                  <div className="space-y-2 mt-2">
+                    <p className="text-sm text-muted-foreground">Przesłane pliki ({uploadedFiles.length}/3):</p>
+                    {uploadedFiles.map((file) => (
+                      <div key={file.path} className="flex items-center justify-between bg-muted/50 p-2 rounded">
+                        <span className="text-sm truncate flex-1">{file.name}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveFile(file.path)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)
+              </p>
+            </FormItem>
 
             <div className="flex gap-4 pt-4">
               <Button type="button" variant="outline" onClick={() => navigate("/wywiad-ogolny")} className="flex-1">
                 Wstecz
               </Button>
-              <Button type="submit" className="flex-1">
+              <Button type="submit" className="flex-1" disabled={isUploading}>
                 Dalej do podsumowania
               </Button>
             </div>

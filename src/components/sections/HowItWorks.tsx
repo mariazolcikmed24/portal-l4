@@ -1,11 +1,11 @@
-import { FileText, Video, Download, ArrowRight } from "lucide-react";
+import { FileText, Stethoscope, Download, ArrowRight } from "lucide-react";
 const steps = [{
   icon: FileText,
   title: "Wypełnij formularz",
   description: "Uzupełnij krótki formularz medyczny online. To zajmie maksymalnie 5 minut.",
   step: "01"
 }, {
-  icon: Video,
+  icon: Stethoscope,
   title: "Weryfikacja przez lekarza",
   description: "Lekarz weryfikuje dane z wypełnionego formularza medycznego i w razie potrzeby kontaktuje się z Tobą.",
   step: "02"

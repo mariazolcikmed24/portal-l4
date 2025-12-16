@@ -954,13 +954,13 @@ const Rejestracja = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <Link to="/" className="flex-1">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
+              <Link to="/" className="sm:flex-1">
                 <Button type="button" variant="outline" size="lg" className="w-full">
                   Anuluj
                 </Button>
               </Link>
-              <Button type="submit" size="lg" className="flex-1" disabled={isSubmitting}>
+              <Button type="submit" size="lg" className="w-full sm:flex-1" disabled={isSubmitting}>
                 {isSubmitting 
                   ? (isGuestMode ? "Zapisywanie..." : "Rejestracja...") 
                   : (isGuestMode ? "Zapisz i przejdź dalej" : "Zarejestruj się i przejdź dalej")

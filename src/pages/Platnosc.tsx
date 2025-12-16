@@ -88,7 +88,7 @@ export default function Platnosc() {
           has_meds: wywiadOgolny.q_meds === 'yes',
           meds_list: wywiadOgolny.meds_list,
           chronic_conditions: wywiadOgolny.chronic_list || [],
-          chronic_other: wywiadOgolny.chronic_other,
+          chronic_other: wywiadOgolny.chronic_other_text,
           long_leave: wywiadOgolny.q_long_leave === 'yes',
           main_category: wywiadObjawy.main_category,
           symptom_duration: wywiadObjawy.symptom_duration,

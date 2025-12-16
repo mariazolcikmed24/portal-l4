@@ -66,55 +66,127 @@ export default function Podsumowanie() {
 
   const getMainCategoryLabel = (category: string) => {
     const labels: Record<string, string> = {
-      'cold_pain': 'Przeziębienie / Ból',
-      'digestive': 'Problemy trawienne',
-      'injury': 'Uraz',
-      'mental': 'Zdrowie psychiczne',
-      'pregnancy': 'Ciąża',
-      'other': 'Inne'
+      'cold_pain': 'Przeziębienie lub bóle',
+      'gastro': 'Zatrucie i problemy żołądkowe',
+      'bladder': 'Problemy z pęcherzem',
+      'injury': 'Urazy',
+      'menstruation': 'Menstruacja / miesiączka',
+      'back_pain': 'Bóle pleców',
+      'eye': 'Problemy z oczami',
+      'migraine': 'Migrena',
+      'acute_stress': 'Ostre reakcje na stres',
+      'psych': 'Problemy psychologiczne'
     };
     return labels[category] || category;
   };
 
   const getChronicConditionLabel = (condition: string) => {
     const labels: Record<string, string> = {
-      'hypertension': 'Nadciśnienie',
+      'autoimmune': 'Choroby autoimmunologiczne',
+      'respiratory': 'Choroby układu oddechowego',
       'diabetes': 'Cukrzyca',
-      'asthma': 'Astma',
-      'heart_disease': 'Choroba serca',
-      'thyroid': 'Choroba tarczycy',
-      'autoimmune': 'Choroba autoimmunologiczna',
+      'circulatory': 'Choroby układu krążenia',
       'cancer': 'Nowotwór',
-      'mental_health': 'Choroba psychiczna',
-      'other': 'Inna'
+      'osteoporosis': 'Osteoporoza',
+      'epilepsy': 'Padaczka',
+      'aids': 'AIDS',
+      'obesity': 'Otyłość',
+      'other': 'Inne'
     };
     return labels[condition] || condition;
   };
 
   const getSymptomLabel = (symptom: string) => {
     const labels: Record<string, string> = {
-      'fever': 'Gorączka',
-      'chills': 'Dreszcze',
-      'cough': 'Kaszel',
-      'sore_throat': 'Ból gardła',
-      'runny_nose': 'Katar',
-      'headache': 'Ból głowy',
-      'body_aches': 'Bóle mięśniowe',
+      // cold_pain
+      'fever': 'Gorączka >38°C',
       'fatigue': 'Zmęczenie',
-      'nausea': 'Nudności',
-      'vomiting': 'Wymioty',
-      'diarrhea': 'Biegunka',
-      'stomach_pain': 'Ból brzucha',
       'dizziness': 'Zawroty głowy',
-      'shortness_of_breath': 'Duszność',
-      'chest_pain': 'Ból w klatce piersiowej',
-      'back_pain': 'Ból pleców',
-      'joint_pain': 'Bólstawów',
-      'rash': 'Wysypka',
-      'swelling': 'Obrzęk',
-      'other': 'Inne'
+      'chills': 'Dreszcze',
+      'swollen_tonsils': 'Spuchnięte migdałki',
+      'runny_nose': 'Katar',
+      'sinusitis': 'Zapalenie zatok',
+      'cough': 'Kaszel',
+      'hoarseness': 'Chrypka',
+      'sore_throat': 'Ból gardła',
+      'muscle_pain': 'Ból mięśni',
+      'chest_heaviness': 'Uczucie ciężkości w klatce piersiowej',
+      // gastro
+      'no_appetite': 'Brak apetytu',
+      'diarrhea': 'Biegunka',
+      'food_poisoning': 'Zatrucie pokarmowe',
+      'vomiting': 'Wymioty',
+      'abdominal_pain': 'Ból brzucha',
+      // bladder
+      'frequent_urination': 'Częste oddawanie moczu',
+      'painful_urination': 'Bolesne oddawanie moczu',
+      'bladder_pain': 'Ból pęcherza',
+      'urge': 'Parcie na mocz',
+      'oliguria': 'Skąpomocz',
+      // injury
+      'head': 'Głowa i czaszka',
+      'neck': 'Szyja',
+      'spine': 'Kręgosłup',
+      'chest': 'Klatka piersiowa',
+      'abdomen': 'Brzuch',
+      'pelvis': 'Miednica',
+      'shoulder': 'Barki i ramię',
+      'forearm': 'Przedramię',
+      'elbow': 'Łokieć',
+      'hand': 'Ręka/nadgarstek',
+      'hip': 'Biodro',
+      'thigh': 'Udo',
+      'knee': 'Kolano',
+      'shin': 'Podudzie',
+      'ankle': 'Staw skokowy/stopa',
+      // menstruation
+      'severe_pain': 'Silne bóle miesiączkowe',
+      'heavy_bleeding': 'Obfite krwawienie',
+      'irritation': 'Rozdrażnienie',
+      'painful_start': 'Bolesny początek miesiączki',
+      // back_pain
+      'back_spine': 'Ból pleców/kręgosłupa',
+      'sciatica': 'Rwa kulszowa',
+      'shoulder_radiculopathy': 'Rwa barkowa',
+      'cervical_pain': 'Ból w odcinku szyjnym',
+      'thoracic_pain': 'Ból w odcinku piersiowym',
+      'upper_limb_radiation': 'Promieniowanie do kończyny górnej',
+      'lower_limb_radiation': 'Promieniowanie do kończyny dolnej',
+      'tingling': 'Mrowienie w kończynach',
+      'sitting_pain': 'Ból w pozycji siedzącej',
+      'lumbar_pain': 'Ból w odcinku lędźwiowo-krzyżowym',
+      'lifting_problem': 'Problem z podnoszeniem ciężkich przedmiotów',
+      'standing_pain': 'Ból w pozycji stojącej',
+      // eye
+      'burning': 'Pieczenie',
+      'redness': 'Zaczerwienienie oczu',
+      'tearing': 'Łzawienie',
+      'gritty': 'Uczucie piasku pod powiekami',
+      'discharge': 'Ropa w oczach',
+      // migraine
+      'photophobia': 'Światłowstręt',
+      'confusion': 'Rozkojarzenie',
+      'history': 'Migrena rozpoznana w przeszłości',
+      // acute_stress & psych
+      'family_problems': 'Problemy rodzinne',
+      'divorce': 'Stres (rozwód)',
+      'family_issues': 'Stres (problemy rodzinne)',
+      'death': 'Stres (śmierć bliskiej osoby)',
+      'work': 'Stres (praca)',
+      'job_loss': 'Stres (utrata pracy)',
     };
     return labels[symptom] || symptom;
+  };
+
+  const getDurationLabel = (duration: string) => {
+    const labels: Record<string, string> = {
+      'today': 'Od dziś',
+      'yesterday': 'Od wczoraj',
+      '2_3': '2-3 dni',
+      '4_5': '4-5 dni',
+      'gt_5': 'Ponad 5 dni'
+    };
+    return labels[duration] || duration;
   };
 
   if (!profileData) {
@@ -224,11 +296,10 @@ export default function Podsumowanie() {
                     {formData.wywiadOgolny.q_chronic === 'yes' && formData.wywiadOgolny.chronic_list?.length > 0 && (
                       <div className="ml-4 mt-1 text-sm">
                         {formData.wywiadOgolny.chronic_list.map((condition: string) => (
-                          <div key={condition}>• {getChronicConditionLabel(condition)}</div>
+                          condition === 'other' && formData.wywiadOgolny.chronic_other_text 
+                            ? <div key={condition}>• Inne: {formData.wywiadOgolny.chronic_other_text}</div>
+                            : <div key={condition}>• {getChronicConditionLabel(condition)}</div>
                         ))}
-                        {formData.wywiadOgolny.chronic_other && (
-                          <div>• Inne: {formData.wywiadOgolny.chronic_other}</div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -276,11 +347,7 @@ export default function Podsumowanie() {
                   <div>
                     <span className="text-muted-foreground">Czas trwania objawów: </span>
                     <span className="font-medium">
-                      {formData.wywiadObjawy.symptom_duration === 'today' && 'Od dziś'}
-                      {formData.wywiadObjawy.symptom_duration === 'yesterday' && 'Od wczoraj'}
-                      {formData.wywiadObjawy.symptom_duration === '2-3_days' && '2-3 dni'}
-                      {formData.wywiadObjawy.symptom_duration === 'week' && 'Tydzień'}
-                      {formData.wywiadObjawy.symptom_duration === 'longer' && 'Dłużej'}
+                      {getDurationLabel(formData.wywiadObjawy.symptom_duration)}
                     </span>
                   </div>
                 )}

@@ -206,19 +206,19 @@ export default function StatusSprawy() {
               <CardContent className="space-y-4">
                 {/* Unified Status Display */}
                 <div className={`p-4 sm:p-6 rounded-lg border ${status.bgColor} ${status.borderColor}`}>
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
-                    <div className={status.color}>
-                      <status.icon className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <div className="flex flex-col gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={status.color}>
+                        <status.icon className="w-6 h-6 sm:w-8 sm:h-8" />
+                      </div>
+                      <p className={`text-xl sm:text-2xl font-bold ${status.color}`}>
+                        {status.label}
+                      </p>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-2">
-                        <p className={`text-xl sm:text-2xl font-bold ${status.color}`}>
-                          {status.label}
-                        </p>
-                        <p className="text-sm sm:text-lg font-mono font-bold text-muted-foreground break-all">
-                          {caseData.case_number}
-                        </p>
-                      </div>
+                      <p className="text-sm sm:text-lg font-mono font-bold text-muted-foreground break-all mb-2">
+                        {caseData.case_number}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {status.description}
                       </p>

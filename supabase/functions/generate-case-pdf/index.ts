@@ -184,19 +184,25 @@ serve(async (req) => {
     drawText(`Choroby przewlekle: ${caseData.chronic_conditions?.length > 0 ? 'Tak' : 'Nie'}`);
     if (caseData.chronic_conditions?.length > 0) {
       const chronicLabels: Record<string, string> = {
-        'hypertension': 'Nadcisnienie',
+        'autoimmune': 'Choroby autoimmunologiczne',
+        'respiratory': 'Choroby ukladu oddechowego',
         'diabetes': 'Cukrzyca',
-        'asthma': 'Astma',
-        'heart_disease': 'Choroba serca',
-        'thyroid': 'Choroba tarczycy',
-        'autoimmune': 'Choroba autoimmunologiczna',
+        'circulatory': 'Choroby ukladu krazenia',
         'cancer': 'Nowotwor',
-        'mental_health': 'Choroba psychiczna',
-        'other': 'Inna',
+        'osteoporosis': 'Osteoporoza',
+        'epilepsy': 'Padaczka',
+        'aids': 'AIDS',
+        'obesity': 'Otylosc',
+        'other': 'Inne',
       };
-      const chronicList = caseData.chronic_conditions.map((c: string) => chronicLabels[c] || c).join(', ');
-      drawText(`  - ${chronicList}`);
-      if (caseData.chronic_other) {
+      const chronicList = caseData.chronic_conditions
+        .filter((c: string) => c !== 'other')
+        .map((c: string) => chronicLabels[c] || c)
+        .join(', ');
+      if (chronicList) {
+        drawText(`  - ${chronicList}`);
+      }
+      if (caseData.chronic_conditions.includes('other') && caseData.chronic_other) {
         drawText(`  - Inne: ${caseData.chronic_other}`);
       }
     }
@@ -219,7 +225,86 @@ serve(async (req) => {
     drawText(`Czas trwania objawow: ${getDurationLabel(caseData.symptom_duration)}`);
     
     if (caseData.symptoms?.length > 0) {
-      drawText(`Objawy: ${caseData.symptoms.join(', ')}`);
+      const symptomLabels: Record<string, string> = {
+        // cold_pain
+        'fever': 'Goraczka >38C',
+        'fatigue': 'Zmeczenie',
+        'dizziness': 'Zawroty glowy',
+        'chills': 'Dreszcze',
+        'swollen_tonsils': 'Spuchniete migdalki',
+        'runny_nose': 'Katar',
+        'sinusitis': 'Zapalenie zatok',
+        'cough': 'Kaszel',
+        'hoarseness': 'Chrypka',
+        'sore_throat': 'Bol gardla',
+        'muscle_pain': 'Bol miesni',
+        'chest_heaviness': 'Uczucie ciezkosci w klatce piersiowej',
+        // gastro
+        'no_appetite': 'Brak apetytu',
+        'diarrhea': 'Biegunka',
+        'food_poisoning': 'Zatrucie pokarmowe',
+        'vomiting': 'Wymioty',
+        'abdominal_pain': 'Bol brzucha',
+        // bladder
+        'frequent_urination': 'Czeste oddawanie moczu',
+        'painful_urination': 'Bolesne oddawanie moczu',
+        'bladder_pain': 'Bol pecherza',
+        'urge': 'Parcie na mocz',
+        'oliguria': 'Skapomocz',
+        // injury
+        'head': 'Glowa i czaszka',
+        'neck': 'Szyja',
+        'spine': 'Kregoslup',
+        'chest': 'Klatka piersiowa',
+        'abdomen': 'Brzuch',
+        'pelvis': 'Miednica',
+        'shoulder': 'Barki i ramie',
+        'forearm': 'Przedramie',
+        'elbow': 'Lokiec',
+        'hand': 'Reka/nadgarstek',
+        'hip': 'Biodro',
+        'thigh': 'Udo',
+        'knee': 'Kolano',
+        'shin': 'Podudzie',
+        'ankle': 'Staw skokowy/stopa',
+        // menstruation
+        'severe_pain': 'Silne bole miesiączkowe',
+        'heavy_bleeding': 'Obfite krwawienie',
+        'irritation': 'Rozdraznienie',
+        'painful_start': 'Bolesny poczatek miesiaczki',
+        // back_pain
+        'back_spine': 'Bol plecow/kregoslupa',
+        'sciatica': 'Rwa kulszowa',
+        'shoulder_radiculopathy': 'Rwa barkowa',
+        'cervical_pain': 'Bol w odcinku szyjnym',
+        'thoracic_pain': 'Bol w odcinku piersiowym',
+        'upper_limb_radiation': 'Promieniowanie do konczyny gornej',
+        'lower_limb_radiation': 'Promieniowanie do konczyny dolnej',
+        'tingling': 'Mrowienie w konczynach',
+        'sitting_pain': 'Bol w pozycji siedzacej',
+        'lumbar_pain': 'Bol w odcinku ledzwiowo-krzyzowym',
+        'lifting_problem': 'Problem z podnoszeniem ciezkich przedmiotow',
+        'standing_pain': 'Bol w pozycji stojacej',
+        // eye
+        'burning': 'Pieczenie',
+        'redness': 'Zaczerwienienie oczu',
+        'tearing': 'Lzawienie',
+        'gritty': 'Uczucie piasku pod powiekami',
+        'discharge': 'Ropa w oczach',
+        // migraine
+        'photophobia': 'Swiatlowstret',
+        'confusion': 'Rozkojarzenie',
+        'history': 'Migrena rozpoznana w przeszlosci',
+        // acute_stress & psych
+        'family_problems': 'Problemy rodzinne',
+        'divorce': 'Stres (rozwod)',
+        'family_issues': 'Stres (problemy rodzinne)',
+        'death': 'Stres (smierc bliskiej osoby)',
+        'work': 'Stres (praca)',
+        'job_loss': 'Stres (utrata pracy)',
+      };
+      const symptomsList = caseData.symptoms.map((s: string) => symptomLabels[s] || s).join(', ');
+      drawText(`Objawy: ${symptomsList}`);
     }
 
     // Free text description

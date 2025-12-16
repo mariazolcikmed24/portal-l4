@@ -25,12 +25,51 @@ const validatePesel = (pesel: string): boolean => {
   return checksum === parseInt(pesel[10]);
 };
 
+// Extract date of birth from PESEL
+const extractDateOfBirthFromPesel = (pesel: string): string => {
+  const year = parseInt(pesel.substring(0, 2));
+  const month = parseInt(pesel.substring(2, 4));
+  const day = parseInt(pesel.substring(4, 6));
+  
+  // Determine century based on month code
+  let fullYear: number;
+  let realMonth: number;
+  
+  if (month >= 1 && month <= 12) {
+    // 1900-1999
+    fullYear = 1900 + year;
+    realMonth = month;
+  } else if (month >= 21 && month <= 32) {
+    // 2000-2099
+    fullYear = 2000 + year;
+    realMonth = month - 20;
+  } else if (month >= 41 && month <= 52) {
+    // 2100-2199
+    fullYear = 2100 + year;
+    realMonth = month - 40;
+  } else if (month >= 61 && month <= 72) {
+    // 2200-2299
+    fullYear = 2200 + year;
+    realMonth = month - 60;
+  } else if (month >= 81 && month <= 92) {
+    // 1800-1899
+    fullYear = 1800 + year;
+    realMonth = month - 80;
+  } else {
+    // Fallback
+    fullYear = 1900 + year;
+    realMonth = month;
+  }
+  
+  // Format as YYYY-MM-DD
+  return `${fullYear}-${String(realMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+
 const registrationSchema = z.object({
   firstName: z.string().trim().min(1, "Imię jest wymagane").max(50, "Imię jest za długie"),
   lastName: z.string().trim().min(1, "Nazwisko jest wymagane").max(50, "Nazwisko jest za długie"),
   email: z.string().trim().email("Nieprawidłowy adres e-mail").max(254, "E-mail jest za długi"),
   pesel: z.string().refine(validatePesel, "Nieprawidłowy numer PESEL"),
-  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Nieprawidłowa data (format: RRRR-MM-DD)"),
   phonePrefix: z.string().min(1, "Prefiks jest wymagany"),
   phoneNumber: z.string().regex(/^\d{9,13}$/, "Nieprawidłowy numer telefonu (9-13 cyfr)"),
   street: z.string().trim().min(1, "Ulica jest wymagana").max(100, "Ulica jest za długa"),
@@ -354,7 +393,7 @@ const Rejestracja = () => {
           last_name: data.lastName,
           email: data.email,
           pesel: data.pesel,
-          date_of_birth: data.dateOfBirth,
+          date_of_birth: extractDateOfBirthFromPesel(data.pesel),
           phone: fullPhone,
           street: data.street,
           house_no: data.houseNo,
@@ -399,7 +438,7 @@ const Rejestracja = () => {
               first_name: data.firstName,
               last_name: data.lastName,
               pesel: data.pesel,
-              date_of_birth: data.dateOfBirth,
+              date_of_birth: extractDateOfBirthFromPesel(data.pesel),
               phone: fullPhone,
               street: data.street,
               house_no: data.houseNo,
@@ -529,33 +568,18 @@ const Rejestracja = () => {
                 </div>
               )}
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="reg_pesel">PESEL *</Label>
-                  <Input
-                    id="reg_pesel"
-                    {...register("pesel")}
-                    maxLength={11}
-                    placeholder="12345678901"
-                    className={errors.pesel ? "border-destructive" : ""}
-                  />
-                  {errors.pesel && (
-                    <p className="text-sm text-destructive">{errors.pesel.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="reg_dob">Data urodzenia *</Label>
-                  <Input
-                    id="reg_dob"
-                    type="date"
-                    {...register("dateOfBirth")}
-                    className={errors.dateOfBirth ? "border-destructive" : ""}
-                  />
-                  {errors.dateOfBirth && (
-                    <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>
-                  )}
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="reg_pesel">PESEL *</Label>
+                <Input
+                  id="reg_pesel"
+                  {...register("pesel")}
+                  maxLength={11}
+                  placeholder="12345678901"
+                  className={errors.pesel ? "border-destructive" : ""}
+                />
+                {errors.pesel && (
+                  <p className="text-sm text-destructive">{errors.pesel.message}</p>
+                )}
               </div>
 
               <div className="grid md:grid-cols-1 gap-4">

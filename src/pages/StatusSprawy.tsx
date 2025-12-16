@@ -211,13 +211,15 @@ export default function StatusSprawy() {
                       <status.icon className="w-6 h-6 sm:w-8 sm:h-8" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-2">
-                        <p className={`text-xl sm:text-2xl font-bold ${status.color}`}>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                        <p className={`text-xl sm:text-2xl font-bold leading-tight ${status.color}`}>
                           {status.label}
                         </p>
-                        <p className="text-sm sm:text-lg font-mono font-bold text-muted-foreground break-all">
-                          {caseData.case_number}
-                        </p>
+                        <div className="sm:text-right">
+                          <span className="inline-flex max-w-full break-all rounded-md border border-border/60 bg-background/60 px-2 py-1 text-xs sm:text-sm font-mono font-semibold text-muted-foreground">
+                            {caseData.case_number}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {status.description}

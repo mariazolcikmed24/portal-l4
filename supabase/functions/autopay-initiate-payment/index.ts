@@ -90,23 +90,35 @@ Deno.serve(async (req) => {
     }
 
     // Prepare payment parameters
-    // Amount in PLN format (e.g., "79.00")
+    // Amount in PLN format (e.g., "79.00") - Autopay expects decimal format
     const amountStr = (amount / 100).toFixed(2);
     const currency = "PLN";
-    const description = `E-konsultacja medyczna ${caseData.case_number || case_id}`;
+    const description = `Konsultacja medyczna ${caseData.case_number || case_id}`;
     
     // Return URL after payment
     const origin = req.headers.get("origin") || "https://e-zwolnienie.com.pl";
     const returnUrl = `${origin}/potwierdzenie?case=${caseData.case_number}`;
     
     // Generate hash for security
-    // Hash format: SHA256(serviceID|orderID|amount|currency|hashKey)
-    const hashString = `${serviceId}|${case_id}|${amountStr}|${currency}|${hashKey}`;
+    // Hash format for Autopay payment link: SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|hashKey)
+    // For basic payment without optional fields: SHA256(ServiceID|OrderID|Amount|Currency|hashKey)
+    // Note: Description and GatewayID are optional in hash if not sent
+    let hashString: string;
+    if (gatewayId) {
+      hashString = `${serviceId}|${case_id}|${amountStr}|${currency}|${gatewayId}|${hashKey}`;
+    } else {
+      hashString = `${serviceId}|${case_id}|${amountStr}|${currency}|${hashKey}`;
+    }
+    
+    console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
+    
     const encoder = new TextEncoder();
     const data = encoder.encode(hashString);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+    console.log("Generated hash:", hash);
 
     // Build Autopay payment URL
     // Test: https://testpay.autopay.eu/payment
@@ -130,6 +142,8 @@ Deno.serve(async (req) => {
     if (gatewayId) {
       params.append("GatewayID", gatewayId.toString());
     }
+    
+    console.log("Payment params:", Object.fromEntries(params.entries()));
 
     const paymentUrl = `${baseUrl}?${params.toString()}`;
 

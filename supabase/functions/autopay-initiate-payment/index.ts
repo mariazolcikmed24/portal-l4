@@ -90,13 +90,14 @@ Deno.serve(async (req) => {
     }
 
     // Prepare payment parameters
-    // Amount in grosz (79 PLN = 7900 grosz)
-    const amountStr = amount.toFixed(2);
+    // Amount in PLN format (e.g., "79.00")
+    const amountStr = (amount / 100).toFixed(2);
     const currency = "PLN";
     const description = `E-konsultacja medyczna ${caseData.case_number || case_id}`;
     
-    // Return URL after payment (will include transaction status)
-    const returnUrl = `${req.headers.get("origin") || "https://e-zwolnienie.com.pl"}/potwierdzenie?case=${caseData.case_number}`;
+    // Return URL after payment
+    const origin = req.headers.get("origin") || "https://e-zwolnienie.com.pl";
+    const returnUrl = `${origin}/potwierdzenie?case=${caseData.case_number}`;
     
     // Generate hash for security
     // Hash format: SHA256(serviceID|orderID|amount|currency|hashKey)
@@ -122,7 +123,7 @@ Deno.serve(async (req) => {
       Currency: currency,
       Description: description,
       Hash: hash,
-      CustomerEmail: "", // Will be filled by profile if needed
+      ReturnURL: returnUrl,
     });
 
     // Add gateway ID if specific method selected

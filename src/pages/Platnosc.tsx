@@ -70,7 +70,7 @@ export default function Platnosc() {
         throw new Error('Nie znaleziono profilu użytkownika');
       }
 
-      // Zapisz sprawę do bazy danych
+      // Zapisz sprawę do bazy danych z payment_status: "pending"
       const { data: caseData, error } = await supabase
         .from('cases')
         .insert({
@@ -96,8 +96,8 @@ export default function Platnosc() {
           free_text_reason: wywiadObjawy.free_text_reason,
           attachment_file_ids: attachmentPaths,
           payment_method: data.payment_method,
-          payment_status: 'success',
-          status: 'submitted',
+          payment_status: 'pending',
+          status: 'draft',
           late_justification: datyChoroby.late_justification,
         })
         .select('case_number, id')
@@ -105,37 +105,37 @@ export default function Platnosc() {
 
       if (error) throw error;
 
-      toast.success("Płatność zakończona pomyślnie");
-      
-      // Utwórz wizytę w Med24
-      console.log('Creating Med24 visit for case:', caseData.id);
-      try {
-        const { data: med24Result, error: med24Error } = await supabase.functions.invoke('med24-create-visit', {
-          body: { case_id: caseData.id }
-        });
-        
-        if (med24Error) {
-          console.error('Med24 visit creation error:', med24Error);
-        } else {
-          console.log('Med24 visit created:', med24Result);
+      console.log('Case created:', caseData);
+
+      // Wywołaj edge function do inicjowania płatności Autopay
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('autopay-initiate-payment', {
+        body: { 
+          case_id: caseData.id,
+          payment_method: data.payment_method,
+          amount: 7900, // 79 PLN w groszach
         }
-      } catch (med24Err) {
-        console.error('Failed to create Med24 visit:', med24Err);
+      });
+
+      if (paymentError) {
+        console.error('Payment initiation error:', paymentError);
+        throw new Error('Nie udało się zainicjować płatności');
       }
-      
-      // Clear all form data from localStorage after successful payment
+
+      console.log('Payment URL:', paymentData.payment_url);
+
+      // Clear all form data from localStorage before redirect
       localStorage.removeItem('formData_datyChoroby');
       localStorage.removeItem('formData_rodzajZwolnienia');
       localStorage.removeItem('formData_wywiadOgolny');
       localStorage.removeItem('formData_wywiadObjawy');
       localStorage.removeItem('uploadedFiles_attachments');
       
-      // Przekieruj z numerem sprawy
-      navigate(`/potwierdzenie?case=${caseData.case_number}`);
+      // Przekieruj do bramki płatności Autopay
+      window.location.href = paymentData.payment_url;
+
     } catch (error: any) {
       console.error('Błąd podczas zapisywania sprawy:', error);
       toast.error("Wystąpił błąd podczas przetwarzania płatności");
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -240,7 +240,7 @@ export default function Platnosc() {
                 Wstecz
               </Button>
               <Button type="submit" className="flex-1" disabled={isProcessing}>
-                {isProcessing ? "Przetwarzanie..." : "Zapłać 79 PLN"}
+                {isProcessing ? "Przekierowywanie do płatności..." : "Zapłać 79 PLN"}
               </Button>
             </div>
           </form>

@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       .from("cases")
       .update(updatePayload)
       .eq("id", case_id)
-      .select("case_number")
+      .select("case_number, profile_id, profiles(email)")
       .single();
 
     if (updateError) {
@@ -94,27 +94,37 @@ Deno.serve(async (req) => {
     }
 
     // Prepare payment parameters
-    // Amount in grosze (e.g., 7900) - Autopay expects integer format for online payments
-    const amountStr = String(amount);
+    // Amount in PLN format (e.g., "79.00") - Autopay expects decimal format with dot separator
+    const amountStr = (amount / 100).toFixed(2);
     const currency = "PLN";
     const description = `Konsultacja medyczna ${caseData.case_number || case_id}`;
     
-    // Return URL after payment
-    const origin = req.headers.get("origin") || "https://e-zwolnienie.com.pl";
-    const returnUrl = `${origin}/potwierdzenie?case=${caseData.case_number}`;
-    
     // Generate hash for security
-    // Hash format for Autopay payment link: SHA256(ServiceID|OrderID|Amount|Currency|hashKey)
-    // Note: Even if you pass optional params (e.g., Description, ReturnURL, GatewayID), the payment link hash is computed only from the core fields.
-    const hashString = `${serviceId}|${case_id}|${amountStr}|${currency}|${hashKey}`;
+    // Hash format per Autopay docs (Rozpoczęcie transakcji):
+    // SHA256(ServiceID|OrderID|Amount|[Description]|[GatewayID]|[Currency]|CustomerEmail|HashKey)
+    // Note: include optional params in the hash ONLY if you send them.
+    const customerEmail = (caseData as any)?.profiles?.email as string | undefined;
+    if (!customerEmail) {
+      console.error("CustomerEmail missing for case/profile", { case_id });
+      return new Response(
+        JSON.stringify({ error: "Customer email missing" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const hashParts: string[] = [serviceId, case_id, amountStr, description];
+    if (gatewayId) hashParts.push(String(gatewayId));
+    hashParts.push(currency, customerEmail, hashKey);
+
+    const hashString = hashParts.join("|");
 
     console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
-    
+
     const encoder = new TextEncoder();
     const data = encoder.encode(hashString);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
     console.log("Generated hash:", hash);
 
@@ -130,10 +140,10 @@ Deno.serve(async (req) => {
       ServiceID: serviceId,
       OrderID: case_id,
       Amount: amountStr,
-      Currency: currency,
       Description: description,
+      Currency: currency,
+      CustomerEmail: customerEmail,
       Hash: hash,
-      ReturnURL: returnUrl,
     });
 
     // Add gateway ID if specific method selected

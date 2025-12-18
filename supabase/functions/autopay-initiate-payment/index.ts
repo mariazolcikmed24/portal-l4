@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface PaymentRequest {
   case_id: string;
-  payment_method: string;
+  payment_method?: string;
   amount?: number;
 }
 
@@ -54,14 +54,16 @@ Deno.serve(async (req) => {
     // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Update case payment status to pending and save payment method
+    // Update case payment status to pending and (optionally) save payment method
+    const updatePayload: Record<string, unknown> = {
+      payment_status: "pending",
+      updated_at: new Date().toISOString(),
+    };
+    if (payment_method) updatePayload.payment_method = payment_method;
+
     const { data: caseData, error: updateError } = await supabase
       .from("cases")
-      .update({
-        payment_status: "pending",
-        payment_method: payment_method,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq("id", case_id)
       .select("case_number")
       .single();
@@ -77,21 +79,23 @@ Deno.serve(async (req) => {
     // Map payment method to Autopay gateway ID
     // https://developers.autopay.pl/online/kody-bramek
     let gatewayId: number | undefined;
-    switch (payment_method) {
-      case "blik":
-        gatewayId = 509; // BLIK
-        break;
-      case "card":
-        gatewayId = 1500; // Visa/Mastercard
-        break;
-      case "transfer":
-        gatewayId = undefined; // Let user choose bank
-        break;
+    if (payment_method) {
+      switch (payment_method) {
+        case "blik":
+          gatewayId = 509; // BLIK
+          break;
+        case "card":
+          gatewayId = 1500; // Visa/Mastercard
+          break;
+        case "transfer":
+          gatewayId = undefined; // Let user choose bank
+          break;
+      }
     }
 
     // Prepare payment parameters
-    // Amount in PLN format (e.g., "79.00") - Autopay expects decimal format
-    const amountStr = (amount / 100).toFixed(2);
+    // Amount in grosze (e.g., 7900) - Autopay expects integer format for online payments
+    const amountStr = String(amount);
     const currency = "PLN";
     const description = `Konsultacja medyczna ${caseData.case_number || case_id}`;
     

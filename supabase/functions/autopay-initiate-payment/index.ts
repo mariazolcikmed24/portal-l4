@@ -173,13 +173,19 @@ Deno.serve(async (req) => {
     console.log("Payment URL generated:", paymentUrl);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
+        // Backwards compatibility (GET redirect)
         payment_url: paymentUrl,
+
+        // Preferred: POST redirect to gateway
+        payment_base_url: baseUrl,
+        payment_params: Object.fromEntries(params.entries()),
+
         case_number: caseData.case_number,
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
 

@@ -28,14 +28,6 @@ export default function Platnosc() {
   });
 
   const onSubmit = async (data: PaymentFormData) => {
-    // IMPORTANT: Autopay service is configured for the preview domain.
-    // If user is on a different domain, redirect to the configured domain before initiating payment.
-    const configuredDomain = "https://preview--portal-l4.lovable.app";
-    if (window.location.origin !== configuredDomain) {
-      window.location.replace(`${configuredDomain}/platnosc`);
-      return;
-    }
-
     setIsProcessing(true);
     console.log("Płatność:", data);
     

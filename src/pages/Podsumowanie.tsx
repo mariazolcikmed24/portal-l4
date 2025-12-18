@@ -251,6 +251,12 @@ export default function Podsumowanie() {
                     : '-'}
                 </span>
               </div>
+              {formData.datyChoroby?.late_justification && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Uzasadnienie:</span>
+                  <span className="font-medium text-right max-w-[60%]">{formData.datyChoroby.late_justification}</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 

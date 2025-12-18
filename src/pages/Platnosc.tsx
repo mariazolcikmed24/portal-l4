@@ -123,12 +123,8 @@ export default function Platnosc() {
 
       console.log('Payment URL:', paymentData.payment_url);
 
-      // Clear all form data from localStorage before redirect
-      localStorage.removeItem('formData_datyChoroby');
-      localStorage.removeItem('formData_rodzajZwolnienia');
-      localStorage.removeItem('formData_wywiadOgolny');
-      localStorage.removeItem('formData_wywiadObjawy');
-      localStorage.removeItem('uploadedFiles_attachments');
+      // Note: localStorage is cleared on the confirmation page after successful payment
+      // This allows retry if payment fails
       
       // Przekieruj do bramki płatności Autopay
       window.location.href = paymentData.payment_url;

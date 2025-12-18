@@ -78,7 +78,8 @@ Deno.serve(async (req) => {
 
     // Map payment method to Autopay gateway ID
     // https://developers.autopay.pl/online/kody-bramek
-    let gatewayId: number | undefined;
+    // Note: Autopay examples use GatewayID=0 when user should choose method on the gateway.
+    let gatewayId: number = 0;
     if (payment_method) {
       switch (payment_method) {
         case "blik":
@@ -88,7 +89,7 @@ Deno.serve(async (req) => {
           gatewayId = 1500; // Visa/Mastercard
           break;
         case "transfer":
-          gatewayId = undefined; // Let user choose bank
+          gatewayId = 0; // Let user choose bank/method
           break;
       }
     }
@@ -124,11 +125,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    const hashParts: string[] = [serviceId, orderId, amountStr, description];
-    if (gatewayId) hashParts.push(String(gatewayId));
-    hashParts.push(currency, customerEmail, hashKey);
-
-    const hashString = hashParts.join("|");
+    // IMPORTANT: When some optional values are empty, Autopay still expects separators to be preserved.
+    // Hash = SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
+    const hashString = `${serviceId}|${orderId}|${amountStr}|${description}|${gatewayId}|${currency}|${customerEmail}|${hashKey}`;
 
     console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
 
@@ -161,10 +160,8 @@ Deno.serve(async (req) => {
       ReturnURL: returnUrl,
     });
 
-    // Add gateway ID if specific method selected
-    if (gatewayId) {
-      params.append("GatewayID", gatewayId.toString());
-    }
+    // GatewayID is always provided (0 = user chooses method on gateway)
+    params.append("GatewayID", gatewayId.toString());
     
     console.log("Payment params:", Object.fromEntries(params.entries()));
 

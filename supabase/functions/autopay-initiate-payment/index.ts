@@ -100,16 +100,10 @@ Deno.serve(async (req) => {
     const returnUrl = `${origin}/potwierdzenie?case=${caseData.case_number}`;
     
     // Generate hash for security
-    // Hash format for Autopay payment link: SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|hashKey)
-    // For basic payment without optional fields: SHA256(ServiceID|OrderID|Amount|Currency|hashKey)
-    // Note: Description and GatewayID are optional in hash if not sent
-    let hashString: string;
-    if (gatewayId) {
-      hashString = `${serviceId}|${case_id}|${amountStr}|${currency}|${gatewayId}|${hashKey}`;
-    } else {
-      hashString = `${serviceId}|${case_id}|${amountStr}|${currency}|${hashKey}`;
-    }
-    
+    // Hash format for Autopay payment link: SHA256(ServiceID|OrderID|Amount|Currency|hashKey)
+    // Note: Even if you pass optional params (e.g., Description, ReturnURL, GatewayID), the payment link hash is computed only from the core fields.
+    const hashString = `${serviceId}|${case_id}|${amountStr}|${currency}|${hashKey}`;
+
     console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
     
     const encoder = new TextEncoder();

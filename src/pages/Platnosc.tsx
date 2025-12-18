@@ -118,10 +118,27 @@ export default function Platnosc() {
 
       console.log('Payment URL:', paymentData.payment_url);
 
-      // Note: localStorage is cleared on the confirmation page after successful payment
-      // This allows retry if payment fails
-      
-      // Przekieruj do bramki płatności Autopay
+      // Redirect to Autopay gateway.
+      // Autopay initiation is specified as a POST (form submission).
+      if (paymentData?.payment_base_url && paymentData?.payment_params) {
+        const formEl = document.createElement('form');
+        formEl.method = 'POST';
+        formEl.action = paymentData.payment_base_url;
+
+        Object.entries(paymentData.payment_params as Record<string, string>).forEach(([key, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value;
+          formEl.appendChild(input);
+        });
+
+        document.body.appendChild(formEl);
+        formEl.submit();
+        return;
+      }
+
+      // Fallback: GET redirect
       window.location.href = paymentData.payment_url;
 
     } catch (error: any) {

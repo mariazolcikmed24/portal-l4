@@ -25,8 +25,8 @@ export const ProgressSteps = ({ currentStep }: ProgressStepsProps) => {
     <div className="w-full max-w-3xl mx-auto mb-8">
       <div className="flex items-center justify-between">
         {steps.map((step, index) => (
-          <div key={step.number} className="flex items-center flex-1">
-            <div className="flex flex-col items-center flex-1">
+          <div key={step.number} className={cn("flex items-center", index < steps.length - 1 ? "flex-1" : "")}>
+            <div className="flex flex-col items-center">
               <div
                 className={cn(
                   "w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all",

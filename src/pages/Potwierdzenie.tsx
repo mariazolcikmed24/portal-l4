@@ -1,4 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,15 @@ export default function Potwierdzenie() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const caseId = searchParams.get('case') || "EZ-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+  // Clear form data from localStorage after successful payment redirect
+  useEffect(() => {
+    localStorage.removeItem('formData_datyChoroby');
+    localStorage.removeItem('formData_rodzajZwolnienia');
+    localStorage.removeItem('formData_wywiadOgolny');
+    localStorage.removeItem('formData_wywiadObjawy');
+    localStorage.removeItem('uploadedFiles_attachments');
+  }, []);
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">

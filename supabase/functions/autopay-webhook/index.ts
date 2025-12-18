@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
         payment_psp_ref: remoteID,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", orderID)
+      .eq("case_number", orderID)
       .select()
       .single();
 
@@ -203,7 +203,7 @@ Deno.serve(async (req) => {
     }
 
     console.log("Case updated successfully:", {
-      caseId: orderID,
+      caseNumber: orderID,
       paymentStatus: dbPaymentStatus,
       pspRef: remoteID,
     });
@@ -213,7 +213,7 @@ Deno.serve(async (req) => {
       await supabase
         .from("cases")
         .update({ status: "submitted" })
-        .eq("id", orderID);
+        .eq("case_number", orderID);
 
       // Create Med24 visit (fire and forget - don't block response)
       createMed24Visit(supabase, orderID).catch((err) => {
@@ -241,7 +241,7 @@ Deno.serve(async (req) => {
 });
 
 // Background task to create Med24 visit
-async function createMed24Visit(supabase: any, orderID: string) {
+async function createMed24Visit(supabase: any, caseNumber: string) {
   try {
     const med24ApiUrl = Deno.env.get("MED24_API_URL");
     const med24Username = Deno.env.get("MED24_API_USERNAME");
@@ -257,11 +257,11 @@ async function createMed24Visit(supabase: any, orderID: string) {
     const { data: caseWithProfile } = await supabase
       .from("cases")
       .select("*, profile:profiles(*)")
-      .eq("id", orderID)
+      .eq("case_number", caseNumber)
       .single();
 
     if (!caseWithProfile?.profile) {
-      console.error("No profile found for case:", orderID);
+      console.error("No profile found for case:", caseNumber);
       return;
     }
 
@@ -313,7 +313,7 @@ async function createMed24Visit(supabase: any, orderID: string) {
           med24_booking_intent: "finalize",
           med24_last_sync_at: new Date().toISOString(),
         })
-        .eq("id", orderID);
+        .eq("case_number", caseNumber);
 
       console.log("Med24 visit created successfully:", med24Data.id);
 

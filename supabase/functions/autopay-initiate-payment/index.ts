@@ -97,8 +97,20 @@ Deno.serve(async (req) => {
     // Amount in PLN format (e.g., "79.00") - Autopay expects decimal format with dot separator
     const amountStr = (amount / 100).toFixed(2);
     const currency = "PLN";
-    const description = `Konsultacja medyczna ${caseData.case_number || case_id}`;
-    
+
+    // IMPORTANT: Autopay OrderID max length is 32 chars.
+    // Our case UUID is 36 chars, so we use case_number (e.g., EZ-XXXXXXXXX) as OrderID.
+    const orderId = caseData.case_number as string | null;
+    if (!orderId) {
+      console.error("case_number missing - cannot initiate Autopay payment", { case_id });
+      return new Response(
+        JSON.stringify({ error: "Case number missing" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const description = `Konsultacja medyczna ${orderId}`;
+
     // Generate hash for security
     // Hash format per Autopay docs (Rozpoczęcie transakcji):
     // SHA256(ServiceID|OrderID|Amount|[Description]|[GatewayID]|[Currency]|CustomerEmail|HashKey)
@@ -112,7 +124,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const hashParts: string[] = [serviceId, case_id, amountStr, description];
+    const hashParts: string[] = [serviceId, orderId, amountStr, description];
     if (gatewayId) hashParts.push(String(gatewayId));
     hashParts.push(currency, customerEmail, hashKey);
 
@@ -132,9 +144,7 @@ Deno.serve(async (req) => {
     // Test: https://testpay.autopay.eu/payment
     // Production: https://pay.autopay.eu/payment
     const isTest = Deno.env.get("AUTOPAY_TEST_MODE") !== "false";
-    const baseUrl = isTest 
-      ? "https://testpay.autopay.eu/payment" 
-      : "https://pay.autopay.eu/payment";
+    const baseUrl = isTest ? "https://testpay.autopay.eu/payment" : "https://pay.autopay.eu/payment";
 
     // Return URL after payment - Autopay will redirect here with ServiceID, OrderID, Hash
     const origin = req.headers.get("origin") || "https://e-zwolnienie.com.pl";
@@ -142,7 +152,7 @@ Deno.serve(async (req) => {
 
     const params = new URLSearchParams({
       ServiceID: serviceId,
-      OrderID: case_id,
+      OrderID: orderId,
       Amount: amountStr,
       Description: description,
       Currency: currency,

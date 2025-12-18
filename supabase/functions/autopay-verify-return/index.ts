@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
 
     console.log("Hash verified successfully");
 
-    // Fetch case data by OrderID (which is case UUID)
+    // Fetch case data by OrderID (we use case_number as OrderID)
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     const { data: caseData, error: caseError } = await supabase
       .from("cases")
       .select("case_number, payment_status, status")
-      .eq("id", OrderID)
+      .eq("case_number", OrderID)
       .single();
 
     if (caseError || !caseData) {

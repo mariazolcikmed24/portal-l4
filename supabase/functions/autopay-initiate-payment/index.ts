@@ -113,13 +113,17 @@ Deno.serve(async (req) => {
     }
 
     // Optional fields: Description, CustomerEmail, GatewayID.
-    // IMPORTANT: Some Autopay merchant configurations validate the hash only for the minimal parameter set.
-    // To maximize compatibility (and avoid "invalid hash" on the gateway), we send only the minimal required fields.
+    // Autopay hash validation depends on merchant configuration.
+    // The official (common) formula includes placeholders for optional fields:
+    // SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
 
-    // Generate hash for security (minimal mode)
-    // Hash format (minimal): SHA256(ServiceID|OrderID|Amount|Currency|HashKey)
-    // Note: Hash is calculated from RAW values (not URL-encoded).
-    const hashString = `${serviceId}|${orderId}|${amountStr}|${currency}|${hashKey}`;
+    const description = "E-konsultacja lekarska";
+    const profilesJoin: any = (caseData as any).profiles;
+    const customerEmail = Array.isArray(profilesJoin)
+      ? (profilesJoin[0]?.email ?? "")
+      : (profilesJoin?.email ?? "");
+    // NOTE: Hash must be calculated from RAW (not URL-encoded) values.
+    const hashString = `${serviceId}|${orderId}|${amountStr}|${description}|${gatewayId}|${currency}|${customerEmail}|${hashKey}`;
 
     console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
 
@@ -146,6 +150,9 @@ Deno.serve(async (req) => {
       OrderID: orderId,
       Amount: amountStr,
       Currency: currency,
+      Description: description,
+      CustomerEmail: customerEmail,
+      GatewayID: String(gatewayId),
       Hash: hash,
       ReturnURL: returnUrl,
     });

@@ -119,18 +119,35 @@ Deno.serve(async (req) => {
 
     // Optional fields: Description, CustomerEmail, GatewayID.
     // Autopay hash validation depends on merchant configuration.
-    // The official (common) formula includes placeholders for optional fields:
-    // SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
+    // Docs: SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
 
     const description = "E-konsultacja lekarska";
     const profilesJoin: any = (caseData as any).profiles;
     const customerEmail = Array.isArray(profilesJoin)
       ? (profilesJoin[0]?.email ?? "")
       : (profilesJoin?.email ?? "");
-    // NOTE: Hash must be calculated from RAW (not URL-encoded) values.
-    const hashString = `${serviceId}|${orderId}|${amountStr}|${description}|${gatewayId}|${currency}|${customerEmail}|${hashKey}`;
 
-    console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
+    // NOTE: Some Autopay setups validate hash on URL-encoded values (spaces as '+', special chars percent-encoded).
+    // We support both modes to eliminate INVALID_HASH.
+    const hashMode = (Deno.env.get("AUTOPAY_HASH_MODE") || "raw").toLowerCase();
+
+    const encodeQueryValue = (val: string) =>
+      encodeURIComponent(val).replace(/%20/g, "+");
+
+    const rawHashString = `${serviceId}|${orderId}|${amountStr}|${description}|${gatewayId}|${currency}|${customerEmail}|${hashKey}`;
+    const encodedHashString = `${serviceId}|${orderId}|${amountStr}|${encodeQueryValue(description)}|${gatewayId}|${currency}|${encodeQueryValue(customerEmail)}|${hashKey}`;
+
+    const hashString = hashMode === "urlencoded" ? encodedHashString : rawHashString;
+
+    console.log("Hash mode:", hashMode);
+    console.log(
+      "Hash input string (masked):",
+      hashString.replace(hashKey, "***")
+    );
+    console.log(
+      "Alt hash (masked):",
+      (hashMode === "urlencoded" ? rawHashString : encodedHashString).replace(hashKey, "***")
+    );
 
     const encoder = new TextEncoder();
     const data = encoder.encode(hashString);

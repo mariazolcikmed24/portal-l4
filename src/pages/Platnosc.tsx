@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -15,7 +13,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 const paymentSchema = z.object({
-  payment_method: z.enum(["card", "blik", "transfer"], { required_error: "Wybierz metodę płatności" }),
   confirm_data: z.literal(true, { errorMap: () => ({ message: "Potwierdzenie jest wymagane" }) }),
 });
 
@@ -95,7 +92,6 @@ export default function Platnosc() {
           symptoms: wywiadObjawy.symptoms || [],
           free_text_reason: wywiadObjawy.free_text_reason,
           attachment_file_ids: attachmentPaths,
-          payment_method: data.payment_method,
           payment_status: 'pending',
           status: 'draft',
           late_justification: datyChoroby.late_justification,
@@ -111,7 +107,6 @@ export default function Platnosc() {
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('autopay-initiate-payment', {
         body: { 
           case_id: caseData.id,
-          payment_method: data.payment_method,
           amount: 7900, // 79 PLN w groszach
         }
       });
@@ -162,41 +157,6 @@ export default function Platnosc() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="payment_method"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Metoda płatności *</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-3">
-                      <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 cursor-pointer">
-                        <RadioGroupItem value="card" id="card" />
-                        <Label htmlFor="card" className="flex-1 cursor-pointer">
-                          <div className="font-medium">Karta płatnicza</div>
-                          <div className="text-sm text-muted-foreground">Visa, Mastercard, Maestro</div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 cursor-pointer">
-                        <RadioGroupItem value="blik" id="blik" />
-                        <Label htmlFor="blik" className="flex-1 cursor-pointer">
-                          <div className="font-medium">BLIK</div>
-                          <div className="text-sm text-muted-foreground">Szybka płatność kodem z aplikacji bankowej</div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 cursor-pointer">
-                        <RadioGroupItem value="transfer" id="transfer" />
-                        <Label htmlFor="transfer" className="flex-1 cursor-pointer">
-                          <div className="font-medium">Przelew online</div>
-                          <div className="text-sm text-muted-foreground">Szybki przelew przez bank</div>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <FormField
               control={form.control}

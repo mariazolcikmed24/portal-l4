@@ -110,24 +110,23 @@ Deno.serve(async (req) => {
       );
     }
 
-    const description = `Konsultacja medyczna ${orderId}`;
-
-    // Generate hash for security
-    // Hash format per Autopay docs (Rozpoczęcie transakcji):
-    // SHA256(ServiceID|OrderID|Amount|[Description]|[GatewayID]|[Currency]|CustomerEmail|HashKey)
-    // Note: include optional params in the hash ONLY if you send them.
-    const customerEmail = (caseData as any)?.profiles?.email as string | undefined;
-    if (!customerEmail) {
-      console.error("CustomerEmail missing for case/profile", { case_id });
+    // Guard for TypeScript narrowing
+    if (!caseData) {
+      console.error("Case data missing after update", { case_id });
       return new Response(
-        JSON.stringify({ error: "Customer email missing" }),
+        JSON.stringify({ error: "Case data missing" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // IMPORTANT: When some optional values are empty, Autopay still expects separators to be preserved.
-    // Hash = SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
-    const hashString = `${serviceId}|${orderId}|${amountStr}|${description}|${gatewayId}|${currency}|${customerEmail}|${hashKey}`;
+    // Optional fields: Description, CustomerEmail, GatewayID.
+    // IMPORTANT: Some Autopay merchant configurations validate the hash only for the minimal parameter set.
+    // To maximize compatibility (and avoid "invalid hash" on the gateway), we send only the minimal required fields.
+
+    // Generate hash for security (minimal mode)
+    // Hash format (minimal): SHA256(ServiceID|OrderID|Amount|Currency|HashKey)
+    // Note: Hash is calculated from RAW values (not URL-encoded).
+    const hashString = `${serviceId}|${orderId}|${amountStr}|${currency}|${hashKey}`;
 
     console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
 
@@ -153,15 +152,10 @@ Deno.serve(async (req) => {
       ServiceID: serviceId,
       OrderID: orderId,
       Amount: amountStr,
-      Description: description,
       Currency: currency,
-      CustomerEmail: customerEmail,
       Hash: hash,
       ReturnURL: returnUrl,
     });
-
-    // GatewayID is always provided (0 = user chooses method on gateway)
-    params.append("GatewayID", gatewayId.toString());
     
     console.log("Payment params:", Object.fromEntries(params.entries()));
 

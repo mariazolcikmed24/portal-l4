@@ -136,6 +136,10 @@ Deno.serve(async (req) => {
       ? "https://testpay.autopay.eu/payment" 
       : "https://pay.autopay.eu/payment";
 
+    // Return URL after payment - Autopay will redirect here with ServiceID, OrderID, Hash
+    const origin = req.headers.get("origin") || "https://e-zwolnienie.com.pl";
+    const returnUrl = `${origin}/potwierdzenie`;
+
     const params = new URLSearchParams({
       ServiceID: serviceId,
       OrderID: case_id,
@@ -144,6 +148,7 @@ Deno.serve(async (req) => {
       Currency: currency,
       CustomerEmail: customerEmail,
       Hash: hash,
+      ReturnURL: returnUrl,
     });
 
     // Add gateway ID if specific method selected

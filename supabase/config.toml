@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.autopay-initiate-payment]
 verify_jwt = false
 
+[functions.autopay-verify-return]
+verify_jwt = false
+
 [functions.med24-create-visit]
 verify_jwt = false
 

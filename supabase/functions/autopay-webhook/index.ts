@@ -51,6 +51,13 @@ function parseItnXml(xmlString: string): TransactionData | null {
   }
 }
 
+// Convert OrderID (UUID without dashes) back to UUID with dashes
+function orderIdToCaseId(orderId: string): string {
+  // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  if (orderId.length !== 32) return orderId;
+  return `${orderId.slice(0, 8)}-${orderId.slice(8, 12)}-${orderId.slice(12, 16)}-${orderId.slice(16, 20)}-${orderId.slice(20)}`;
+}
+
 // Calculate SHA256 hash
 async function calculateHash(input: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -185,6 +192,10 @@ Deno.serve(async (req) => {
         dbPaymentStatus = "pending";
     }
 
+    // Convert OrderID back to case UUID
+    const caseId = orderIdToCaseId(orderID);
+    console.log("Converted OrderID to case_id:", { orderID, caseId });
+
     // Update case payment status
     const { data: updatedCase, error: updateError } = await supabase
       .from("cases")
@@ -193,7 +204,7 @@ Deno.serve(async (req) => {
         payment_psp_ref: remoteID,
         updated_at: new Date().toISOString(),
       })
-      .eq("case_number", orderID)
+      .eq("id", caseId)
       .select()
       .single();
 
@@ -213,10 +224,10 @@ Deno.serve(async (req) => {
       await supabase
         .from("cases")
         .update({ status: "submitted" })
-        .eq("case_number", orderID);
+        .eq("id", caseId);
 
       // Create Med24 visit (fire and forget - don't block response)
-      createMed24Visit(supabase, orderID).catch((err) => {
+      createMed24Visit(supabase, caseId).catch((err) => {
         console.error("Med24 visit creation failed:", err);
       });
     }
@@ -241,7 +252,7 @@ Deno.serve(async (req) => {
 });
 
 // Background task to create Med24 visit
-async function createMed24Visit(supabase: any, caseNumber: string) {
+async function createMed24Visit(supabase: any, caseId: string) {
   try {
     const med24ApiUrl = Deno.env.get("MED24_API_URL");
     const med24Username = Deno.env.get("MED24_API_USERNAME");
@@ -257,11 +268,11 @@ async function createMed24Visit(supabase: any, caseNumber: string) {
     const { data: caseWithProfile } = await supabase
       .from("cases")
       .select("*, profile:profiles(*)")
-      .eq("case_number", caseNumber)
+      .eq("id", caseId)
       .single();
 
     if (!caseWithProfile?.profile) {
-      console.error("No profile found for case:", caseNumber);
+      console.error("No profile found for case:", caseId);
       return;
     }
 
@@ -313,7 +324,7 @@ async function createMed24Visit(supabase: any, caseNumber: string) {
           med24_booking_intent: "finalize",
           med24_last_sync_at: new Date().toISOString(),
         })
-        .eq("case_number", caseNumber);
+        .eq("id", caseId);
 
       console.log("Med24 visit created successfully:", med24Data.id);
 

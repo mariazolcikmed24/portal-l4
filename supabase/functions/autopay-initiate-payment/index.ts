@@ -100,15 +100,8 @@ Deno.serve(async (req) => {
     const currency = "PLN";
 
     // IMPORTANT: Autopay OrderID max length is 32 chars.
-    // Our case UUID is 36 chars, so we use case_number (e.g., EZ-XXXXXXXXX) as OrderID.
-    const orderId = caseData.case_number as string | null;
-    if (!orderId) {
-      console.error("case_number missing - cannot initiate Autopay payment", { case_id });
-      return new Response(
-        JSON.stringify({ error: "Case number missing" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // UUID without dashes = 32 chars exactly, so we use case_id without dashes.
+    const orderId = case_id.replace(/-/g, "");
 
     // Guard for TypeScript narrowing
     if (!caseData) {
@@ -172,7 +165,8 @@ Deno.serve(async (req) => {
         payment_base_url: baseUrl,
         payment_params: Object.fromEntries(params.entries()),
 
-        case_number: caseData.case_number,
+        order_id: orderId,
+        case_id: case_id,
       }),
       {
         status: 200,

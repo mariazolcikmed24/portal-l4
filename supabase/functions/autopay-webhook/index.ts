@@ -6,7 +6,74 @@ const corsHeaders = {
 };
 
 // Autopay ITN (Instant Transaction Notification) webhook handler
-// Documentation: https://developers.autopay.pl/online/itn
+// Documentation: https://developers.autopay.pl/online/dokumentacja#powiadomienia-natychmiastowe-(itn)
+// 
+// Format: POST with application/x-www-form-urlencoded
+// Parameter: transactions = Base64 encoded XML document
+
+interface TransactionData {
+  serviceID: string;
+  orderID: string;
+  remoteID: string;
+  amount: string;
+  currency: string;
+  gatewayID?: string;
+  paymentDate: string;
+  paymentStatus: string;
+  paymentStatusDetails?: string;
+  hash: string;
+}
+
+// Simple XML parser for Autopay ITN format
+function parseItnXml(xmlString: string): TransactionData | null {
+  try {
+    const getValue = (tag: string): string => {
+      const regex = new RegExp(`<${tag}>([^<]*)</${tag}>`);
+      const match = xmlString.match(regex);
+      return match ? match[1] : "";
+    };
+
+    return {
+      serviceID: getValue("serviceID"),
+      orderID: getValue("orderID"),
+      remoteID: getValue("remoteID"),
+      amount: getValue("amount"),
+      currency: getValue("currency"),
+      gatewayID: getValue("gatewayID") || undefined,
+      paymentDate: getValue("paymentDate"),
+      paymentStatus: getValue("paymentStatus"),
+      paymentStatusDetails: getValue("paymentStatusDetails") || undefined,
+      hash: getValue("hash"),
+    };
+  } catch (e) {
+    console.error("XML parsing error:", e);
+    return null;
+  }
+}
+
+// Calculate SHA256 hash
+async function calculateHash(input: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Build XML confirmation response
+function buildConfirmationXml(serviceID: string, orderID: string, hash: string): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<confirmationList>
+  <serviceID>${serviceID}</serviceID>
+  <transactionsConfirmations>
+    <transactionConfirmed>
+      <orderID>${orderID}</orderID>
+      <confirmation>OK</confirmation>
+    </transactionConfirmed>
+  </transactionsConfirmations>
+  <hash>${hash}</hash>
+</confirmationList>`;
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -19,44 +86,78 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Parse ITN data from Autopay (form-urlencoded or JSON)
-    const contentType = req.headers.get("content-type") || "";
-    let itnData: Record<string, string>;
-
-    if (contentType.includes("application/x-www-form-urlencoded")) {
-      const formData = await req.formData();
-      itnData = Object.fromEntries(formData.entries()) as Record<string, string>;
-    } else {
-      itnData = await req.json();
-    }
-
-    console.log("Received ITN notification:", JSON.stringify(itnData, null, 2));
-
-    // Extract key fields from ITN
-    const {
-      serviceID,      // Autopay service ID
-      orderID,        // Our case ID
-      remoteID,       // Autopay transaction ID
-      amount,         // Transaction amount
-      currency,       // Currency (PLN)
-      paymentStatus,  // Payment status from Autopay
-      hash,           // Security hash for verification
-    } = itnData;
-
-    // Verify hash signature (CRITICAL for security)
     const autopayHashKey = Deno.env.get("AUTOPAY_HASH_KEY");
-    if (!autopayHashKey) {
-      console.error("AUTOPAY_HASH_KEY not configured");
+    const expectedServiceId = Deno.env.get("AUTOPAY_SERVICE_ID");
+    
+    if (!autopayHashKey || !expectedServiceId) {
+      console.error("Autopay configuration missing");
       return new Response("Server configuration error", { status: 500, headers: corsHeaders });
     }
 
-    // Autopay hash verification: SHA256(serviceID|orderID|remoteID|amount|currency|paymentStatus|hashKey)
-    const hashString = `${serviceID}|${orderID}|${remoteID}|${amount}|${currency}|${paymentStatus}|${autopayHashKey}`;
-    const encoder = new TextEncoder();
-    const data = encoder.encode(hashString);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const calculatedHash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    // Parse the request - Autopay sends transactions parameter as Base64 encoded XML
+    const contentType = req.headers.get("content-type") || "";
+    let transactionData: TransactionData | null = null;
+
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+      const formData = await req.formData();
+      const transactionsBase64 = formData.get("transactions") as string;
+      
+      if (!transactionsBase64) {
+        console.error("No transactions parameter in request");
+        return new Response("Missing transactions parameter", { status: 400, headers: corsHeaders });
+      }
+
+      // Decode Base64 to XML
+      const xmlString = atob(transactionsBase64);
+      console.log("Decoded ITN XML:", xmlString);
+      
+      transactionData = parseItnXml(xmlString);
+    } else {
+      // Fallback for testing - accept JSON directly
+      const jsonData = await req.json();
+      console.log("Received ITN as JSON (test mode):", JSON.stringify(jsonData, null, 2));
+      transactionData = jsonData as TransactionData;
+    }
+
+    if (!transactionData) {
+      console.error("Failed to parse transaction data");
+      return new Response("Invalid transaction data", { status: 400, headers: corsHeaders });
+    }
+
+    console.log("Parsed ITN data:", JSON.stringify(transactionData, null, 2));
+
+    const {
+      serviceID,
+      orderID,
+      remoteID,
+      amount,
+      currency,
+      gatewayID,
+      paymentDate,
+      paymentStatus,
+      paymentStatusDetails,
+      hash,
+    } = transactionData;
+
+    // Verify ServiceID
+    if (serviceID !== expectedServiceId) {
+      console.error("ServiceID mismatch", { received: serviceID, expected: expectedServiceId });
+      return new Response("Invalid ServiceID", { status: 403, headers: corsHeaders });
+    }
+
+    // Verify hash signature (CRITICAL for security)
+    // Hash order per docs: serviceID|orderID|remoteID|amount|currency|gatewayID|paymentDate|paymentStatus|paymentStatusDetails|hashKey
+    // Note: Include optional fields only if present in the ITN
+    const hashParts: string[] = [serviceID, orderID, remoteID, amount, currency];
+    if (gatewayID) hashParts.push(gatewayID);
+    hashParts.push(paymentDate, paymentStatus);
+    if (paymentStatusDetails) hashParts.push(paymentStatusDetails);
+    hashParts.push(autopayHashKey);
+
+    const hashString = hashParts.join("|");
+    console.log("Hash input (masked):", hashString.replace(autopayHashKey, "***"));
+
+    const calculatedHash = await calculateHash(hashString);
 
     if (calculatedHash.toLowerCase() !== hash?.toLowerCase()) {
       console.error("Hash verification failed", { received: hash, calculated: calculatedHash });
@@ -74,14 +175,12 @@ Deno.serve(async (req) => {
     let dbPaymentStatus: "pending" | "success" | "fail";
     switch (paymentStatus) {
       case "SUCCESS":
-      case "CONFIRMED":
         dbPaymentStatus = "success";
         break;
       case "FAILURE":
-      case "CANCELLED":
-      case "REJECTED":
         dbPaymentStatus = "fail";
         break;
+      case "PENDING":
       default:
         dbPaymentStatus = "pending";
     }
@@ -115,95 +214,24 @@ Deno.serve(async (req) => {
         .from("cases")
         .update({ status: "submitted" })
         .eq("id", orderID);
-      
-      console.log("Case status updated to submitted");
 
-      // Create Med24 visit
-      try {
-        const med24ApiUrl = Deno.env.get("MED24_API_URL");
-        const med24Username = Deno.env.get("MED24_API_USERNAME");
-        const med24Password = Deno.env.get("MED24_API_PASSWORD");
-        const med24ServiceId = Deno.env.get("MED24_SERVICE_ID");
-
-        if (med24ApiUrl && med24Username && med24Password) {
-          // Fetch profile data for the case
-          const { data: caseWithProfile } = await supabase
-            .from("cases")
-            .select("*, profile:profiles(*)")
-            .eq("id", orderID)
-            .single();
-
-          if (caseWithProfile?.profile) {
-            const profile = caseWithProfile.profile;
-            
-            const visitPayload = {
-              channel_kind: "text_message",
-              service_id: med24ServiceId || null,
-              patient: {
-                first_name: profile.first_name,
-                last_name: profile.last_name,
-                pesel: profile.pesel || null,
-                date_of_birth: profile.date_of_birth || null,
-                email: profile.email || null,
-                phone_number: profile.phone || null,
-                address: profile.street || null,
-                house_number: profile.house_no || null,
-                flat_number: profile.flat_no || null,
-                postal_code: profile.postcode || null,
-                city: profile.city || null,
-              },
-              external_tag: caseWithProfile.case_number || orderID,
-              booking_intent: "finalize",
-              queue: "urgent",
-            };
-
-            console.log("Creating Med24 visit:", JSON.stringify(visitPayload, null, 2));
-
-            const basicAuth = btoa(`${med24Username}:${med24Password}`);
-            const med24Response = await fetch(`${med24ApiUrl}/api/v2/external/visit`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Basic ${basicAuth}`,
-              },
-              body: JSON.stringify(visitPayload),
-            });
-
-            const med24Data = await med24Response.json();
-            console.log("Med24 API response:", med24Response.status, JSON.stringify(med24Data, null, 2));
-
-            if (med24Response.ok) {
-              // Update case with Med24 visit data
-              await supabase
-                .from("cases")
-                .update({
-                  med24_visit_id: med24Data.id,
-                  med24_visit_status: med24Data,
-                  med24_external_tag: caseWithProfile.case_number || orderID,
-                  med24_channel_kind: "text_message",
-                  med24_booking_intent: "finalize",
-                  med24_last_sync_at: new Date().toISOString(),
-                })
-                .eq("id", orderID);
-
-              console.log("Med24 visit created successfully:", med24Data.id);
-            } else {
-              console.error("Med24 API error:", med24Data);
-            }
-          }
-        } else {
-          console.log("Med24 API not configured, skipping visit creation");
-        }
-      } catch (med24Error) {
-        console.error("Error creating Med24 visit:", med24Error);
-        // Don't fail the webhook, payment was still successful
-      }
+      // Create Med24 visit (fire and forget - don't block response)
+      createMed24Visit(supabase, orderID).catch((err) => {
+        console.error("Med24 visit creation failed:", err);
+      });
     }
 
-    // Return OK response (Autopay expects this)
-    return new Response("OK", { 
-      status: 200, 
-      headers: { ...corsHeaders, "Content-Type": "text/plain" } 
+    // Build confirmation response with hash
+    // Response hash: SHA256(serviceID|orderID|confirmation|hashKey)
+    const confirmationHashString = `${serviceID}|${orderID}|OK|${autopayHashKey}`;
+    const confirmationHash = await calculateHash(confirmationHashString);
+    
+    const responseXml = buildConfirmationXml(serviceID, orderID, confirmationHash);
+    console.log("Sending confirmation XML:", responseXml);
+
+    return new Response(responseXml, {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/xml; charset=utf-8" },
     });
 
   } catch (error) {
@@ -211,3 +239,90 @@ Deno.serve(async (req) => {
     return new Response("Internal server error", { status: 500, headers: corsHeaders });
   }
 });
+
+// Background task to create Med24 visit
+async function createMed24Visit(supabase: any, orderID: string) {
+  try {
+    const med24ApiUrl = Deno.env.get("MED24_API_URL");
+    const med24Username = Deno.env.get("MED24_API_USERNAME");
+    const med24Password = Deno.env.get("MED24_API_PASSWORD");
+    const med24ServiceId = Deno.env.get("MED24_SERVICE_ID");
+
+    if (!med24ApiUrl || !med24Username || !med24Password) {
+      console.log("Med24 API not configured, skipping visit creation");
+      return;
+    }
+
+    // Fetch profile data for the case
+    const { data: caseWithProfile } = await supabase
+      .from("cases")
+      .select("*, profile:profiles(*)")
+      .eq("id", orderID)
+      .single();
+
+    if (!caseWithProfile?.profile) {
+      console.error("No profile found for case:", orderID);
+      return;
+    }
+
+    const profile = caseWithProfile.profile;
+
+    const visitPayload = {
+      channel_kind: "phone_call",
+      service_id: med24ServiceId || null,
+      patient: {
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        pesel: profile.pesel || null,
+        date_of_birth: profile.date_of_birth || null,
+        email: profile.email || null,
+        phone_number: profile.phone || null,
+        address: profile.street || null,
+        house_number: profile.house_no || null,
+        flat_number: profile.flat_no || null,
+        postal_code: profile.postcode || null,
+        city: profile.city || null,
+      },
+      booking_intent: "finalize",
+      queue: "urgent",
+    };
+
+    console.log("Creating Med24 visit:", JSON.stringify(visitPayload, null, 2));
+
+    const basicAuth = btoa(`${med24Username}:${med24Password}`);
+    const med24Response = await fetch(`${med24ApiUrl}/api/v2/external/visit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${basicAuth}`,
+      },
+      body: JSON.stringify(visitPayload),
+    });
+
+    const med24Data = await med24Response.json();
+    console.log("Med24 API response:", med24Response.status, JSON.stringify(med24Data, null, 2));
+
+    if (med24Response.ok) {
+      // Update case with Med24 visit data
+      await supabase
+        .from("cases")
+        .update({
+          med24_visit_id: med24Data.id,
+          med24_visit_status: med24Data,
+          med24_channel_kind: "phone_call",
+          med24_booking_intent: "finalize",
+          med24_last_sync_at: new Date().toISOString(),
+        })
+        .eq("id", orderID);
+
+      console.log("Med24 visit created successfully:", med24Data.id);
+
+      // Upload files to Med24 if any
+      // TODO: Implement file upload via med24-upload-files function
+    } else {
+      console.error("Med24 API error:", med24Data);
+    }
+  } catch (med24Error) {
+    console.error("Error creating Med24 visit:", med24Error);
+  }
+}

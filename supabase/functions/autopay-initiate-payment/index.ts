@@ -76,29 +76,28 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Determine environment early because GatewayID defaults differ in test mode
+    // Determine environment early
     const isTest = Deno.env.get("AUTOPAY_TEST_MODE") !== "false";
 
     // Map payment method to Autopay gateway ID
     // https://developers.autopay.pl/online/kody-bramek
-    // Note: Autopay examples use GatewayID=0 when user should choose method on the gateway.
-    let gatewayId: number = 0;
+    // GatewayID=0 means the user picks the method on Autopay's page (paywall)
+    // Per user choice: we use GatewayID=0 for "wybór na bramce"
+    let gatewayId: string = "0";
     if (payment_method) {
       switch (payment_method) {
         case "blik":
-          gatewayId = 509; // BLIK
+          gatewayId = "509"; // BLIK
           break;
         case "card":
-          gatewayId = 1500; // Visa/Mastercard
+          gatewayId = "1500"; // Visa/Mastercard
           break;
         case "transfer":
-          gatewayId = isTest ? 106 : 0; // Test PayByLink channel: "TEST 106"; prod: let user choose
+          gatewayId = "0"; // Let user choose on gateway
           break;
       }
-    } else if (isTest) {
-      // In our current UI we don't ask for payment method; on test we default to PayByLink "TEST 106".
-      gatewayId = 106;
     }
+    // For test environment without specific payment_method, still use "0" for paywall
 
     // Prepare payment parameters
     // Amount in PLN format (e.g., "79.00") - Autopay expects decimal format with dot separator

@@ -147,8 +147,8 @@ Deno.serve(async (req) => {
     const baseUrl = isTest ? "https://testpay.autopay.eu/payment" : "https://pay.autopay.eu/payment";
 
     // Return URL after payment - Autopay will redirect here with ServiceID, OrderID, Hash
-    const origin = req.headers.get("origin") || "https://e-zwolnienie.com.pl";
-    const returnUrl = `${origin}/potwierdzenie`;
+    // Must match URL registered in Autopay panel
+    const returnUrl = Deno.env.get("AUTOPAY_RETURN_URL") || "https://preview--portal-l4.lovable.app/potwierdzenie";
 
     const params = new URLSearchParams({
       ServiceID: serviceId,

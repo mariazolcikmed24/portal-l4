@@ -8,6 +8,13 @@ const corsHeaders = {
 // Verify Autopay return redirect hash and fetch case data
 // Per docs: Hash = SHA256(ServiceID|OrderID|HashKey)
 
+// Convert OrderID (UUID without dashes) back to UUID with dashes
+function orderIdToCaseId(orderId: string): string {
+  // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  if (orderId.length !== 32) return orderId;
+  return `${orderId.slice(0, 8)}-${orderId.slice(8, 12)}-${orderId.slice(12, 16)}-${orderId.slice(16, 20)}-${orderId.slice(20)}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -76,11 +83,14 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Convert OrderID back to case UUID
+    const caseId = orderIdToCaseId(OrderID);
+
     const { data: caseData, error: caseError } = await supabase
       .from("cases")
-      .select("case_number, payment_status, status")
-      .eq("case_number", OrderID)
-      .single();
+      .select("id, case_number, payment_status, status")
+      .eq("id", caseId)
+      .maybeSingle();
 
     if (caseError || !caseData) {
       console.error("Case not found:", caseError);
@@ -95,6 +105,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         valid: true,
+        case_id: caseData.id,
         case_number: caseData.case_number,
         payment_status: caseData.payment_status,
         case_status: caseData.status,

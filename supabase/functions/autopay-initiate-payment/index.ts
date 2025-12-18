@@ -76,6 +76,9 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Determine environment early because GatewayID defaults differ in test mode
+    const isTest = Deno.env.get("AUTOPAY_TEST_MODE") !== "false";
+
     // Map payment method to Autopay gateway ID
     // https://developers.autopay.pl/online/kody-bramek
     // Note: Autopay examples use GatewayID=0 when user should choose method on the gateway.
@@ -89,9 +92,12 @@ Deno.serve(async (req) => {
           gatewayId = 1500; // Visa/Mastercard
           break;
         case "transfer":
-          gatewayId = 0; // Let user choose bank/method
+          gatewayId = isTest ? 106 : 0; // Test PayByLink channel: "TEST 106"; prod: let user choose
           break;
       }
+    } else if (isTest) {
+      // In our current UI we don't ask for payment method; on test we default to PayByLink "TEST 106".
+      gatewayId = 106;
     }
 
     // Prepare payment parameters
@@ -138,7 +144,6 @@ Deno.serve(async (req) => {
     // Build Autopay payment URL
     // Test: https://testpay.autopay.eu/payment
     // Production: https://pay.autopay.eu/payment
-    const isTest = Deno.env.get("AUTOPAY_TEST_MODE") !== "false";
     const baseUrl = isTest ? "https://testpay.autopay.eu/payment" : "https://pay.autopay.eu/payment";
 
     // Return URL after payment - Autopay will redirect here with ServiceID, OrderID, Hash

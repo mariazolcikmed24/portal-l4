@@ -30,7 +30,7 @@ function parseItnXml(xmlString: string): TransactionData | null {
     const getValue = (tag: string): string => {
       const regex = new RegExp(`<${tag}>([^<]*)</${tag}>`);
       const match = xmlString.match(regex);
-      return match ? match[1] : "";
+      return (match ? match[1] : "").trim();
     };
 
     return {

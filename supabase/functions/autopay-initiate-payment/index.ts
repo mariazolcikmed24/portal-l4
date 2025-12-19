@@ -117,9 +117,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Optional fields: Description, CustomerEmail, GatewayID.
-    // Autopay hash validation depends on merchant configuration.
-    // Docs: SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
+    // Hash per docs for TRANSACTION_START:
+    // SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
+    // IMPORTANT: optional fields must be OMITTED (no empty placeholders) if not sent.
 
     const description = "E-konsultacja lekarska";
     const profilesJoin: any = (caseData as any).profiles;
@@ -127,27 +127,23 @@ Deno.serve(async (req) => {
       ? (profilesJoin[0]?.email ?? "")
       : (profilesJoin?.email ?? "");
 
-    // NOTE: Some Autopay setups validate hash on URL-encoded values (spaces as '+', special chars percent-encoded).
-    // We support both modes to eliminate INVALID_HASH.
-    const hashMode = (Deno.env.get("AUTOPAY_HASH_MODE") || "raw").toLowerCase();
+    const hashParts: string[] = [
+      serviceId,
+      orderId,
+      amountStr,
+      description,
+      String(gatewayId),
+      currency,
+    ];
 
-    const encodeQueryValue = (val: string) =>
-      encodeURIComponent(val).replace(/%20/g, "+");
+    // CustomerEmail is optional in Autopay; include it only when actually sending it.
+    if (customerEmail) hashParts.push(customerEmail);
 
-    const rawHashString = `${serviceId}|${orderId}|${amountStr}|${description}|${gatewayId}|${currency}|${customerEmail}|${hashKey}`;
-    const encodedHashString = `${serviceId}|${orderId}|${amountStr}|${encodeQueryValue(description)}|${gatewayId}|${currency}|${encodeQueryValue(customerEmail)}|${hashKey}`;
+    hashParts.push(hashKey);
 
-    const hashString = hashMode === "urlencoded" ? encodedHashString : rawHashString;
+    const hashString = hashParts.join("|");
 
-    console.log("Hash mode:", hashMode);
-    console.log(
-      "Hash input string (masked):",
-      hashString.replace(hashKey, "***")
-    );
-    console.log(
-      "Alt hash (masked):",
-      (hashMode === "urlencoded" ? rawHashString : encodedHashString).replace(hashKey, "***")
-    );
+    console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
 
     const encoder = new TextEncoder();
     const data = encoder.encode(hashString);
@@ -174,11 +170,12 @@ Deno.serve(async (req) => {
       Amount: amountStr,
       Currency: currency,
       Description: description,
-      CustomerEmail: customerEmail,
       GatewayID: String(gatewayId),
       Hash: hash,
       ReturnURL: returnUrl,
     });
+
+    if (customerEmail) params.set("CustomerEmail", customerEmail);
     
     console.log("Payment params:", Object.fromEntries(params.entries()));
 

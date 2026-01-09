@@ -81,9 +81,9 @@ Deno.serve(async (req) => {
 
     // Map payment method to Autopay gateway ID
     // https://developers.autopay.pl/online/kody-bramek
-    // IMPORTANT: GatewayID is OPTIONAL. If omitted, Autopay paywall should allow user to choose.
-    // If GatewayID is sent, it MUST be included in the hash string.
-    let gatewayId: string | undefined;
+    // NOTE: In practice, some Autopay environments expect GatewayID to be present even for paywall.
+    // For paywall, we send GatewayID="0" and include it in the hash.
+    let gatewayId: string = "0";
     if (payment_method) {
       switch (payment_method) {
         case "blik":
@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
           gatewayId = "1500"; // Visa/Mastercard
           break;
         case "transfer":
-          gatewayId = undefined; // Paywall (user chooses) -> omit GatewayID
+          gatewayId = "0"; // Paywall (user chooses)
           break;
       }
     }
@@ -117,25 +117,25 @@ Deno.serve(async (req) => {
     }
 
     // Hash per docs for TRANSACTION_START:
-    // SHA256(ServiceID|OrderID|Amount|GatewayID|Currency|CustomerEmail|HashKey)
+    // SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
     // IMPORTANT: optional fields must be OMITTED (no empty placeholders) if not sent.
-    // Description is optional (NIE) - removing it to test if hash works without it.
+    // We re-introduce Description + GatewayID (paywall "0") to match the most common signature used by Autopay.
 
-    // CustomerEmail is OPTIONAL in Autopay and can be sensitive to encoding/normalization on the gateway side.
-    // For debugging INVALID_HASH, we temporarily OMIT CustomerEmail from both request params and hash.
-    // (If this fixes the issue, we can re-introduce it conditionally / after confirmation from Autopay.)
+    const description = "E-konsultacja lekarska";
+
+    // CustomerEmail omitted intentionally for now (we'll bring it back once INVALID_HASH is resolved)
     const customerEmail = "";
 
-    // Hash order per docs: 1-ServiceID, 2-OrderID, 3-Amount, 5-GatewayID, 6-Currency, 7-CustomerEmail, HashKey
-    // Skipping 4-Description (optional)
+    // Hash order per docs (by field number):
+    // 1-ServiceID, 2-OrderID, 3-Amount, 4-Description, 5-GatewayID, 6-Currency, 7-CustomerEmail, HashKey
     const hashParts: string[] = [
       serviceId,
       orderId,
       amountStr,
+      description,
+      String(gatewayId),
+      currency,
     ];
-
-    if (gatewayId) hashParts.push(String(gatewayId));
-    hashParts.push(currency);
 
     // CustomerEmail omitted intentionally for now
 
@@ -169,11 +169,12 @@ Deno.serve(async (req) => {
       OrderID: orderId,
       Amount: amountStr,
       Currency: currency,
+      Description: description,
       Hash: hash,
       ReturnURL: returnUrl,
     });
 
-    if (gatewayId) params.set("GatewayID", String(gatewayId));
+    params.set("GatewayID", String(gatewayId));
     // CustomerEmail omitted intentionally for now
 
     console.log("Payment params:", Object.fromEntries(params.entries()));

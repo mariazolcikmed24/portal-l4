@@ -81,9 +81,9 @@ Deno.serve(async (req) => {
 
     // Map payment method to Autopay gateway ID
     // https://developers.autopay.pl/online/kody-bramek
-    // If GatewayID is omitted, user picks the method on Autopay's page (paywall).
-    // IMPORTANT: When we want paywall selection, we OMIT GatewayID entirely.
-    let gatewayId: string | undefined;
+    // Paywall (wybór metody na stronie Autopay): GatewayID = "0".
+    // UWAGA: Jeśli wysyłamy GatewayID (także "0"), musi ono być uwzględnione w stringu do HASH.
+    let gatewayId: string = "0";
     if (payment_method) {
       switch (payment_method) {
         case "blik":
@@ -93,11 +93,10 @@ Deno.serve(async (req) => {
           gatewayId = "1500"; // Visa/Mastercard
           break;
         case "transfer":
-          gatewayId = undefined; // Paywall (user chooses)
+          gatewayId = "0"; // Paywall (user chooses)
           break;
       }
     }
-
 
     // Prepare payment parameters
     // Amount in PLN format (e.g., "79.00") - Autopay expects decimal format with dot separator

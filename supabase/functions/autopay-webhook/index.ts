@@ -21,17 +21,40 @@ interface TransactionData {
   paymentDate: string;
   paymentStatus: string;
   paymentStatusDetails?: string;
+  customerData?: Record<string, string>;
   hash: string;
 }
 
 // Simple XML parser for Autopay ITN format
 function parseItnXml(xmlString: string): TransactionData | null {
   try {
-    const getValue = (tag: string): string => {
+    const getValue = (tag: string, within?: string): string => {
+      const haystack = within ?? xmlString;
       const regex = new RegExp(`<${tag}>([^<]*)</${tag}>`);
-      const match = xmlString.match(regex);
+      const match = haystack.match(regex);
       return (match ? match[1] : "").trim();
     };
+
+    const customerDataBlockMatch = xmlString.match(/<customerData>([\s\S]*?)<\/customerData>/);
+    const customerDataBlock = customerDataBlockMatch ? customerDataBlockMatch[1] : "";
+
+    const customerDataTags = [
+      "fName",
+      "lName",
+      "streetName",
+      "streetHouseNo",
+      "streetStaircaseNo",
+      "streetPremiseNo",
+      "postalCode",
+      "city",
+      "nrb",
+    ];
+
+    const customerData: Record<string, string> = {};
+    for (const tag of customerDataTags) {
+      const v = customerDataBlock ? getValue(tag, customerDataBlock) : "";
+      if (v) customerData[tag] = v;
+    }
 
     return {
       serviceID: getValue("serviceID"),
@@ -43,6 +66,7 @@ function parseItnXml(xmlString: string): TransactionData | null {
       paymentDate: getValue("paymentDate"),
       paymentStatus: getValue("paymentStatus"),
       paymentStatusDetails: getValue("paymentStatusDetails") || undefined,
+      customerData: Object.keys(customerData).length ? customerData : undefined,
       hash: getValue("hash"),
     };
   } catch (e) {
@@ -146,6 +170,7 @@ Deno.serve(async (req) => {
       paymentDate,
       paymentStatus,
       paymentStatusDetails,
+      customerData,
       hash,
     } = transactionData;
 
@@ -253,10 +278,43 @@ Deno.serve(async (req) => {
     }
 
     if (!hashVerified) {
-      console.error("Hash verification FAILED", { 
-        received: hash, 
+      // Some service configurations appear to include customerData in hash for certain gateways.
+      // This is NOT in the standard ITN docs, but we try it as a compatibility fallback.
+      if (customerData && Object.keys(customerData).length) {
+        const customerValues = [
+          customerData.fName,
+          customerData.lName,
+          customerData.streetName,
+          customerData.streetHouseNo,
+          customerData.streetStaircaseNo,
+          customerData.streetPremiseNo,
+          customerData.postalCode,
+          customerData.city,
+          customerData.nrb,
+        ].filter((v): v is string => !!v && v.trim() !== "").map((v) => v.trim());
+
+        const customerHashParts = [...hashParts.slice(0, -1), ...customerValues, autopayHashKey.trim()];
+        const customerHashString = customerHashParts.join("|");
+        const customerHash = await calculateHash(customerHashString);
+        console.log(
+          "Alt hash (with customerData):",
+          customerHash,
+          "parts:",
+          customerHashParts.length,
+        );
+
+        if (customerHash.toLowerCase() === hash?.toLowerCase()) {
+          hashVerified = true;
+          console.log("Hash matched with customerData fallback");
+        }
+      }
+    }
+
+    if (!hashVerified) {
+      console.error("Hash verification FAILED", {
+        received: hash,
         calculated: calculatedHash,
-        hashStringMasked: hashString.replace(autopayHashKey.trim(), "KEY")
+        hashStringMasked: hashString.replace(autopayHashKey.trim(), "KEY"),
       });
       return new Response("Invalid hash", { status: 403, headers: corsHeaders });
     }

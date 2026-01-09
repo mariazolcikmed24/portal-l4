@@ -532,12 +532,63 @@ async function createMed24Visit(supabase: any, caseId: string) {
 
       console.log("Med24 visit created successfully:", med24Data.id);
 
-      // Upload files to Med24 if any
-      // TODO: Implement file upload via med24-upload-files function
+      // Generate PDF summary and upload files to Med24
+      await generatePdfAndUploadFiles(caseId, med24Data.id);
     } else {
       console.error("Med24 API error:", med24Data);
     }
   } catch (med24Error) {
     console.error("Error creating Med24 visit:", med24Error);
+  }
+}
+
+// Generate PDF summary and upload all files to Med24
+async function generatePdfAndUploadFiles(caseId: string, visitId: string) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    console.log(`Starting PDF generation and file upload for case ${caseId}, visit ${visitId}`);
+
+    // Step 1: Generate PDF summary
+    console.log("Calling generate-case-pdf function...");
+    const pdfResponse = await fetch(`${supabaseUrl}/functions/v1/generate-case-pdf`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({ case_id: caseId }),
+    });
+
+    const pdfResult = await pdfResponse.json();
+    
+    if (pdfResponse.ok && pdfResult.success) {
+      console.log(`PDF generated successfully: ${pdfResult.pdf_path}`);
+    } else {
+      console.error("PDF generation failed:", pdfResult);
+    }
+
+    // Step 2: Upload all files (including the PDF) to Med24
+    console.log("Calling med24-upload-files function...");
+    const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/med24-upload-files`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({ case_id: caseId, visit_id: visitId }),
+    });
+
+    const uploadResult = await uploadResponse.json();
+    
+    if (uploadResponse.ok) {
+      console.log(`File upload complete: ${uploadResult.uploaded}/${uploadResult.total} files uploaded`);
+    } else {
+      console.error("File upload failed:", uploadResult);
+    }
+
+  } catch (error) {
+    console.error("Error in generatePdfAndUploadFiles:", error);
   }
 }

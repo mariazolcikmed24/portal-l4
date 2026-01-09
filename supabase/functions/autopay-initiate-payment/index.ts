@@ -121,10 +121,10 @@ Deno.serve(async (req) => {
     // IMPORTANT: optional fields must be OMITTED (no empty placeholders) if not sent.
     // Description is optional (NIE) - removing it to test if hash works without it.
 
-    const profilesJoin: any = (caseData as any).profiles;
-    const customerEmail = Array.isArray(profilesJoin)
-      ? (profilesJoin[0]?.email ?? "")
-      : (profilesJoin?.email ?? "");
+    // CustomerEmail is OPTIONAL in Autopay and can be sensitive to encoding/normalization on the gateway side.
+    // For debugging INVALID_HASH, we temporarily OMIT CustomerEmail from both request params and hash.
+    // (If this fixes the issue, we can re-introduce it conditionally / after confirmation from Autopay.)
+    const customerEmail = "";
 
     // Hash order per docs: 1-ServiceID, 2-OrderID, 3-Amount, 5-GatewayID, 6-Currency, 7-CustomerEmail, HashKey
     // Skipping 4-Description (optional)
@@ -137,8 +137,7 @@ Deno.serve(async (req) => {
     if (gatewayId) hashParts.push(String(gatewayId));
     hashParts.push(currency);
 
-    // CustomerEmail is optional in Autopay; include it only when actually sending it.
-    if (customerEmail) hashParts.push(customerEmail);
+    // CustomerEmail omitted intentionally for now
 
     hashParts.push(hashKey);
 
@@ -175,7 +174,7 @@ Deno.serve(async (req) => {
     });
 
     if (gatewayId) params.set("GatewayID", String(gatewayId));
-    if (customerEmail) params.set("CustomerEmail", customerEmail);
+    // CustomerEmail omitted intentionally for now
 
     console.log("Payment params:", Object.fromEntries(params.entries()));
 

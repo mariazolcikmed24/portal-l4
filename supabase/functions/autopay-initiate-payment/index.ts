@@ -41,8 +41,13 @@ Deno.serve(async (req) => {
     const serviceId = Deno.env.get("AUTOPAY_SERVICE_ID")?.trim();
     const hashKey = Deno.env.get("AUTOPAY_HASH_KEY")?.trim();
     // Some Autopay environments hash raw values, others hash form-url-encoded values.
-    // Default to raw unless explicitly set to "urlencoded".
-    const hashMode = (Deno.env.get("AUTOPAY_HASH_MODE") || "raw").trim().toLowerCase();
+    // In practice, most gateways verify hash on the *form-url-encoded* representation.
+    // Default to "urlencoded" unless explicitly set to "raw".
+    const hashMode = (Deno.env.get("AUTOPAY_HASH_MODE") || "urlencoded").trim().toLowerCase();
+
+    // Autopay can be configured for SHA256 or SHA512. Default is SHA256.
+    const hashAlgo = (Deno.env.get("AUTOPAY_HASH_ALGO") || "sha256").trim().toLowerCase();
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -132,10 +137,11 @@ Deno.serve(async (req) => {
       ? (profilesJoin[0]?.email ?? "")
       : (profilesJoin?.email ?? "");
 
-    const computeSha256Hex = async (input: string): Promise<string> => {
+    const computeHashHex = async (input: string): Promise<string> => {
+      const algo = hashAlgo === "sha512" ? "SHA-512" : "SHA-256";
       const encoder = new TextEncoder();
       const data = encoder.encode(input);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashBuffer = await crypto.subtle.digest(algo, data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
     };
@@ -209,10 +215,10 @@ Deno.serve(async (req) => {
     );
     console.log("CustomerEmail value:", customerEmail || "(empty)");
 
-    const hashInput = hashMode === "urlencoded" ? hashStringEncoded : hashStringRaw;
-    const hash = await computeSha256Hex(hashInput);
+    const hashInput = hashMode === "raw" ? hashStringRaw : hashStringEncoded;
+    const hash = await computeHashHex(hashInput);
 
-    console.log("Generated hash:", hash);
+    console.log("Generated hash:", hash, `(algo=${hashAlgo}, mode=${hashMode})`);
 
     // Build Autopay payment URL
     // Test: https://testpay.autopay.eu/payment

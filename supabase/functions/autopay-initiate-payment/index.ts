@@ -117,20 +117,21 @@ Deno.serve(async (req) => {
     }
 
     // Hash per docs for TRANSACTION_START:
-    // SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
+    // SHA256(ServiceID|OrderID|Amount|GatewayID|Currency|CustomerEmail|HashKey)
     // IMPORTANT: optional fields must be OMITTED (no empty placeholders) if not sent.
+    // Description is optional (NIE) - removing it to test if hash works without it.
 
-    const description = "E-konsultacja lekarska";
     const profilesJoin: any = (caseData as any).profiles;
     const customerEmail = Array.isArray(profilesJoin)
       ? (profilesJoin[0]?.email ?? "")
       : (profilesJoin?.email ?? "");
 
+    // Hash order per docs: 1-ServiceID, 2-OrderID, 3-Amount, 5-GatewayID, 6-Currency, 7-CustomerEmail, HashKey
+    // Skipping 4-Description (optional)
     const hashParts: string[] = [
       serviceId,
       orderId,
       amountStr,
-      description,
     ];
 
     if (gatewayId) hashParts.push(String(gatewayId));
@@ -169,7 +170,6 @@ Deno.serve(async (req) => {
       OrderID: orderId,
       Amount: amountStr,
       Currency: currency,
-      Description: description,
       Hash: hash,
       ReturnURL: returnUrl,
     });

@@ -40,7 +40,6 @@ Deno.serve(async (req) => {
     // Get Autopay configuration
     const serviceId = Deno.env.get("AUTOPAY_SERVICE_ID")?.trim();
     const hashKey = Deno.env.get("AUTOPAY_HASH_KEY")?.trim();
-    const hashMode = (Deno.env.get("AUTOPAY_HASH_MODE") || "raw").trim().toLowerCase();
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -163,14 +162,11 @@ Deno.serve(async (req) => {
 
     // Helpful logs for Autopay support (masked)
     console.log("Hash input raw (masked):", hashStringRaw.replace(hashKey, "***"));
-    console.log(
-      "Hash input encoded (masked):",
-      hashStringEncoded.replace(hashKey, "***"),
-      `(mode=${hashMode})`,
-    );
+    console.log("Hash input encoded (masked):", hashStringEncoded.replace(hashKey, "***"));
 
-    const hashInput = hashMode === "urlencoded" ? hashStringEncoded : hashStringRaw;
-    const hash = await computeSha256Hex(hashInput);
+    // Autopay receives parameters as application/x-www-form-urlencoded.
+    // To match gateway-side hashing, we hash the URL-encoded variant.
+    const hash = await computeSha256Hex(hashStringEncoded);
 
     console.log("Generated hash:", hash);
 

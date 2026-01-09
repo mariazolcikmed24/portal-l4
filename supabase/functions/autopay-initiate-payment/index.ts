@@ -172,8 +172,11 @@ Deno.serve(async (req) => {
       hashPartsEncoded.push(formUrlEncode(description));
     }
 
-    // 5. GatewayID (optional) - we send it, so include
-    if (gatewayId) {
+    // 5. GatewayID (optional)
+    // IMPORTANT: For paywall we previously sent GatewayID="0".
+    // Autopay appears to treat "0" as equivalent to "not provided" for hash verification,
+    // so we OMIT it from the hash when it's "0".
+    if (gatewayId && gatewayId !== "0") {
       hashPartsRaw.push(String(gatewayId));
       hashPartsEncoded.push(formUrlEncode(String(gatewayId)));
     }
@@ -231,8 +234,8 @@ Deno.serve(async (req) => {
       CustomerEmail: customerEmail,
     });
 
-    params.set("GatewayID", String(gatewayId));
-    // CustomerEmail omitted intentionally for now
+    // Omit GatewayID when it's the paywall default ("0") to match Autopay hash expectations.
+    if (gatewayId !== "0") params.set("GatewayID", String(gatewayId));
 
     console.log("Payment params:", Object.fromEntries(params.entries()));
 

@@ -38,8 +38,8 @@ Deno.serve(async (req) => {
     console.log("Initiating Autopay payment for case:", case_id);
 
     // Get Autopay configuration
-    const serviceId = Deno.env.get("AUTOPAY_SERVICE_ID");
-    const hashKey = Deno.env.get("AUTOPAY_HASH_KEY");
+    const serviceId = Deno.env.get("AUTOPAY_SERVICE_ID")?.trim();
+    const hashKey = Deno.env.get("AUTOPAY_HASH_KEY")?.trim();
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 

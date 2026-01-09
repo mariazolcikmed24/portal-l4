@@ -42,6 +42,7 @@ const App = () => (
             <Route path="/platnosc" element={<Platnosc />} />
             <Route path="/potwierdzenie" element={<Potwierdzenie />} />
             <Route path="/status" element={<StatusSprawy />} />
+            <Route path="/status-sprawy" element={<StatusSprawy />} />
             <Route path="/panel" element={<PanelUzytkownika />} />
             <Route path="/api-docs" element={<DokumentacjaAPI />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -286,35 +286,89 @@ Deno.serve(async (req) => {
     const caseId = orderIdToCaseId(orderID);
     console.log("Converted OrderID to case_id:", { orderID, caseId });
 
-    // Update case payment status
-    const { data: updatedCase, error: updateError } = await supabase
+    // Fetch current case state BEFORE update
+    const { data: currentCase, error: fetchError } = await supabase
       .from("cases")
-      .update({
-        payment_status: dbPaymentStatus,
-        payment_psp_ref: remoteID,
-        updated_at: new Date().toISOString(),
-      })
+      .select("payment_status, payment_psp_ref, status")
       .eq("id", caseId)
-      .select()
-      .single();
+      .maybeSingle();
 
-    if (updateError) {
-      console.error("Failed to update case:", updateError);
-      return new Response("Database update failed", { status: 500, headers: corsHeaders });
+    if (fetchError) {
+      console.error("Failed to fetch case:", fetchError);
+      return new Response("Database fetch failed", { status: 500, headers: corsHeaders });
     }
 
-    console.log("Case updated successfully:", {
-      caseNumber: orderID,
-      paymentStatus: dbPaymentStatus,
-      pspRef: remoteID,
+    if (!currentCase) {
+      console.error("Case not found:", caseId);
+      // Still confirm to Autopay to stop retries
+      // Will return CONFIRMED below
+    }
+
+    console.log("Current case state:", { 
+      currentPaymentStatus: currentCase?.payment_status, 
+      currentRemoteID: currentCase?.payment_psp_ref,
+      incomingStatus: dbPaymentStatus,
+      incomingRemoteID: remoteID
     });
 
-    // If payment successful, update case status to submitted and create Med24 visit
-    if (dbPaymentStatus === "success" && updatedCase.status === "draft") {
+    // Simplified model per Autopay docs:
+    // 1. For non-SUCCESS: always confirm, update status only if not already SUCCESS
+    // 2. For first SUCCESS: update status + run business logic (Med24)
+    // 3. For subsequent SUCCESS: just confirm, no update
+    
+    let shouldUpdateDb = false;
+    let shouldRunBusinessLogic = false;
+
+    if (currentCase) {
+      if (currentCase.payment_status === "success") {
+        // Already SUCCESS - don't downgrade to PENDING/FAILURE (could be different remoteID)
+        // Just confirm the ITN without updating
+        console.log("Case already has SUCCESS status, skipping update");
+        shouldUpdateDb = false;
+        shouldRunBusinessLogic = false;
+      } else if (dbPaymentStatus === "success") {
+        // First SUCCESS - update and run business logic
+        shouldUpdateDb = true;
+        shouldRunBusinessLogic = currentCase.status === "draft";
+        console.log("First SUCCESS received, will update and run business logic");
+      } else {
+        // PENDING or FAILURE when not yet SUCCESS - update status
+        shouldUpdateDb = true;
+        shouldRunBusinessLogic = false;
+        console.log("Updating to", dbPaymentStatus);
+      }
+    }
+
+    if (shouldUpdateDb && currentCase) {
+      const { error: updateError } = await supabase
+        .from("cases")
+        .update({
+          payment_status: dbPaymentStatus,
+          payment_psp_ref: remoteID,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", caseId);
+
+      if (updateError) {
+        console.error("Failed to update case:", updateError);
+        return new Response("Database update failed", { status: 500, headers: corsHeaders });
+      }
+
+      console.log("Case updated successfully:", {
+        caseId,
+        paymentStatus: dbPaymentStatus,
+        pspRef: remoteID,
+      });
+    }
+
+    // Run business logic only on first SUCCESS
+    if (shouldRunBusinessLogic) {
       await supabase
         .from("cases")
         .update({ status: "submitted" })
         .eq("id", caseId);
+
+      console.log("Case status changed to submitted, creating Med24 visit");
 
       // Create Med24 visit (fire and forget - don't block response)
       createMed24Visit(supabase, caseId).catch((err) => {

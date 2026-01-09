@@ -71,14 +71,14 @@ async function calculateHash(input: string): Promise<string> {
 }
 
 // Build XML confirmation response
-function buildConfirmationXml(serviceID: string, orderID: string, hash: string): string {
+function buildConfirmationXml(serviceID: string, orderID: string, confirmation: string, hash: string): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <confirmationList>
   <serviceID>${serviceID}</serviceID>
   <transactionsConfirmations>
     <transactionConfirmed>
       <orderID>${orderID}</orderID>
-      <confirmation>OK</confirmation>
+      <confirmation>${confirmation}</confirmation>
     </transactionConfirmed>
   </transactionsConfirmations>
   <hash>${hash}</hash>
@@ -323,11 +323,13 @@ Deno.serve(async (req) => {
     }
 
     // Build confirmation response with hash
-    // Response hash: SHA256(serviceID|orderID|confirmation|hashKey)
-    const confirmationHashString = `${serviceID}|${orderID}|OK|${autopayHashKey}`;
+    // Response hash per docs: SHA256(serviceID|orderID|confirmation|hashKey)
+    // confirmation = "CONFIRMED" or "NOTCONFIRMED"
+    const confirmation = "CONFIRMED";
+    const confirmationHashString = `${serviceID}|${orderID}|${confirmation}|${autopayHashKey.trim()}`;
     const confirmationHash = await calculateHash(confirmationHashString);
     
-    const responseXml = buildConfirmationXml(serviceID, orderID, confirmationHash);
+    const responseXml = buildConfirmationXml(serviceID, orderID, confirmation, confirmationHash);
     console.log("Sending confirmation XML:", responseXml);
 
     return new Response(responseXml, {

@@ -141,12 +141,9 @@ Deno.serve(async (req) => {
     // Some Autopay channels expect hashing on raw values, others expect hashing on
     // form-url-encoded values (application/x-www-form-urlencoded, spaces as '+').
     const formUrlEncode = (value: string) => encodeURIComponent(value).replace(/%20/g, "+");
-    const maybeEncode = (value: string) => (hashMode === "urlencoded" ? formUrlEncode(value) : value);
 
-    // Hash order per docs (by field number):
-    // 1-ServiceID, 2-OrderID, 3-Amount, 4-Description, 5-GatewayID, 6-Currency, 7-CustomerEmail, HashKey
-    // CustomerEmail is REQUIRED per Autopay docs (marked "TAK").
-    const hashPartsRaw: string[] = [
+    // Build BOTH variants for diagnostics (independent of hashMode)
+    const hashStringRaw = [
       serviceId,
       orderId,
       amountStr,
@@ -155,25 +152,21 @@ Deno.serve(async (req) => {
       currency,
       customerEmail,
       hashKey,
-    ];
+    ].join("|");
 
-    const hashStringRaw = hashPartsRaw.join("|");
     const hashStringEncoded = [
-      maybeEncode(serviceId),
-      maybeEncode(orderId),
-      maybeEncode(amountStr),
-      maybeEncode(description),
-      maybeEncode(String(gatewayId)),
-      maybeEncode(currency),
-      maybeEncode(customerEmail),
+      formUrlEncode(serviceId),
+      formUrlEncode(orderId),
+      formUrlEncode(amountStr),
+      formUrlEncode(description),
+      formUrlEncode(String(gatewayId)),
+      formUrlEncode(currency),
+      formUrlEncode(customerEmail),
       hashKey,
     ].join("|");
 
     // Helpful logs for Autopay support (masked)
-    console.log(
-      "Hash input raw (masked):",
-      hashStringRaw.replace(hashKey, "***"),
-    );
+    console.log("Hash input raw (masked):", hashStringRaw.replace(hashKey, "***"));
     console.log(
       "Hash input encoded (masked):",
       hashStringEncoded.replace(hashKey, "***"),

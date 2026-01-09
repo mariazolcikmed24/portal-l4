@@ -81,9 +81,9 @@ Deno.serve(async (req) => {
 
     // Map payment method to Autopay gateway ID
     // https://developers.autopay.pl/online/kody-bramek
-    // GatewayID=0 means the user picks the method on Autopay's page (paywall)
-    // Per user choice: we use GatewayID=0 for "wybór na bramce"
-    let gatewayId: string = "0";
+    // If GatewayID is omitted, user picks the method on Autopay's page (paywall).
+    // IMPORTANT: When we want paywall selection, we OMIT GatewayID entirely.
+    let gatewayId: string | undefined;
     if (payment_method) {
       switch (payment_method) {
         case "blik":
@@ -93,11 +93,11 @@ Deno.serve(async (req) => {
           gatewayId = "1500"; // Visa/Mastercard
           break;
         case "transfer":
-          gatewayId = "0"; // Let user choose on gateway
+          gatewayId = undefined; // Paywall (user chooses)
           break;
       }
     }
-    // For test environment without specific payment_method, still use "0" for paywall
+
 
     // Prepare payment parameters
     // Amount in PLN format (e.g., "79.00") - Autopay expects decimal format with dot separator
@@ -132,9 +132,10 @@ Deno.serve(async (req) => {
       orderId,
       amountStr,
       description,
-      String(gatewayId),
-      currency,
     ];
+
+    if (gatewayId) hashParts.push(String(gatewayId));
+    hashParts.push(currency);
 
     // CustomerEmail is optional in Autopay; include it only when actually sending it.
     if (customerEmail) hashParts.push(customerEmail);
@@ -170,10 +171,11 @@ Deno.serve(async (req) => {
       Amount: amountStr,
       Currency: currency,
       Description: description,
-      GatewayID: String(gatewayId),
       Hash: hash,
       ReturnURL: returnUrl,
     });
+
+    if (gatewayId) params.set("GatewayID", String(gatewayId));
 
     if (customerEmail) params.set("CustomerEmail", customerEmail);
     

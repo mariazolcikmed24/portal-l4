@@ -156,56 +156,110 @@ Deno.serve(async (req) => {
     }
 
     // Verify hash signature (CRITICAL for security)
-    // Hash order per docs: serviceID|orderID|remoteID|amount|currency|gatewayID|paymentDate|paymentStatus|paymentStatusDetails|hashKey
-    // Note: gatewayID and paymentStatusDetails are optional in hash calculation
+    // Hash order per Autopay docs (screenshot):
+    // 1. serviceID (required)
+    // 2. orderID (required)
+    // 3. remoteID (required)
+    // 4. amount (required) - format: 0.00
+    // 5. currency (required)
+    // 6. gatewayID (optional - include only if present)
+    // 7. paymentDate (required)
+    // 8. paymentStatus (required)
+    // 9. paymentStatusDetails (optional - include only if present)
+    // + hashKey at the end
     
-    // Try multiple hash variants to find the correct one
-    const hashVariants: { name: string; parts: string[] }[] = [
-      // Variant 1: Full hash with all fields
-      {
-        name: "full",
-        parts: [serviceID, orderID, remoteID, amount, currency, ...(gatewayID ? [gatewayID] : []), paymentDate, paymentStatus, ...(paymentStatusDetails ? [paymentStatusDetails] : []), autopayHashKey]
-      },
-      // Variant 2: Without gatewayID
-      {
-        name: "no-gatewayID",
-        parts: [serviceID, orderID, remoteID, amount, currency, paymentDate, paymentStatus, ...(paymentStatusDetails ? [paymentStatusDetails] : []), autopayHashKey]
-      },
-      // Variant 3: Without paymentStatusDetails
-      {
-        name: "no-statusDetails",
-        parts: [serviceID, orderID, remoteID, amount, currency, ...(gatewayID ? [gatewayID] : []), paymentDate, paymentStatus, autopayHashKey]
-      },
-      // Variant 4: Minimal - without both optional fields
-      {
-        name: "minimal",
-        parts: [serviceID, orderID, remoteID, amount, currency, paymentDate, paymentStatus, autopayHashKey]
-      }
+    // Build hash string with only non-empty optional fields
+    const hashParts: string[] = [
+      serviceID.trim(),
+      orderID.trim(),
+      remoteID.trim(),
+      amount.trim(),
+      currency.trim(),
     ];
-
-    let hashVerified = false;
-    let matchedVariant = "";
-
-    for (const variant of hashVariants) {
-      const hashString = variant.parts.join("|");
-      console.log(`Hash variant [${variant.name}] (masked):`, hashString.replace(autopayHashKey, "***"));
+    
+    // gatewayID (position 6) - include only if non-empty
+    if (gatewayID && gatewayID.trim()) {
+      hashParts.push(gatewayID.trim());
+    }
+    
+    hashParts.push(paymentDate.trim());
+    hashParts.push(paymentStatus.trim());
+    
+    // paymentStatusDetails (position 9) - include only if non-empty
+    if (paymentStatusDetails && paymentStatusDetails.trim()) {
+      hashParts.push(paymentStatusDetails.trim());
+    }
+    
+    hashParts.push(autopayHashKey.trim());
+    
+    const hashString = hashParts.join("|");
+    console.log("Hash calculation string (masked):", hashString.replace(autopayHashKey.trim(), "KEY"));
+    console.log("Hash parts count:", hashParts.length);
+    console.log("gatewayID included:", !!(gatewayID && gatewayID.trim()));
+    console.log("paymentStatusDetails included:", !!(paymentStatusDetails && paymentStatusDetails.trim()));
+    
+    const calculatedHash = await calculateHash(hashString);
+    console.log("Received hash:", hash);
+    console.log("Calculated hash:", calculatedHash);
+    
+    // Also try alternative hash formats for debugging
+    let hashVerified = calculatedHash.toLowerCase() === hash?.toLowerCase();
+    
+    if (!hashVerified) {
+      // Try with all fields including empty optionals as empty strings
+      const fullHashParts = [
+        serviceID.trim(),
+        orderID.trim(),
+        remoteID.trim(),
+        amount.trim(),
+        currency.trim(),
+        gatewayID?.trim() || "",
+        paymentDate.trim(),
+        paymentStatus.trim(),
+        paymentStatusDetails?.trim() || "",
+        autopayHashKey.trim()
+      ];
+      const fullHashString = fullHashParts.join("|");
+      const fullHash = await calculateHash(fullHashString);
+      console.log("Alt hash (with empty optionals):", fullHash);
       
-      const calculatedHash = await calculateHash(hashString);
-      
-      if (calculatedHash.toLowerCase() === hash?.toLowerCase()) {
-        console.log(`Hash verification successful with variant: ${variant.name}`);
+      if (fullHash.toLowerCase() === hash?.toLowerCase()) {
         hashVerified = true;
-        matchedVariant = variant.name;
-        break;
+        console.log("Hash matched with empty optional fields included");
+      }
+    }
+    
+    if (!hashVerified) {
+      // Try without pipe separators for optional empty fields
+      const altParts = [
+        serviceID.trim(),
+        orderID.trim(),
+        remoteID.trim(),
+        amount.trim(),
+        currency.trim(),
+        ...(gatewayID?.trim() ? [gatewayID.trim()] : []),
+        paymentDate.trim(),
+        paymentStatus.trim(),
+        ...(paymentStatusDetails?.trim() ? [paymentStatusDetails.trim()] : []),
+        autopayHashKey.trim()
+      ];
+      const altHashString = altParts.join("|");
+      const altHash = await calculateHash(altHashString);
+      
+      if (altHash.toLowerCase() === hash?.toLowerCase()) {
+        hashVerified = true;
+        console.log("Hash matched with trimmed parts variant");
       }
     }
 
     if (!hashVerified) {
-      console.error("Hash verification failed - no variant matched", { received: hash });
+      console.error("Hash verification FAILED", { 
+        received: hash, 
+        calculated: calculatedHash,
+        hashStringMasked: hashString.replace(autopayHashKey.trim(), "KEY")
+      });
       return new Response("Invalid hash", { status: 403, headers: corsHeaders });
     }
-
-    console.log(`Hash verification successful (variant: ${matchedVariant})`)
 
     console.log("Hash verification successful");
 

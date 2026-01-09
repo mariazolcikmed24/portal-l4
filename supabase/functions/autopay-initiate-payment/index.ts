@@ -40,6 +40,7 @@ Deno.serve(async (req) => {
     // Get Autopay configuration
     const serviceId = Deno.env.get("AUTOPAY_SERVICE_ID")?.trim();
     const hashKey = Deno.env.get("AUTOPAY_HASH_KEY")?.trim();
+    const hashMode = (Deno.env.get("AUTOPAY_HASH_MODE") || "raw").trim().toLowerCase();
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -119,39 +120,68 @@ Deno.serve(async (req) => {
     // Hash per docs for TRANSACTION_START:
     // SHA256(ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey)
     // IMPORTANT: optional fields must be OMITTED (no empty placeholders) if not sent.
-    // We re-introduce Description + GatewayID (paywall "0") to match the most common signature used by Autopay.
 
     const description = "E-konsultacja lekarska";
 
-    // CustomerEmail omitted intentionally for now (we'll bring it back once INVALID_HASH is resolved)
-    const customerEmail = "";
+    // CustomerEmail optional. We still omit it from params for now, but we keep the extraction here
+    // because some merchants have it enabled and we may need to include it.
+    const profilesJoin: any = (caseData as any).profiles;
+    const customerEmail = Array.isArray(profilesJoin)
+      ? (profilesJoin[0]?.email ?? "")
+      : (profilesJoin?.email ?? "");
+
+    const computeSha256Hex = async (input: string): Promise<string> => {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(input);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    };
+
+    // Some Autopay channels expect hashing on raw values, others expect hashing on
+    // form-url-encoded values (application/x-www-form-urlencoded, spaces as '+').
+    const formUrlEncode = (value: string) => encodeURIComponent(value).replace(/%20/g, "+");
+    const maybeEncode = (value: string) => (hashMode === "urlencoded" ? formUrlEncode(value) : value);
 
     // Hash order per docs (by field number):
     // 1-ServiceID, 2-OrderID, 3-Amount, 4-Description, 5-GatewayID, 6-Currency, 7-CustomerEmail, HashKey
-    const hashParts: string[] = [
+    // NOTE: CustomerEmail is optional; currently NOT included in params. Keep it out of hash as well.
+    const hashPartsRaw: string[] = [
       serviceId,
       orderId,
       amountStr,
       description,
       String(gatewayId),
       currency,
+      // customerEmail, // optional
+      hashKey,
     ];
 
-    // CustomerEmail omitted intentionally for now
+    const hashStringRaw = hashPartsRaw.join("|");
+    const hashStringEncoded = [
+      maybeEncode(serviceId),
+      maybeEncode(orderId),
+      maybeEncode(amountStr),
+      maybeEncode(description),
+      maybeEncode(String(gatewayId)),
+      maybeEncode(currency),
+      // maybeEncode(customerEmail),
+      hashKey,
+    ].join("|");
 
-    hashParts.push(hashKey);
+    // Helpful logs for Autopay support (masked)
+    console.log(
+      "Hash input raw (masked):",
+      hashStringRaw.replace(hashKey, "***"),
+    );
+    console.log(
+      "Hash input encoded (masked):",
+      hashStringEncoded.replace(hashKey, "***"),
+      `(mode=${hashMode})`,
+    );
 
-    const hashString = hashParts.join("|");
-
-    console.log("Hash input string (masked):", hashString.replace(hashKey, "***"));
-
-    const encoder = new TextEncoder();
-    const data = encoder.encode(hashString);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-
-    // Autopay docs examples use lowercase hex
-    const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    const hashInput = hashMode === "urlencoded" ? hashStringEncoded : hashStringRaw;
+    const hash = await computeSha256Hex(hashInput);
 
     console.log("Generated hash:", hash);
 

@@ -142,14 +142,13 @@ Deno.serve(async (req) => {
     // form-url-encoded values (application/x-www-form-urlencoded, spaces as '+').
     const formUrlEncode = (value: string) => encodeURIComponent(value).replace(/%20/g, "+");
 
-    // Build BOTH variants for diagnostics (independent of hashMode)
+    // Per Autopay docs, hash includes ONLY fields marked "TAK" (required):
+    // ServiceID (1), OrderID (2), Amount (3), CustomerEmail (7), HashKey
+    // Fields marked "NIE" (Description, GatewayID, Currency) are NOT in hash!
     const hashStringRaw = [
       serviceId,
       orderId,
       amountStr,
-      description,
-      String(gatewayId),
-      currency,
       customerEmail,
       hashKey,
     ].join("|");
@@ -158,9 +157,6 @@ Deno.serve(async (req) => {
       formUrlEncode(serviceId),
       formUrlEncode(orderId),
       formUrlEncode(amountStr),
-      formUrlEncode(description),
-      formUrlEncode(String(gatewayId)),
-      formUrlEncode(currency),
       formUrlEncode(customerEmail),
       hashKey,
     ].join("|");

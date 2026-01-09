@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
 
     // Hash order per docs (by field number):
     // 1-ServiceID, 2-OrderID, 3-Amount, 4-Description, 5-GatewayID, 6-Currency, 7-CustomerEmail, HashKey
-    // NOTE: CustomerEmail is optional; currently NOT included in params. Keep it out of hash as well.
+    // CustomerEmail is REQUIRED per Autopay docs (marked "TAK").
     const hashPartsRaw: string[] = [
       serviceId,
       orderId,
@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
       description,
       String(gatewayId),
       currency,
-      // customerEmail, // optional
+      customerEmail,
       hashKey,
     ];
 
@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
       maybeEncode(description),
       maybeEncode(String(gatewayId)),
       maybeEncode(currency),
-      // maybeEncode(customerEmail),
+      maybeEncode(customerEmail),
       hashKey,
     ].join("|");
 
@@ -202,6 +202,7 @@ Deno.serve(async (req) => {
       Description: description,
       Hash: hash,
       ReturnURL: returnUrl,
+      CustomerEmail: customerEmail,
     });
 
     params.set("GatewayID", String(gatewayId));

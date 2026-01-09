@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     if (!case_id) {
       return new Response(
         JSON.stringify({ error: "case_id is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
       console.error("Autopay configuration missing");
       return new Response(
         JSON.stringify({ error: "Payment gateway not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
       console.error("Failed to update case:", updateError);
       return new Response(
         JSON.stringify({ error: "Failed to update case" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -81,9 +81,9 @@ Deno.serve(async (req) => {
 
     // Map payment method to Autopay gateway ID
     // https://developers.autopay.pl/online/kody-bramek
-    // Paywall (wybór metody na stronie Autopay): GatewayID = "0".
-    // UWAGA: Jeśli wysyłamy GatewayID (także "0"), musi ono być uwzględnione w stringu do HASH.
-    let gatewayId: string = "0";
+    // IMPORTANT: GatewayID is OPTIONAL. If omitted, Autopay paywall should allow user to choose.
+    // If GatewayID is sent, it MUST be included in the hash string.
+    let gatewayId: string | undefined;
     if (payment_method) {
       switch (payment_method) {
         case "blik":
@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
           gatewayId = "1500"; // Visa/Mastercard
           break;
         case "transfer":
-          gatewayId = "0"; // Paywall (user chooses)
+          gatewayId = undefined; // Paywall (user chooses) -> omit GatewayID
           break;
       }
     }
@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
       console.error("Case data missing after update", { case_id });
       return new Response(
         JSON.stringify({ error: "Case data missing" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
     const data = encoder.encode(hashString);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    
+
     // Autopay docs examples use lowercase hex
     const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
@@ -175,9 +175,8 @@ Deno.serve(async (req) => {
     });
 
     if (gatewayId) params.set("GatewayID", String(gatewayId));
-
     if (customerEmail) params.set("CustomerEmail", customerEmail);
-    
+
     console.log("Payment params:", Object.fromEntries(params.entries()));
 
     const paymentUrl = `${baseUrl}?${params.toString()}`;
@@ -199,14 +198,13 @@ Deno.serve(async (req) => {
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      },
     );
-
   } catch (error) {
     console.error("Payment initiation error:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });

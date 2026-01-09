@@ -154,22 +154,55 @@ Deno.serve(async (req) => {
 
     // Verify hash signature (CRITICAL for security)
     // Hash order per docs: serviceID|orderID|remoteID|amount|currency|gatewayID|paymentDate|paymentStatus|paymentStatusDetails|hashKey
-    // Note: Include optional fields only if present in the ITN
-    const hashParts: string[] = [serviceID, orderID, remoteID, amount, currency];
-    if (gatewayID) hashParts.push(gatewayID);
-    hashParts.push(paymentDate, paymentStatus);
-    if (paymentStatusDetails) hashParts.push(paymentStatusDetails);
-    hashParts.push(autopayHashKey);
+    // Note: gatewayID and paymentStatusDetails are optional in hash calculation
+    
+    // Try multiple hash variants to find the correct one
+    const hashVariants: { name: string; parts: string[] }[] = [
+      // Variant 1: Full hash with all fields
+      {
+        name: "full",
+        parts: [serviceID, orderID, remoteID, amount, currency, ...(gatewayID ? [gatewayID] : []), paymentDate, paymentStatus, ...(paymentStatusDetails ? [paymentStatusDetails] : []), autopayHashKey]
+      },
+      // Variant 2: Without gatewayID
+      {
+        name: "no-gatewayID",
+        parts: [serviceID, orderID, remoteID, amount, currency, paymentDate, paymentStatus, ...(paymentStatusDetails ? [paymentStatusDetails] : []), autopayHashKey]
+      },
+      // Variant 3: Without paymentStatusDetails
+      {
+        name: "no-statusDetails",
+        parts: [serviceID, orderID, remoteID, amount, currency, ...(gatewayID ? [gatewayID] : []), paymentDate, paymentStatus, autopayHashKey]
+      },
+      // Variant 4: Minimal - without both optional fields
+      {
+        name: "minimal",
+        parts: [serviceID, orderID, remoteID, amount, currency, paymentDate, paymentStatus, autopayHashKey]
+      }
+    ];
 
-    const hashString = hashParts.join("|");
-    console.log("Hash input (masked):", hashString.replace(autopayHashKey, "***"));
+    let hashVerified = false;
+    let matchedVariant = "";
 
-    const calculatedHash = await calculateHash(hashString);
+    for (const variant of hashVariants) {
+      const hashString = variant.parts.join("|");
+      console.log(`Hash variant [${variant.name}] (masked):`, hashString.replace(autopayHashKey, "***"));
+      
+      const calculatedHash = await calculateHash(hashString);
+      
+      if (calculatedHash.toLowerCase() === hash?.toLowerCase()) {
+        console.log(`Hash verification successful with variant: ${variant.name}`);
+        hashVerified = true;
+        matchedVariant = variant.name;
+        break;
+      }
+    }
 
-    if (calculatedHash.toLowerCase() !== hash?.toLowerCase()) {
-      console.error("Hash verification failed", { received: hash, calculated: calculatedHash });
+    if (!hashVerified) {
+      console.error("Hash verification failed - no variant matched", { received: hash });
       return new Response("Invalid hash", { status: 403, headers: corsHeaders });
     }
+
+    console.log(`Hash verification successful (variant: ${matchedVariant})`)
 
     console.log("Hash verification successful");
 

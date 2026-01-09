@@ -236,9 +236,13 @@ Deno.serve(async (req) => {
       Currency: currency,
       Description: description,
       Hash: hash,
-      ReturnURL: returnUrl,
       CustomerEmail: customerEmail,
     });
+
+    // ReturnURL - only add if provided (testing without it now)
+    if (returnUrl) {
+      // params.set("ReturnURL", returnUrl); // DISABLED FOR TESTING
+    }
 
     // Omit GatewayID when it's the paywall default ("0") to match Autopay hash expectations.
     if (gatewayId !== "0") params.set("GatewayID", String(gatewayId));

@@ -144,30 +144,58 @@ Deno.serve(async (req) => {
     // form-url-encoded values (application/x-www-form-urlencoded, spaces as '+').
     const formUrlEncode = (value: string) => encodeURIComponent(value).replace(/%20/g, "+");
 
-    // Hash input order (per docs):
-    // ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey
-    // If we SEND optional fields (Description/GatewayID/Currency), they must be included in the hash.
-    const hashStringRaw = [
-      serviceId,
-      orderId,
-      amountStr,
-      description,
-      String(gatewayId),
-      currency,
-      customerEmail,
-      hashKey,
-    ].join("|");
+    // Hash input order (per docs) - fields in NUMERICAL order:
+    // 1-ServiceID | 2-OrderID | 3-Amount | 4-Description | 5-GatewayID | 6-Currency | 7-CustomerEmail | HashKey
+    // IMPORTANT: Empty/missing optional fields must be OMITTED (no separator)!
+    // Required fields: ServiceID(1), OrderID(2), Amount(3), CustomerEmail(7), Hash
+    // Optional fields: Description(4), GatewayID(5), Currency(6)
 
-    const hashStringEncoded = [
-      formUrlEncode(serviceId),
-      formUrlEncode(orderId),
-      formUrlEncode(amountStr),
-      formUrlEncode(description),
-      formUrlEncode(String(gatewayId)),
-      formUrlEncode(currency),
-      formUrlEncode(customerEmail),
-      hashKey,
-    ].join("|");
+    // Build hash parts dynamically - only include non-empty values
+    const hashPartsRaw: string[] = [];
+    const hashPartsEncoded: string[] = [];
+
+    // 1. ServiceID (required)
+    hashPartsRaw.push(serviceId);
+    hashPartsEncoded.push(formUrlEncode(serviceId));
+
+    // 2. OrderID (required)
+    hashPartsRaw.push(orderId);
+    hashPartsEncoded.push(formUrlEncode(orderId));
+
+    // 3. Amount (required)
+    hashPartsRaw.push(amountStr);
+    hashPartsEncoded.push(formUrlEncode(amountStr));
+
+    // 4. Description (optional) - we send it, so include
+    if (description) {
+      hashPartsRaw.push(description);
+      hashPartsEncoded.push(formUrlEncode(description));
+    }
+
+    // 5. GatewayID (optional) - we send it, so include
+    if (gatewayId) {
+      hashPartsRaw.push(String(gatewayId));
+      hashPartsEncoded.push(formUrlEncode(String(gatewayId)));
+    }
+
+    // 6. Currency (optional) - we send it, so include
+    if (currency) {
+      hashPartsRaw.push(currency);
+      hashPartsEncoded.push(formUrlEncode(currency));
+    }
+
+    // 7. CustomerEmail (required per docs)
+    if (customerEmail) {
+      hashPartsRaw.push(customerEmail);
+      hashPartsEncoded.push(formUrlEncode(customerEmail));
+    }
+
+    // Finally, append hash key (always last, no separator issues - it's always present)
+    hashPartsRaw.push(hashKey);
+    hashPartsEncoded.push(hashKey); // Hash key is NOT url-encoded
+
+    const hashStringRaw = hashPartsRaw.join("|");
+    const hashStringEncoded = hashPartsEncoded.join("|");
 
     // Helpful logs for Autopay support (masked)
     console.log("Hash input raw (masked):", hashStringRaw.replace(hashKey, "***"));
@@ -176,6 +204,7 @@ Deno.serve(async (req) => {
       hashStringEncoded.replace(hashKey, "***"),
       `(mode=${hashMode})`,
     );
+    console.log("CustomerEmail value:", customerEmail || "(empty)");
 
     const hashInput = hashMode === "urlencoded" ? hashStringEncoded : hashStringRaw;
     const hash = await computeSha256Hex(hashInput);

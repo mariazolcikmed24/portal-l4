@@ -40,6 +40,9 @@ Deno.serve(async (req) => {
     // Get Autopay configuration
     const serviceId = Deno.env.get("AUTOPAY_SERVICE_ID")?.trim();
     const hashKey = Deno.env.get("AUTOPAY_HASH_KEY")?.trim();
+    // Some Autopay environments hash raw values, others hash form-url-encoded values.
+    // Default to raw unless explicitly set to "urlencoded".
+    const hashMode = (Deno.env.get("AUTOPAY_HASH_MODE") || "raw").trim().toLowerCase();
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -141,13 +144,16 @@ Deno.serve(async (req) => {
     // form-url-encoded values (application/x-www-form-urlencoded, spaces as '+').
     const formUrlEncode = (value: string) => encodeURIComponent(value).replace(/%20/g, "+");
 
-    // Per Autopay docs, hash includes ONLY fields marked "TAK" (required):
-    // ServiceID (1), OrderID (2), Amount (3), CustomerEmail (7), HashKey
-    // Fields marked "NIE" (Description, GatewayID, Currency) are NOT in hash!
+    // Hash input order (per docs):
+    // ServiceID|OrderID|Amount|Description|GatewayID|Currency|CustomerEmail|HashKey
+    // If we SEND optional fields (Description/GatewayID/Currency), they must be included in the hash.
     const hashStringRaw = [
       serviceId,
       orderId,
       amountStr,
+      description,
+      String(gatewayId),
+      currency,
       customerEmail,
       hashKey,
     ].join("|");
@@ -156,17 +162,23 @@ Deno.serve(async (req) => {
       formUrlEncode(serviceId),
       formUrlEncode(orderId),
       formUrlEncode(amountStr),
+      formUrlEncode(description),
+      formUrlEncode(String(gatewayId)),
+      formUrlEncode(currency),
       formUrlEncode(customerEmail),
       hashKey,
     ].join("|");
 
     // Helpful logs for Autopay support (masked)
     console.log("Hash input raw (masked):", hashStringRaw.replace(hashKey, "***"));
-    console.log("Hash input encoded (masked):", hashStringEncoded.replace(hashKey, "***"));
+    console.log(
+      "Hash input encoded (masked):",
+      hashStringEncoded.replace(hashKey, "***"),
+      `(mode=${hashMode})`,
+    );
 
-    // Autopay receives parameters as application/x-www-form-urlencoded.
-    // To match gateway-side hashing, we hash the URL-encoded variant.
-    const hash = await computeSha256Hex(hashStringEncoded);
+    const hashInput = hashMode === "urlencoded" ? hashStringEncoded : hashStringRaw;
+    const hash = await computeSha256Hex(hashInput);
 
     console.log("Generated hash:", hash);
 

@@ -58,11 +58,14 @@ function orderIdToCaseId(orderId: string): string {
   return `${orderId.slice(0, 8)}-${orderId.slice(8, 12)}-${orderId.slice(12, 16)}-${orderId.slice(16, 20)}-${orderId.slice(20)}`;
 }
 
-// Calculate SHA256 hash
+// Calculate hash (SHA256 default; SHA512 optional via AUTOPAY_HASH_ALGO)
 async function calculateHash(input: string): Promise<string> {
+  const algoRaw = (Deno.env.get("AUTOPAY_HASH_ALGO") || "sha256").toLowerCase();
+  const algo: AlgorithmIdentifier = algoRaw === "sha512" ? "SHA-512" : "SHA-256";
+
   const encoder = new TextEncoder();
   const data = encoder.encode(input);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashBuffer = await crypto.subtle.digest(algo, data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }

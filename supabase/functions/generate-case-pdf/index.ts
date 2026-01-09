@@ -334,9 +334,11 @@ serve(async (req) => {
     // Save PDF
     const pdfBytes = await pdfDoc.save();
     
-    // Upload to storage
-    const timestamp = Date.now();
-    const filePath = `summaries/${case_id}-${timestamp}-podsumowanie.pdf`;
+    // Upload to storage with readable filename
+    const visitDate = new Date(caseData.created_at);
+    const formattedDate = visitDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const safeFileName = `Wizyta_z_dnia_${formattedDate}.pdf`;
+    const filePath = `summaries/${case_id}/${safeFileName}`;
     
     const { error: uploadError } = await supabase.storage
       .from('case-attachments')

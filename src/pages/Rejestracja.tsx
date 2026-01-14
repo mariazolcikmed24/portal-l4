@@ -178,7 +178,11 @@ const Rejestracja = () => {
       const fullPhone = data.phonePrefix + data.phoneNumber;
       
       if (isGuestMode) {
+        // Generate UUID on the client side so we have it for localStorage
+        const guestProfileId = crypto.randomUUID();
+        
         const guestProfileData = {
+          id: guestProfileId,
           first_name: data.firstName,
           last_name: data.lastName,
           email: data.email,
@@ -206,7 +210,7 @@ const Rejestracja = () => {
 
         if (error) throw error;
 
-        // Save guest profile to localStorage for later steps
+        // Save guest profile to localStorage for later steps (includes id)
         localStorage.setItem('guestProfile', JSON.stringify(guestProfileData));
 
         toast({

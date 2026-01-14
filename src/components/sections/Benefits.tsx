@@ -1,43 +1,37 @@
 import { Shield, Clock, Lock, CheckCircle, Smartphone, FileCheck } from "lucide-react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const benefits = [
   {
     icon: Clock,
-    title: "Szybko i wygodnie",
-    description: "Otrzymasz zwolnienie w ciągu 30 minut, bez wychodzenia z domu i czekania w kolejce."
+    title: "Szybko i wygodnie bez",
+    description: "Otrzymasz zwolnienie w ciągu 30 minut, bez wychodzenia z domu i czekania w kolejce.",
   },
   {
     icon: Shield,
     title: "W 100% legalne",
-    description: "Zwolnienia wystawiane przez licencjonowanych lekarzy zgodnie z obowiązującymi przepisami."
+    description: "Zwolnienia wystawiane przez licencjonowanych lekarzy zgodnie z obowiązującymi przepisami.",
   },
   {
     icon: Lock,
     title: "Bezpieczeństwo danych",
-    description: "Pełna zgodność z RODO. Twoje dane medyczne są szyfrowane i chronione najwyższymi standardami."
+    description: "Pełna zgodność z RODO. Twoje dane medyczne są szyfrowane i chronione najwyższymi standardami.",
   },
   {
     icon: Smartphone,
     title: "Dostępne 24/7",
-    description: "Skorzystaj z usługi o każdej porze dnia, również w weekendy i święta."
+    description: "Skorzystaj z usługi o każdej porze dnia, również w weekendy i święta.",
   },
   {
     icon: FileCheck,
     title: "Automatyczne wysłanie",
-    description: "e-zwolnienie trafia bezpośrednio do ZUS i Twojego pracodawcy. Nie musisz nic załatwiać."
+    description: "e-zwolnienie trafia bezpośrednio do ZUS i Twojego pracodawcy. Nie musisz nic załatwiać.",
   },
   {
     icon: CheckCircle,
     title: "Doświadczeni lekarze",
-    description: "Zespół certyfikowanych specjalistów z wieloletnim doświadczeniem w telemedycynie."
-  }
+    description: "Zespół certyfikowanych specjalistów z wieloletnim doświadczeniem w telemedycynie.",
+  },
 ];
 
 const Benefits = () => {
@@ -67,12 +61,8 @@ const Benefits = () => {
                           <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-semibold text-foreground mb-2">
-                            {benefit.title}
-                          </h3>
-                          <p className="text-muted-foreground leading-relaxed">
-                            {benefit.description}
-                          </p>
+                          <h3 className="text-xl font-semibold text-foreground mb-2">{benefit.title}</h3>
+                          <p className="text-muted-foreground leading-relaxed">{benefit.description}</p>
                         </div>
                       </div>
                     </article>
@@ -99,12 +89,8 @@ const Benefits = () => {
                     <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      {benefit.title}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {benefit.description}
-                    </p>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">{benefit.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{benefit.description}</p>
                   </div>
                 </div>
               </article>
@@ -120,8 +106,8 @@ const Benefits = () => {
               Gwarancja bezpieczeństwa i legalności
             </h3>
             <p className="text-lg text-muted-foreground mb-6">
-              Wszystkie konsultacje prowadzone są przez lekarzy posiadających prawo wykonywania zawodu na terenie Polski. 
-              Wystawione zwolnienia są w pełni zgodne z przepisami ZUS i polskim prawem medycznym.
+              Wszystkie konsultacje prowadzone są przez lekarzy posiadających prawo wykonywania zawodu na terenie
+              Polski. Wystawione zwolnienia są w pełni zgodne z przepisami ZUS i polskim prawem medycznym.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">

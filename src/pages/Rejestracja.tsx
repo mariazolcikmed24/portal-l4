@@ -178,7 +178,7 @@ const Rejestracja = () => {
       const fullPhone = data.phonePrefix + data.phoneNumber;
       
       if (isGuestMode) {
-        const { error } = await supabase.from('profiles').insert({
+        const guestProfileData = {
           first_name: data.firstName,
           last_name: data.lastName,
           email: data.email,
@@ -199,9 +199,17 @@ const Rejestracja = () => {
           consent_marketing_email: data.consentMarketingEmail || false,
           consent_marketing_tel: data.consentMarketingTel || false,
           is_guest: true,
-        });
+        };
+
+        const { data: insertedData, error } = await supabase.from('profiles').insert(guestProfileData).select().single();
 
         if (error) throw error;
+
+        // Save guest profile to localStorage for later use (since RLS blocks SELECT for anonymous users)
+        localStorage.setItem('guestProfile', JSON.stringify({
+          ...guestProfileData,
+          id: insertedData.id,
+        }));
 
         toast({
           title: t('forms:common.dataSaved'),

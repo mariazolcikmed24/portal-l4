@@ -25,17 +25,14 @@ export default function Podsumowanie() {
           .from('profiles')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         setProfileData(data);
       } else {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('is_guest', true)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-        setProfileData(data);
+        // For guests, use localStorage (RLS blocks SELECT for anonymous users)
+        const guestProfile = localStorage.getItem('guestProfile');
+        if (guestProfile) {
+          setProfileData(JSON.parse(guestProfile));
+        }
       }
 
       const datyChoroby = localStorage.getItem('formData_datyChoroby');

@@ -1,17 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Menu, User } from "lucide-react";
+import { Shield, Phone, Menu, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "./LanguageSwitcher";
-import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
-  const { t } = useTranslation("common");
-  const { getLocalizedPath } = useLanguageNavigation();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -23,10 +18,10 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-border z-50 shadow-soft">
-      <nav className="container mx-auto px-4 py-4" aria-label={t("nav.howItWorks")}>
+      <nav className="container mx-auto px-4 py-4" aria-label="Główna nawigacja">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to={getLocalizedPath("/")} className="flex items-center gap-2 transition-smooth hover:opacity-80">
+          <Link to="/" className="flex items-center gap-2 transition-smooth hover:opacity-80">
             <div className="w-10 h-10 gradient-hero rounded-lg flex items-center justify-center shadow-soft">
               <Shield className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
@@ -39,56 +34,66 @@ const Header = () => {
               onClick={() => scrollToSection("jak-to-dziala")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              {t("nav.howItWorks")}
+              Jak to działa?
             </button>
             <button
               onClick={() => scrollToSection("zalety")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              {t("nav.benefits")}
+              Zalety
             </button>
             <button
               onClick={() => scrollToSection("faq")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              {t("nav.faq")}
+              FAQ
             </button>
             <Link
-              to={getLocalizedPath("/status")}
+              to="/status"
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              {t("nav.checkStatus")}
+              Sprawdź status sprawy
             </Link>
             <button
               onClick={() => scrollToSection("kontakt")}
               className="text-foreground hover:text-primary transition-smooth font-medium"
             >
-              {t("nav.contact")}
+              Kontakt
             </button>
           </div>
 
-          {/* CTA Buttons + Language Switcher */}
+          {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <LanguageSwitcher variant="minimal" />
-            <Link to={getLocalizedPath("/rejestracja", "guest=true")}>
+            {/* Login/Account buttons hidden for initial launch - uncomment when ready
+            {user ? (
+              <Link to="/panel">
+                <Button variant="ghost">
+                  <User className="w-4 h-4 mr-2" />
+                  Moje konto
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/logowanie">
+                <Button variant="ghost">Zaloguj się</Button>
+              </Link>
+            )}
+            */}
+            <Link to="/rejestracja?guest=true">
               <Button variant="hero" size="lg">
-                {t("nav.getCertificate")}
+                Uzyskaj zwolnienie
               </Button>
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-2">
-            <LanguageSwitcher variant="minimal" />
-            <button
-              className="p-2 hover:bg-muted rounded-lg transition-smooth"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Menu"
-              aria-expanded={mobileMenuOpen}
-            >
-              <Menu className="w-6 h-6 text-foreground" />
-            </button>
-          </div>
+          <button
+            className="md:hidden p-2 hover:bg-muted rounded-lg transition-smooth"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menu mobilne"
+            aria-expanded={mobileMenuOpen}
+          >
+            <Menu className="w-6 h-6 text-foreground" />
+          </button>
         </div>
 
         {/* Mobile Menu */}
@@ -98,37 +103,51 @@ const Header = () => {
               onClick={() => scrollToSection("jak-to-dziala")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
             >
-              {t("nav.howItWorks")}
+              Jak to działa?
             </button>
             <button
               onClick={() => scrollToSection("zalety")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
             >
-              {t("nav.benefits")}
+              Zalety
             </button>
             <button
               onClick={() => scrollToSection("faq")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
             >
-              {t("nav.faq")}
+              FAQ
             </button>
             <Link
-              to={getLocalizedPath("/status")}
+              to="/status"
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {t("nav.checkStatus")}
+              Sprawdź status sprawy
             </Link>
             <button
               onClick={() => scrollToSection("kontakt")}
               className="block w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-smooth font-medium"
             >
-              {t("nav.contact")}
+              Kontakt
             </button>
             <div className="flex flex-col gap-2 pt-2">
-              <Link to={getLocalizedPath("/rejestracja", "guest=true")} className="w-full">
+              {/* Login/Account buttons hidden for initial launch - uncomment when ready
+              {user ? (
+                <Link to="/panel" className="w-full">
+                  <Button variant="outline" className="w-full">
+                    <User className="w-4 h-4 mr-2" />
+                    Moje konto
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/logowanie" className="w-full">
+                  <Button variant="outline" className="w-full">Zaloguj się</Button>
+                </Link>
+              )}
+              */}
+              <Link to="/rejestracja?guest=true" className="w-full">
                 <Button variant="hero" size="lg" className="w-full">
-                  {t("nav.getCertificate")}
+                  Uzyskaj zwolnienie
                 </Button>
               </Link>
             </div>

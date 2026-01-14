@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 const paymentSchema = z.object({
-  confirm_data: z.boolean().refine((v) => v === true, { message: "Potwierdzenie jest wymagane" }),
+  confirm_data: z.literal(true, { errorMap: () => ({ message: "Potwierdzenie jest wymagane" }) }),
 });
 
 type PaymentFormData = z.infer<typeof paymentSchema>;
@@ -25,7 +25,6 @@ export default function Platnosc() {
   
   const form = useForm<PaymentFormData>({
     resolver: zodResolver(paymentSchema),
-    defaultValues: { confirm_data: false },
   });
 
   const onSubmit = async (data: PaymentFormData) => {
@@ -53,12 +52,15 @@ export default function Platnosc() {
           .single();
         profileId = profile?.id;
       } else {
-        // For guests, use localStorage (RLS blocks SELECT for anonymous users)
-        const guestProfile = localStorage.getItem('guestProfile');
-        if (guestProfile) {
-          const parsedProfile = JSON.parse(guestProfile);
-          profileId = parsedProfile.id;
-        }
+        // Dla gościa, znajdź ostatni profil gościa
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('is_guest', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        profileId = profile?.id;
       }
 
       if (!profileId) {
@@ -66,90 +68,45 @@ export default function Platnosc() {
       }
 
       // Zapisz sprawę do bazy danych z payment_status: "pending"
-      // NOTE: For guests we cannot SELECT the inserted row due to RLS, so we pre-generate the case id.
-      let caseData: { id: string; case_number?: string | null } | null = null;
+      const { data: caseData, error } = await supabase
+        .from('cases')
+        .insert({
+          profile_id: profileId,
+          illness_start: datyChoroby.illness_start,
+          illness_end: datyChoroby.illness_end,
+          recipient_type: rodzajZwolnienia.leave_type === 'pl_employer' ? 'pl_employer' : 
+                         rodzajZwolnienia.leave_type === 'foreign_employer' ? 'foreign_employer' :
+                         rodzajZwolnienia.leave_type === 'uniformed' ? 'uniformed' :
+                         rodzajZwolnienia.leave_type === 'care' ? 'care' : 'student',
+          pregnant: wywiadOgolny.q_pregnant === 'yes',
+          pregnancy_leave: wywiadOgolny.q_preg_leave === 'yes',
+          has_allergy: wywiadOgolny.q_allergy === 'yes',
+          allergy_text: wywiadOgolny.allergy_text,
+          has_meds: wywiadOgolny.q_meds === 'yes',
+          meds_list: wywiadOgolny.meds_list,
+          chronic_conditions: wywiadOgolny.chronic_list || [],
+          chronic_other: wywiadOgolny.chronic_other_text,
+          long_leave: wywiadOgolny.q_long_leave === 'yes',
+          main_category: wywiadObjawy.main_category,
+          symptom_duration: wywiadObjawy.symptom_duration,
+          symptoms: wywiadObjawy.symptoms || [],
+          free_text_reason: wywiadObjawy.free_text_reason,
+          attachment_file_ids: attachmentPaths,
+          payment_status: 'pending',
+          status: 'draft',
+          late_justification: datyChoroby.late_justification,
+        })
+        .select('case_number, id')
+        .single();
 
-      if (user) {
-        const { data: insertedCase, error } = await supabase
-          .from('cases')
-          .insert({
-            profile_id: profileId,
-            illness_start: datyChoroby.illness_start,
-            illness_end: datyChoroby.illness_end,
-            recipient_type: rodzajZwolnienia.leave_type === 'pl_employer' ? 'pl_employer' : 
-                           rodzajZwolnienia.leave_type === 'foreign_employer' ? 'foreign_employer' :
-                           rodzajZwolnienia.leave_type === 'uniformed' ? 'uniformed' :
-                           rodzajZwolnienia.leave_type === 'care' ? 'care' : 'student',
-            pregnant: wywiadOgolny.q_pregnant === 'yes',
-            pregnancy_leave: wywiadOgolny.q_preg_leave === 'yes',
-            has_allergy: wywiadOgolny.q_allergy === 'yes',
-            allergy_text: wywiadOgolny.allergy_text,
-            has_meds: wywiadOgolny.q_meds === 'yes',
-            meds_list: wywiadOgolny.meds_list,
-            chronic_conditions: wywiadOgolny.chronic_list || [],
-            chronic_other: wywiadOgolny.chronic_other_text,
-            long_leave: wywiadOgolny.q_long_leave === 'yes',
-            main_category: wywiadObjawy.main_category,
-            symptom_duration: wywiadObjawy.symptom_duration,
-            symptoms: wywiadObjawy.symptoms || [],
-            free_text_reason: wywiadObjawy.free_text_reason,
-            attachment_file_ids: attachmentPaths,
-            payment_status: 'pending',
-            status: 'draft',
-            late_justification: datyChoroby.late_justification,
-          })
-          .select('case_number, id')
-          .single();
-
-        if (error) throw error;
-        caseData = insertedCase;
-      } else {
-        const guestCaseId = crypto.randomUUID();
-
-        const { error } = await supabase
-          .from('cases')
-          .insert({
-            id: guestCaseId,
-            profile_id: profileId,
-            illness_start: datyChoroby.illness_start,
-            illness_end: datyChoroby.illness_end,
-            recipient_type: rodzajZwolnienia.leave_type === 'pl_employer' ? 'pl_employer' : 
-                           rodzajZwolnienia.leave_type === 'foreign_employer' ? 'foreign_employer' :
-                           rodzajZwolnienia.leave_type === 'uniformed' ? 'uniformed' :
-                           rodzajZwolnienia.leave_type === 'care' ? 'care' : 'student',
-            pregnant: wywiadOgolny.q_pregnant === 'yes',
-            pregnancy_leave: wywiadOgolny.q_preg_leave === 'yes',
-            has_allergy: wywiadOgolny.q_allergy === 'yes',
-            allergy_text: wywiadOgolny.allergy_text,
-            has_meds: wywiadOgolny.q_meds === 'yes',
-            meds_list: wywiadOgolny.meds_list,
-            chronic_conditions: wywiadOgolny.chronic_list || [],
-            chronic_other: wywiadOgolny.chronic_other_text,
-            long_leave: wywiadOgolny.q_long_leave === 'yes',
-            main_category: wywiadObjawy.main_category,
-            symptom_duration: wywiadObjawy.symptom_duration,
-            symptoms: wywiadObjawy.symptoms || [],
-            free_text_reason: wywiadObjawy.free_text_reason,
-            attachment_file_ids: attachmentPaths,
-            payment_status: 'pending',
-            status: 'draft',
-            late_justification: datyChoroby.late_justification,
-          } as any);
-
-        if (error) throw error;
-
-        localStorage.setItem('guestCaseId', guestCaseId);
-        caseData = { id: guestCaseId, case_number: null };
-      }
-      if (!caseData) {
-        throw new Error('Nie udało się utworzyć sprawy');
-      }
+      if (error) throw error;
 
       console.log('Case created:', caseData);
+
       // Wywołaj edge function do inicjowania płatności Autopay
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('autopay-initiate-payment', {
         body: { 
-          case_id: caseData!.id,
+          case_id: caseData.id,
           amount: 7900, // 79 PLN w groszach
         }
       });

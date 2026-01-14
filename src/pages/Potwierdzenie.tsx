@@ -16,12 +16,6 @@ export default function Potwierdzenie() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Convert OrderID (UUID without dashes) back to UUID with dashes
-    const orderIdToCaseId = (orderId: string): string => {
-      if (orderId.length !== 32) return orderId;
-      return `${orderId.slice(0, 8)}-${orderId.slice(8, 12)}-${orderId.slice(12, 16)}-${orderId.slice(16, 20)}-${orderId.slice(20)}`;
-    };
-
     const verifyReturn = async () => {
       // Autopay sends: ServiceID, OrderID, Hash
       const serviceId = searchParams.get("ServiceID");
@@ -31,47 +25,14 @@ export default function Potwierdzenie() {
       // Legacy support: if we have 'case' param, it's from our old flow
       const legacyCaseNumber = searchParams.get("case");
 
-      // Our fallback identifier (we set cid=<OrderID> in ReturnURL)
-      const cid = searchParams.get("cid");
-
       if (!serviceId || !orderId || !hash) {
         if (legacyCaseNumber) {
-          // Legacy flow - just show the case number, don't clear data (status unknown)
+          // Legacy flow - just show the case number
           setCaseNumber(legacyCaseNumber);
           setStatus("pending");
+          clearFormData();
           return;
         }
-
-        // Fallback: use cid param OR saved case ID from localStorage
-        const fallbackId = cid || localStorage.getItem("guestCaseId");
-        if (fallbackId) {
-          const caseId = orderIdToCaseId(fallbackId);
-          // keep it for refreshes
-          localStorage.setItem("guestCaseId", caseId);
-
-          try {
-            // Fetch case status using backend function (service role bypasses RLS)
-            const { data, error } = await supabase.functions.invoke("get-case-status", {
-              body: { case_id: caseId },
-            });
-
-            if (data?.success && data.case && !error) {
-              setCaseNumber(data.case.case_number);
-              if (data.case.payment_status === "success") {
-                setStatus("success");
-                clearFormData();
-              } else if (data.case.payment_status === "fail") {
-                setStatus("fail");
-              } else {
-                setStatus("pending");
-              }
-              return;
-            }
-          } catch (e) {
-            console.error("Fallback case lookup failed:", e);
-          }
-        }
-
         setStatus("error");
         setErrorMessage("Brak wymaganych parametrów płatności");
         return;
@@ -94,13 +55,13 @@ export default function Potwierdzenie() {
         // Map payment status
         if (data.payment_status === "success") {
           setStatus("success");
-          clearFormData(); // Only clear on confirmed success
+          clearFormData();
         } else if (data.payment_status === "fail") {
           setStatus("fail");
-          // Don't clear - user may want to retry
         } else {
-          // pending - payment is being processed, don't clear yet
+          // pending - payment is being processed
           setStatus("pending");
+          clearFormData();
         }
       } catch (err) {
         console.error("Verification error:", err);
@@ -113,13 +74,11 @@ export default function Potwierdzenie() {
   }, [searchParams]);
 
   const clearFormData = () => {
-    // Clear all form data and guest profile after successful payment
     localStorage.removeItem("formData_datyChoroby");
     localStorage.removeItem("formData_rodzajZwolnienia");
     localStorage.removeItem("formData_wywiadOgolny");
     localStorage.removeItem("formData_wywiadObjawy");
     localStorage.removeItem("uploadedFiles_attachments");
-    localStorage.removeItem("guestProfile");
   };
 
   if (status === "verifying") {

@@ -7,22 +7,9 @@ import FAQ from "@/components/sections/FAQ";
 import Testimonials from "@/components/sections/Testimonials";
 import Contact from "@/components/sections/Contact";
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
 
 const Index = () => {
-  const { t, i18n } = useTranslation("seo");
-  const currentLang = i18n.language;
-
   useEffect(() => {
-    // Update document title
-    document.title = t("index.title");
-    
-    // Update meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute("content", t("index.description"));
-    }
-
     // Schema.org BreadcrumbList and WebPage
     const breadcrumbSchema = {
       "@context": "https://schema.org",
@@ -31,8 +18,8 @@ const Index = () => {
         {
           "@type": "ListItem",
           "position": 1,
-          "name": t("index.breadcrumb"),
-          "item": `https://e-zwolnienie.com.pl/${currentLang}`
+          "name": "Strona główna",
+          "item": "https://e-zwolnienie.com.pl/"
         }
       ]
     };
@@ -40,27 +27,27 @@ const Index = () => {
     const webPageSchema = {
       "@context": "https://schema.org",
       "@type": "MedicalWebPage",
-      "name": t("index.title"),
-      "description": t("index.description"),
-      "url": `https://e-zwolnienie.com.pl/${currentLang}`,
-      "inLanguage": currentLang,
+      "name": "Zwolnienie lekarskie online – szybko, legalnie i bez wychodzenia z domu",
+      "description": "Zdobądź zwolnienie lekarskie online w kilka minut. Konsultacja z lekarzem, legalne L4, bez wizyty. Wygodnie, bezpiecznie, profesjonalnie.",
+      "url": "https://e-zwolnienie.com.pl/",
+      "inLanguage": "pl",
       "isPartOf": {
         "@type": "WebSite",
-        "name": t("schema.siteName"),
+        "name": "e-zwolnienie",
         "url": "https://e-zwolnienie.com.pl/"
       },
       "about": {
         "@type": "MedicalProcedure",
-        "name": t("schema.procedureName"),
-        "procedureType": t("schema.procedureType"),
-        "followup": t("schema.procedureFollowup")
+        "name": "Telemedyczna konsultacja lekarska",
+        "procedureType": "Zdalna konsultacja medyczna",
+        "followup": "Wystawienie elektronicznego zwolnienia lekarskiego"
       },
       "mainEntity": {
         "@type": "MedicalWebPage",
-        "specialty": t("schema.medicalSpecialty"),
+        "specialty": "Telemedycyna",
         "audience": {
           "@type": "PeopleAudience",
-          "audienceType": t("schema.audienceType")
+          "audienceType": "Pacjenci wymagający zwolnienia lekarskiego"
         }
       }
     };
@@ -69,22 +56,18 @@ const Index = () => {
     const breadcrumbScript = document.createElement('script');
     breadcrumbScript.type = 'application/ld+json';
     breadcrumbScript.text = JSON.stringify(breadcrumbSchema);
-    breadcrumbScript.id = 'breadcrumb-schema';
     document.head.appendChild(breadcrumbScript);
 
     const webPageScript = document.createElement('script');
     webPageScript.type = 'application/ld+json';
     webPageScript.text = JSON.stringify(webPageSchema);
-    webPageScript.id = 'webpage-schema';
     document.head.appendChild(webPageScript);
 
     return () => {
-      const breadcrumb = document.getElementById('breadcrumb-schema');
-      const webpage = document.getElementById('webpage-schema');
-      if (breadcrumb) document.head.removeChild(breadcrumb);
-      if (webpage) document.head.removeChild(webpage);
+      document.head.removeChild(breadcrumbScript);
+      document.head.removeChild(webPageScript);
     };
-  }, [t, currentLang]);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">

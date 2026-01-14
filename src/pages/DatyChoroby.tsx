@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,52 +13,49 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
-import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
+
+const datesSchema = z.object({
+  illness_start: z.date({
+    required_error: "Data zachorowania jest wymagana",
+  }).refine((date) => {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    return date >= threeDaysAgo;
+  }, "Data nie może być starsza niż 3 dni wstecz"),
+  
+  illness_end: z.date({
+    required_error: "Data zakończenia jest wymagana",
+  }),
+  
+  late_justification: z.string().max(500, "Uzasadnienie nie może przekraczać 500 znaków").optional(),
+}).refine((data) => {
+  const maxEndDate = new Date(data.illness_start);
+  maxEndDate.setDate(maxEndDate.getDate() + 6);
+  return data.illness_end <= maxEndDate;
+}, {
+  message: "Data zakończenia nie może być późniejsza niż 7 dni od daty zachorowania",
+  path: ["illness_end"],
+}).refine((data) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const startDate = new Date(data.illness_start);
+  startDate.setHours(0, 0, 0, 0);
+  
+  if (startDate < today && !data.late_justification) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Uzasadnienie opóźnienia jest wymagane dla daty w przeszłości",
+  path: ["late_justification"],
+});
+
+type DatesFormData = z.infer<typeof datesSchema>;
 
 export default function DatyChoroby() {
-  const { t } = useTranslation(['forms', 'validation']);
-  const { navigateToLocalized } = useLanguageNavigation();
+  const navigate = useNavigate();
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
-  
-  // Create schema with translated error messages
-  const datesSchema = useMemo(() => z.object({
-    illness_start: z.date({
-      required_error: t('validation:dates.startRequired'),
-    }).refine((date) => {
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-      return date >= threeDaysAgo;
-    }, t('validation:dates.tooFarBack')),
-    
-    illness_end: z.date({
-      required_error: t('validation:dates.endRequired'),
-    }),
-    
-    late_justification: z.string().max(500, t('validation:required')).optional(),
-  }).refine((data) => {
-    const maxEndDate = new Date(data.illness_start);
-    maxEndDate.setDate(maxEndDate.getDate() + 6);
-    return data.illness_end <= maxEndDate;
-  }, {
-    message: t('validation:dates.tooLong'),
-    path: ["illness_end"],
-  }).refine((data) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const startDate = new Date(data.illness_start);
-    startDate.setHours(0, 0, 0, 0);
-    
-    if (startDate < today && !data.late_justification) {
-      return false;
-    }
-    return true;
-  }, {
-    message: t('validation:required'),
-    path: ["late_justification"],
-  }), [t]);
-
-  type DatesFormData = z.infer<typeof datesSchema>;
   
   const form = useForm<DatesFormData>({
     resolver: zodResolver(datesSchema),
@@ -92,8 +89,8 @@ export default function DatyChoroby() {
 
   const onSubmit = async (data: DatesFormData) => {
     console.log("Daty choroby:", data);
-    toast.success(t('forms:common.dataSaved'));
-    navigateToLocalized('/rodzaj-zwolnienia');
+    toast.success("Dane zapisane");
+    navigate("/rodzaj-zwolnienia");
   };
 
   return (
@@ -102,8 +99,8 @@ export default function DatyChoroby() {
         <ProgressSteps currentStep={1} />
         
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{t('forms:illnessDates.title')}</h1>
-          <p className="text-muted-foreground">{t('forms:illnessDates.subtitle')}</p>
+          <h1 className="text-3xl font-bold mb-2">Daty choroby</h1>
+          <p className="text-muted-foreground">Podaj daty okresu, na który potrzebujesz zwolnienia lekarskiego</p>
         </div>
 
         <Form {...form}>
@@ -113,7 +110,7 @@ export default function DatyChoroby() {
               name="illness_start"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>{t('forms:illnessDates.startDate')} *</FormLabel>
+                  <FormLabel>Data zachorowania *</FormLabel>
                   <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -127,7 +124,7 @@ export default function DatyChoroby() {
                           {field.value ? (
                             format(field.value, "dd.MM.yyyy")
                           ) : (
-                            <span>{t('forms:common.selectDate')}</span>
+                            <span>Wybierz datę</span>
                           )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -162,7 +159,7 @@ export default function DatyChoroby() {
               name="illness_end"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>{t('forms:illnessDates.endDate')} *</FormLabel>
+                  <FormLabel>Data zakończenia *</FormLabel>
                   <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -176,7 +173,7 @@ export default function DatyChoroby() {
                           {field.value ? (
                             format(field.value, "dd.MM.yyyy")
                           ) : (
-                            <span>{t('forms:common.selectDate')}</span>
+                            <span>Wybierz datę</span>
                           )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -212,17 +209,17 @@ export default function DatyChoroby() {
                 name="late_justification"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('forms:illnessDates.lateJustification')} *</FormLabel>
+                    <FormLabel>Uzasadnienie opóźnienia *</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder={t('forms:illnessDates.lateJustificationPlaceholder')}
+                        placeholder="Podaj powód zgłoszenia choroby z opóźnieniem..."
                         className="min-h-[100px]"
                         maxLength={500}
                         {...field}
                       />
                     </FormControl>
                     <p className="text-sm text-muted-foreground">
-                      {field.value?.length || 0}/500 {t('forms:common.characters')}
+                      {field.value?.length || 0}/500 znaków
                     </p>
                     <FormMessage />
                   </FormItem>
@@ -231,11 +228,11 @@ export default function DatyChoroby() {
             )}
 
             <div className="flex gap-4 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigateToLocalized('/wybor-sciezki')} className="flex-1">
-                {t('forms:common.back')}
+              <Button type="button" variant="outline" onClick={() => navigate("/wybor-sciezki")} className="flex-1">
+                Wstecz
               </Button>
               <Button type="submit" className="flex-1">
-                {t('forms:common.next')}
+                Dalej
               </Button>
             </div>
           </form>

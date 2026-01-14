@@ -1,23 +1,26 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
+
+interface Step {
+  number: number;
+  label: string;
+  path: string;
+}
+
+const steps: Step[] = [
+  { number: 1, label: "Daty choroby", path: "/daty-choroby" },
+  { number: 2, label: "Rodzaj zwolnienia", path: "/rodzaj-zwolnienia" },
+  { number: 3, label: "Wywiad ogólny", path: "/wywiad-ogolny" },
+  { number: 4, label: "Objawy", path: "/wywiad-objawy" },
+  { number: 5, label: "Podsumowanie", path: "/podsumowanie" },
+  { number: 6, label: "Płatność", path: "/platnosc" },
+];
 
 interface ProgressStepsProps {
   currentStep: number;
 }
 
 export const ProgressSteps = ({ currentStep }: ProgressStepsProps) => {
-  const { t } = useTranslation("common");
-
-  const steps = [
-    { number: 1, label: t("progressSteps.step2") }, // Illness dates
-    { number: 2, label: t("progressSteps.step3") }, // Leave type
-    { number: 3, label: t("progressSteps.step4") }, // General interview
-    { number: 4, label: t("progressSteps.step5") }, // Symptoms
-    { number: 5, label: t("progressSteps.step6") }, // Summary
-    { number: 6, label: "Payment" }, // Using number 6 for payment
-  ];
-
   return (
     <div className="w-full max-w-3xl mx-auto mb-8">
       <div className="flex items-center justify-between">
@@ -64,7 +67,7 @@ export const ProgressSteps = ({ currentStep }: ProgressStepsProps) => {
       </div>
       <div className="mt-4 text-center">
         <p className="text-sm text-muted-foreground">
-          {t("progressSteps.stepOf", { current: currentStep, total: steps.length })}
+          Krok {currentStep} z {steps.length}
         </p>
       </div>
     </div>

@@ -2,22 +2,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
-import { useState, useEffect, useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 
-// PESEL validation
+// Walidacja sumy kontrolnej PESEL
 const validatePesel = (pesel: string): boolean => {
   if (!/^\d{11}$/.test(pesel)) return false;
   const weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
@@ -32,102 +31,311 @@ const extractDateOfBirthFromPesel = (pesel: string): string => {
   const month = parseInt(pesel.substring(2, 4));
   const day = parseInt(pesel.substring(4, 6));
   
+  // Determine century based on month code
   let fullYear: number;
   let realMonth: number;
   
   if (month >= 1 && month <= 12) {
+    // 1900-1999
     fullYear = 1900 + year;
     realMonth = month;
   } else if (month >= 21 && month <= 32) {
+    // 2000-2099
     fullYear = 2000 + year;
     realMonth = month - 20;
   } else if (month >= 41 && month <= 52) {
+    // 2100-2199
     fullYear = 2100 + year;
     realMonth = month - 40;
   } else if (month >= 61 && month <= 72) {
+    // 2200-2299
     fullYear = 2200 + year;
     realMonth = month - 60;
   } else if (month >= 81 && month <= 92) {
+    // 1800-1899
     fullYear = 1800 + year;
     realMonth = month - 80;
   } else {
+    // Fallback
     fullYear = 1900 + year;
     realMonth = month;
   }
   
+  // Format as YYYY-MM-DD
   return `${fullYear}-${String(realMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
+const registrationSchema = z.object({
+  firstName: z.string().trim().min(1, "Imię jest wymagane").max(50, "Imię jest za długie"),
+  lastName: z.string().trim().min(1, "Nazwisko jest wymagane").max(50, "Nazwisko jest za długie"),
+  email: z.string().trim().email("Nieprawidłowy adres e-mail").max(254, "E-mail jest za długi"),
+  pesel: z.string().refine(validatePesel, "Nieprawidłowy numer PESEL"),
+  phonePrefix: z.string().min(1, "Prefiks jest wymagany"),
+  phoneNumber: z.string().regex(/^\d{9,13}$/, "Nieprawidłowy numer telefonu (9-13 cyfr)"),
+  street: z.string().trim().min(1, "Ulica jest wymagana").max(100, "Ulica jest za długa"),
+  houseNo: z.string().trim().min(1, "Nr domu jest wymagany").max(10, "Nr domu jest za długi"),
+  flatNo: z.string().trim().max(10, "Nr mieszkania jest za długi").optional(),
+  postcode: z.string().regex(/^\d{2}-\d{3}$/, "Nieprawidłowy kod pocztowy (format: XX-XXX)"),
+  city: z.string().trim().min(1, "Miasto jest wymagane").max(85, "Miasto jest za długie"),
+  country: z.string().min(1, "Państwo jest wymagane"),
+  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków").or(z.literal('')).optional(),
+  consentTerms: z.boolean().refine(val => val === true, "Musisz zaakceptować regulamin"),
+  consentEmployment: z.boolean().refine(val => val === true, "Potwierdzenie zatrudnienia jest wymagane"),
+  consentCall: z.boolean().refine(val => val === true, "Zgoda na kontakt telefoniczny jest wymagana"),
+  consentNoGuarantee: z.boolean().refine(val => val === true, "Musisz potwierdzić warunki e-konsultacji"),
+  consentTruth: z.boolean().refine(val => val === true, "Musisz potwierdzić prawdziwość danych"),
+  consentMarketingEmail: z.boolean().optional(),
+  consentMarketingTel: z.boolean().optional(),
+});
+
+type RegistrationFormData = z.infer<typeof registrationSchema>;
+
 const phonePrefixes = [
   { country: "Polska", code: "+48", flag: "🇵🇱" },
-  { country: "Niemcy", code: "+49", flag: "🇩🇪" },
-  { country: "Wielka Brytania", code: "+44", flag: "🇬🇧" },
-  { country: "Francja", code: "+33", flag: "🇫🇷" },
-  { country: "Włochy", code: "+39", flag: "🇮🇹" },
-  { country: "Hiszpania", code: "+34", flag: "🇪🇸" },
-  { country: "Holandia", code: "+31", flag: "🇳🇱" },
-  { country: "Belgia", code: "+32", flag: "🇧🇪" },
+  { country: "Afganistan", code: "+93", flag: "🇦🇫" },
+  { country: "Albania", code: "+355", flag: "🇦🇱" },
+  { country: "Algieria", code: "+213", flag: "🇩🇿" },
+  { country: "Andora", code: "+376", flag: "🇦🇩" },
+  { country: "Angola", code: "+244", flag: "🇦🇴" },
+  { country: "Argentyna", code: "+54", flag: "🇦🇷" },
+  { country: "Armenia", code: "+374", flag: "🇦🇲" },
+  { country: "Australia", code: "+61", flag: "🇦🇺" },
   { country: "Austria", code: "+43", flag: "🇦🇹" },
-  { country: "Szwajcaria", code: "+41", flag: "🇨🇭" },
+  { country: "Azerbejdżan", code: "+994", flag: "🇦🇿" },
+  { country: "Bahrajn", code: "+973", flag: "🇧🇭" },
+  { country: "Bangladesz", code: "+880", flag: "🇧🇩" },
+  { country: "Białoruś", code: "+375", flag: "🇧🇾" },
+  { country: "Belgia", code: "+32", flag: "🇧🇪" },
+  { country: "Belize", code: "+501", flag: "🇧🇿" },
+  { country: "Benin", code: "+229", flag: "🇧🇯" },
+  { country: "Bhutan", code: "+975", flag: "🇧🇹" },
+  { country: "Boliwia", code: "+591", flag: "🇧🇴" },
+  { country: "Bośnia i Hercegowina", code: "+387", flag: "🇧🇦" },
+  { country: "Botswana", code: "+267", flag: "🇧🇼" },
+  { country: "Brazylia", code: "+55", flag: "🇧🇷" },
+  { country: "Brunei", code: "+673", flag: "🇧🇳" },
+  { country: "Bułgaria", code: "+359", flag: "🇧🇬" },
+  { country: "Burkina Faso", code: "+226", flag: "🇧🇫" },
+  { country: "Burundi", code: "+257", flag: "🇧🇮" },
+  { country: "Kambodża", code: "+855", flag: "🇰🇭" },
+  { country: "Kamerun", code: "+237", flag: "🇨🇲" },
+  { country: "Kanada", code: "+1", flag: "🇨🇦" },
+  { country: "Republika Zielonego Przylądka", code: "+238", flag: "🇨🇻" },
+  { country: "Republika Środkowoafrykańska", code: "+236", flag: "🇨🇫" },
+  { country: "Czad", code: "+235", flag: "🇹🇩" },
+  { country: "Chile", code: "+56", flag: "🇨🇱" },
+  { country: "Chiny", code: "+86", flag: "🇨🇳" },
+  { country: "Kolumbia", code: "+57", flag: "🇨🇴" },
+  { country: "Komory", code: "+269", flag: "🇰🇲" },
+  { country: "Kongo", code: "+242", flag: "🇨🇬" },
+  { country: "Kostaryka", code: "+506", flag: "🇨🇷" },
+  { country: "Chorwacja", code: "+385", flag: "🇭🇷" },
+  { country: "Kuba", code: "+53", flag: "🇨🇺" },
+  { country: "Cypr", code: "+357", flag: "🇨🇾" },
   { country: "Czechy", code: "+420", flag: "🇨🇿" },
-  { country: "Norwegia", code: "+47", flag: "🇳🇴" },
-  { country: "Szwecja", code: "+46", flag: "🇸🇪" },
   { country: "Dania", code: "+45", flag: "🇩🇰" },
-  { country: "USA", code: "+1", flag: "🇺🇸" },
+  { country: "Dżibuti", code: "+253", flag: "🇩🇯" },
+  { country: "Ekwador", code: "+593", flag: "🇪🇨" },
+  { country: "Egipt", code: "+20", flag: "🇪🇬" },
+  { country: "Salwador", code: "+503", flag: "🇸🇻" },
+  { country: "Gwinea Równikowa", code: "+240", flag: "🇬🇶" },
+  { country: "Erytrea", code: "+291", flag: "🇪🇷" },
+  { country: "Estonia", code: "+372", flag: "🇪🇪" },
+  { country: "Etiopia", code: "+251", flag: "🇪🇹" },
+  { country: "Fidżi", code: "+679", flag: "🇫🇯" },
+  { country: "Finlandia", code: "+358", flag: "🇫🇮" },
+  { country: "Francja", code: "+33", flag: "🇫🇷" },
+  { country: "Gabon", code: "+241", flag: "🇬🇦" },
+  { country: "Gambia", code: "+220", flag: "🇬🇲" },
+  { country: "Gruzja", code: "+995", flag: "🇬🇪" },
+  { country: "Niemcy", code: "+49", flag: "🇩🇪" },
+  { country: "Ghana", code: "+233", flag: "🇬🇭" },
+  { country: "Grecja", code: "+30", flag: "🇬🇷" },
+  { country: "Gwatemala", code: "+502", flag: "🇬🇹" },
+  { country: "Gwinea", code: "+224", flag: "🇬🇳" },
+  { country: "Gwinea Bissau", code: "+245", flag: "🇬🇼" },
+  { country: "Gujana", code: "+592", flag: "🇬🇾" },
+  { country: "Haiti", code: "+509", flag: "🇭🇹" },
+  { country: "Honduras", code: "+504", flag: "🇭🇳" },
+  { country: "Hongkong", code: "+852", flag: "🇭🇰" },
+  { country: "Węgry", code: "+36", flag: "🇭🇺" },
+  { country: "Islandia", code: "+354", flag: "🇮🇸" },
+  { country: "Indie", code: "+91", flag: "🇮🇳" },
+  { country: "Indonezja", code: "+62", flag: "🇮🇩" },
+  { country: "Iran", code: "+98", flag: "🇮🇷" },
+  { country: "Irak", code: "+964", flag: "🇮🇶" },
+  { country: "Irlandia", code: "+353", flag: "🇮🇪" },
+  { country: "Izrael", code: "+972", flag: "🇮🇱" },
+  { country: "Włochy", code: "+39", flag: "🇮🇹" },
+  { country: "Japonia", code: "+81", flag: "🇯🇵" },
+  { country: "Jordania", code: "+962", flag: "🇯🇴" },
+  { country: "Kazachstan", code: "+7", flag: "🇰🇿" },
+  { country: "Kenia", code: "+254", flag: "🇰🇪" },
+  { country: "Korea Południowa", code: "+82", flag: "🇰🇷" },
+  { country: "Kuwejt", code: "+965", flag: "🇰🇼" },
+  { country: "Kirgistan", code: "+996", flag: "🇰🇬" },
+  { country: "Laos", code: "+856", flag: "🇱🇦" },
+  { country: "Łotwa", code: "+371", flag: "🇱🇻" },
+  { country: "Liban", code: "+961", flag: "🇱🇧" },
+  { country: "Litwa", code: "+370", flag: "🇱🇹" },
+  { country: "Luksemburg", code: "+352", flag: "🇱🇺" },
+  { country: "Malezja", code: "+60", flag: "🇲🇾" },
+  { country: "Meksyk", code: "+52", flag: "🇲🇽" },
+  { country: "Maroko", code: "+212", flag: "🇲🇦" },
+  { country: "Holandia", code: "+31", flag: "🇳🇱" },
+  { country: "Nowa Zelandia", code: "+64", flag: "🇳🇿" },
+  { country: "Norwegia", code: "+47", flag: "🇳🇴" },
+  { country: "Pakistan", code: "+92", flag: "🇵🇰" },
+  { country: "Filipiny", code: "+63", flag: "🇵🇭" },
+  { country: "Portugalia", code: "+351", flag: "🇵🇹" },
+  { country: "Katar", code: "+974", flag: "🇶🇦" },
+  { country: "Rumunia", code: "+40", flag: "🇷🇴" },
+  { country: "Rosja", code: "+7", flag: "🇷🇺" },
+  { country: "Arabia Saudyjska", code: "+966", flag: "🇸🇦" },
+  { country: "Singapur", code: "+65", flag: "🇸🇬" },
+  { country: "Słowacja", code: "+421", flag: "🇸🇰" },
+  { country: "Słowenia", code: "+386", flag: "🇸🇮" },
+  { country: "Republika Południowej Afryki", code: "+27", flag: "🇿🇦" },
+  { country: "Hiszpania", code: "+34", flag: "🇪🇸" },
+  { country: "Szwecja", code: "+46", flag: "🇸🇪" },
+  { country: "Szwajcaria", code: "+41", flag: "🇨🇭" },
+  { country: "Tajwan", code: "+886", flag: "🇹🇼" },
+  { country: "Tajlandia", code: "+66", flag: "🇹🇭" },
+  { country: "Turcja", code: "+90", flag: "🇹🇷" },
+  { country: "Ukraina", code: "+380", flag: "🇺🇦" },
+  { country: "Zjednoczone Emiraty Arabskie", code: "+971", flag: "🇦🇪" },
+  { country: "Wielka Brytania", code: "+44", flag: "🇬🇧" },
+  { country: "Stany Zjednoczone", code: "+1", flag: "🇺🇸" },
+  { country: "Wietnam", code: "+84", flag: "🇻🇳" },
 ];
 
 const countries = [
   { code: "PL", name: "Polska", flag: "🇵🇱" },
-  { code: "DE", name: "Niemcy", flag: "🇩🇪" },
-  { code: "GB", name: "Wielka Brytania", flag: "🇬🇧" },
-  { code: "FR", name: "Francja", flag: "🇫🇷" },
-  { code: "IT", name: "Włochy", flag: "🇮🇹" },
-  { code: "ES", name: "Hiszpania", flag: "🇪🇸" },
-  { code: "NL", name: "Holandia", flag: "🇳🇱" },
-  { code: "BE", name: "Belgia", flag: "🇧🇪" },
+  { code: "AF", name: "Afganistan", flag: "🇦🇫" },
+  { code: "AL", name: "Albania", flag: "🇦🇱" },
+  { code: "DZ", name: "Algieria", flag: "🇩🇿" },
+  { code: "AD", name: "Andora", flag: "🇦🇩" },
+  { code: "AO", name: "Angola", flag: "🇦🇴" },
+  { code: "AR", name: "Argentyna", flag: "🇦🇷" },
+  { code: "AM", name: "Armenia", flag: "🇦🇲" },
+  { code: "AU", name: "Australia", flag: "🇦🇺" },
   { code: "AT", name: "Austria", flag: "🇦🇹" },
-  { code: "CH", name: "Szwajcaria", flag: "🇨🇭" },
+  { code: "AZ", name: "Azerbejdżan", flag: "🇦🇿" },
+  { code: "BH", name: "Bahrajn", flag: "🇧🇭" },
+  { code: "BD", name: "Bangladesz", flag: "🇧🇩" },
+  { code: "BY", name: "Białoruś", flag: "🇧🇾" },
+  { code: "BE", name: "Belgia", flag: "🇧🇪" },
+  { code: "BZ", name: "Belize", flag: "🇧🇿" },
+  { code: "BJ", name: "Benin", flag: "🇧🇯" },
+  { code: "BT", name: "Bhutan", flag: "🇧🇹" },
+  { code: "BO", name: "Boliwia", flag: "🇧🇴" },
+  { code: "BA", name: "Bośnia i Hercegowina", flag: "🇧🇦" },
+  { code: "BW", name: "Botswana", flag: "🇧🇼" },
+  { code: "BR", name: "Brazylia", flag: "🇧🇷" },
+  { code: "BN", name: "Brunei", flag: "🇧🇳" },
+  { code: "BG", name: "Bułgaria", flag: "🇧🇬" },
+  { code: "BF", name: "Burkina Faso", flag: "🇧🇫" },
+  { code: "BI", name: "Burundi", flag: "🇧🇮" },
+  { code: "KH", name: "Kambodża", flag: "🇰🇭" },
+  { code: "CM", name: "Kamerun", flag: "🇨🇲" },
+  { code: "CA", name: "Kanada", flag: "🇨🇦" },
+  { code: "CV", name: "Republika Zielonego Przylądka", flag: "🇨🇻" },
+  { code: "CF", name: "Republika Środkowoafrykańska", flag: "🇨🇫" },
+  { code: "TD", name: "Czad", flag: "🇹🇩" },
+  { code: "CL", name: "Chile", flag: "🇨🇱" },
+  { code: "CN", name: "Chiny", flag: "🇨🇳" },
+  { code: "CO", name: "Kolumbia", flag: "🇨🇴" },
+  { code: "KM", name: "Komory", flag: "🇰🇲" },
+  { code: "CG", name: "Kongo", flag: "🇨🇬" },
+  { code: "CR", name: "Kostaryka", flag: "🇨🇷" },
+  { code: "HR", name: "Chorwacja", flag: "🇭🇷" },
+  { code: "CU", name: "Kuba", flag: "🇨🇺" },
+  { code: "CY", name: "Cypr", flag: "🇨🇾" },
   { code: "CZ", name: "Czechy", flag: "🇨🇿" },
-  { code: "NO", name: "Norwegia", flag: "🇳🇴" },
-  { code: "SE", name: "Szwecja", flag: "🇸🇪" },
   { code: "DK", name: "Dania", flag: "🇩🇰" },
-  { code: "US", name: "USA", flag: "🇺🇸" },
+  { code: "DJ", name: "Dżibuti", flag: "🇩🇯" },
+  { code: "EC", name: "Ekwador", flag: "🇪🇨" },
+  { code: "EG", name: "Egipt", flag: "🇪🇬" },
+  { code: "SV", name: "Salwador", flag: "🇸🇻" },
+  { code: "GQ", name: "Gwinea Równikowa", flag: "🇬🇶" },
+  { code: "ER", name: "Erytrea", flag: "🇪🇷" },
+  { code: "EE", name: "Estonia", flag: "🇪🇪" },
+  { code: "ET", name: "Etiopia", flag: "🇪🇹" },
+  { code: "FJ", name: "Fidżi", flag: "🇫🇯" },
+  { code: "FI", name: "Finlandia", flag: "🇫🇮" },
+  { code: "FR", name: "Francja", flag: "🇫🇷" },
+  { code: "GA", name: "Gabon", flag: "🇬🇦" },
+  { code: "GM", name: "Gambia", flag: "🇬🇲" },
+  { code: "GE", name: "Gruzja", flag: "🇬🇪" },
+  { code: "DE", name: "Niemcy", flag: "🇩🇪" },
+  { code: "GH", name: "Ghana", flag: "🇬🇭" },
+  { code: "GR", name: "Grecja", flag: "🇬🇷" },
+  { code: "GT", name: "Gwatemala", flag: "🇬🇹" },
+  { code: "GN", name: "Gwinea", flag: "🇬🇳" },
+  { code: "GW", name: "Gwinea Bissau", flag: "🇬🇼" },
+  { code: "GY", name: "Gujana", flag: "🇬🇾" },
+  { code: "HT", name: "Haiti", flag: "🇭🇹" },
+  { code: "HN", name: "Honduras", flag: "🇭🇳" },
+  { code: "HK", name: "Hongkong", flag: "🇭🇰" },
+  { code: "HU", name: "Węgry", flag: "🇭🇺" },
+  { code: "IS", name: "Islandia", flag: "🇮🇸" },
+  { code: "IN", name: "Indie", flag: "🇮🇳" },
+  { code: "ID", name: "Indonezja", flag: "🇮🇩" },
+  { code: "IR", name: "Iran", flag: "🇮🇷" },
+  { code: "IQ", name: "Irak", flag: "🇮🇶" },
+  { code: "IE", name: "Irlandia", flag: "🇮🇪" },
+  { code: "IL", name: "Izrael", flag: "🇮🇱" },
+  { code: "IT", name: "Włochy", flag: "🇮🇹" },
+  { code: "JP", name: "Japonia", flag: "🇯🇵" },
+  { code: "JO", name: "Jordania", flag: "🇯🇴" },
+  { code: "KZ", name: "Kazachstan", flag: "🇰🇿" },
+  { code: "KE", name: "Kenia", flag: "🇰🇪" },
+  { code: "KR", name: "Korea Południowa", flag: "🇰🇷" },
+  { code: "KW", name: "Kuwejt", flag: "🇰🇼" },
+  { code: "KG", name: "Kirgistan", flag: "🇰🇬" },
+  { code: "LA", name: "Laos", flag: "🇱🇦" },
+  { code: "LV", name: "Łotwa", flag: "🇱🇻" },
+  { code: "LB", name: "Liban", flag: "🇱🇧" },
+  { code: "LT", name: "Litwa", flag: "🇱🇹" },
+  { code: "LU", name: "Luksemburg", flag: "🇱🇺" },
+  { code: "MY", name: "Malezja", flag: "🇲🇾" },
+  { code: "MX", name: "Meksyk", flag: "🇲🇽" },
+  { code: "MA", name: "Maroko", flag: "🇲🇦" },
+  { code: "NL", name: "Holandia", flag: "🇳🇱" },
+  { code: "NZ", name: "Nowa Zelandia", flag: "🇳🇿" },
+  { code: "NO", name: "Norwegia", flag: "🇳🇴" },
+  { code: "PK", name: "Pakistan", flag: "🇵🇰" },
+  { code: "PH", name: "Filipiny", flag: "🇵🇭" },
+  { code: "PT", name: "Portugalia", flag: "🇵🇹" },
+  { code: "QA", name: "Katar", flag: "🇶🇦" },
+  { code: "RO", name: "Rumunia", flag: "🇷🇴" },
+  { code: "RU", name: "Rosja", flag: "🇷🇺" },
+  { code: "SA", name: "Arabia Saudyjska", flag: "🇸🇦" },
+  { code: "SG", name: "Singapur", flag: "🇸🇬" },
+  { code: "SK", name: "Słowacja", flag: "🇸🇰" },
+  { code: "SI", name: "Słowenia", flag: "🇸🇮" },
+  { code: "ZA", name: "Republika Południowej Afryki", flag: "🇿🇦" },
+  { code: "ES", name: "Hiszpania", flag: "🇪🇸" },
+  { code: "SE", name: "Szwecja", flag: "🇸🇪" },
+  { code: "CH", name: "Szwajcaria", flag: "🇨🇭" },
+  { code: "TW", name: "Tajwan", flag: "🇹🇼" },
+  { code: "TH", name: "Tajlandia", flag: "🇹🇭" },
+  { code: "TR", name: "Turcja", flag: "🇹🇷" },
+  { code: "UA", name: "Ukraina", flag: "🇺🇦" },
+  { code: "AE", name: "Zjednoczone Emiraty Arabskie", flag: "🇦🇪" },
+  { code: "GB", name: "Wielka Brytania", flag: "🇬🇧" },
+  { code: "US", name: "Stany Zjednoczone", flag: "🇺🇸" },
+  { code: "VN", name: "Wietnam", flag: "🇻🇳" },
 ];
 
 const Rejestracja = () => {
-  const { t } = useTranslation(['forms', 'validation']);
-  const { navigateToLocalized, getLocalizedPath } = useLanguageNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openPhonePrefix, setOpenPhonePrefix] = useState(false);
   const [openCountry, setOpenCountry] = useState(false);
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuestMode = searchParams.get('guest') === 'true';
   const { user } = useAuth();
-
-  const registrationSchema = useMemo(() => z.object({
-    firstName: z.string().trim().min(1, t('validation:firstName.required')).max(50),
-    lastName: z.string().trim().min(1, t('validation:lastName.required')).max(50),
-    email: z.string().trim().email(t('validation:email.invalid')).max(254),
-    pesel: z.string().refine(validatePesel, t('validation:pesel.invalid')),
-    phonePrefix: z.string().min(1, t('validation:required')),
-    phoneNumber: z.string().regex(/^\d{9,13}$/, t('validation:phone.invalid')),
-    street: z.string().trim().min(1, t('validation:street.required')).max(100),
-    houseNo: z.string().trim().min(1, t('validation:houseNo.required')).max(10),
-    flatNo: z.string().trim().max(10).optional(),
-    postcode: z.string().regex(/^\d{2}-\d{3}$/, t('validation:postcode.invalid')),
-    city: z.string().trim().min(1, t('validation:city.required')).max(85),
-    country: z.string().min(1, t('validation:required')),
-    password: z.string().min(8, t('validation:required')).or(z.literal('')).optional(),
-    consentTerms: z.boolean().refine(val => val === true, t('validation:consent.terms')),
-    consentEmployment: z.boolean().refine(val => val === true, t('validation:required')),
-    consentCall: z.boolean().refine(val => val === true, t('validation:required')),
-    consentNoGuarantee: z.boolean().refine(val => val === true, t('validation:consent.noGuarantee')),
-    consentTruth: z.boolean().refine(val => val === true, t('validation:consent.truth')),
-    consentMarketingEmail: z.boolean().optional(),
-    consentMarketingTel: z.boolean().optional(),
-  }), [t]);
-
-  type RegistrationFormData = z.infer<typeof registrationSchema>;
   
   const { register, handleSubmit, control, formState: { errors }, setValue, watch } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
@@ -166,11 +374,12 @@ const Rejestracja = () => {
     setValue('consentMarketingTel', checked);
   };
 
+  // Redirect if already logged in
   useEffect(() => {
     if (user && !isGuestMode) {
-      navigateToLocalized('/daty-choroby');
+      navigate('/daty-choroby');
     }
-  }, [user, isGuestMode, navigateToLocalized]);
+  }, [user, isGuestMode, navigate]);
 
   const onSubmit = async (data: RegistrationFormData) => {
     setIsSubmitting(true);
@@ -178,11 +387,8 @@ const Rejestracja = () => {
       const fullPhone = data.phonePrefix + data.phoneNumber;
       
       if (isGuestMode) {
-        // Generate UUID on the client side so we have it for localStorage
-        const guestProfileId = crypto.randomUUID();
-        
-        const guestProfileData = {
-          id: guestProfileId,
+        // Guest mode: Save profile without creating auth account
+        const { error } = await supabase.from('profiles').insert({
           first_name: data.firstName,
           last_name: data.lastName,
           email: data.email,
@@ -203,25 +409,21 @@ const Rejestracja = () => {
           consent_marketing_email: data.consentMarketingEmail || false,
           consent_marketing_tel: data.consentMarketingTel || false,
           is_guest: true,
-        };
-
-        // IMPORTANT: do not request returned rows (SELECT is blocked for anonymous guests by RLS)
-        const { error } = await supabase.from('profiles').insert([guestProfileData] as any);
+        });
 
         if (error) throw error;
 
-        // Save guest profile to localStorage for later steps (includes id)
-        localStorage.setItem('guestProfile', JSON.stringify(guestProfileData));
-
         toast({
-          title: t('forms:common.dataSaved'),
-          description: t('forms:common.next'),
+          title: "Dane zapisane",
+          description: "Przejdź do formularza medycznego.",
         });
-        navigateToLocalized('/daty-choroby');
+        navigate("/daty-choroby");
       } else {
+        // Registration mode: Create auth account with profile
         if (!data.password) {
           toast({
-            title: t('validation:required'),
+            title: "Błąd",
+            description: "Hasło jest wymagane do rejestracji.",
             variant: "destructive",
           });
           return;
@@ -256,17 +458,27 @@ const Rejestracja = () => {
         });
 
         if (error) {
-          throw error;
+          if (error.message.includes('already registered')) {
+            toast({
+              title: "Użytkownik już istnieje",
+              description: "Ten adres e-mail jest już zarejestrowany. Zaloguj się.",
+              variant: "destructive",
+            });
+          } else {
+            throw error;
+          }
         } else {
           toast({
-            title: t('forms:common.dataSaved'),
+            title: "Rejestracja pomyślna",
+            description: "Przejdź do formularza medycznego.",
           });
-          navigateToLocalized('/daty-choroby');
+          navigate("/daty-choroby");
         }
       }
     } catch (error: any) {
       toast({
-        title: error.message || t('validation:required'),
+        title: "Błąd",
+        description: error.message || "Wystąpił problem. Spróbuj ponownie.",
         variant: "destructive",
       });
     } finally {
@@ -277,27 +489,30 @@ const Rejestracja = () => {
   return (
     <div className="min-h-screen gradient-subtle flex items-center justify-center p-4 py-12">
       <div className="max-w-3xl w-full">
-        <Link to={getLocalizedPath('/')} className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
+        <Link to="/" className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
           <ArrowLeft className="w-4 h-4" />
-          {t('forms:common.back')}
+          Powrót na stronę główną
         </Link>
 
         <div className="bg-white p-8 md:p-12 rounded-2xl shadow-strong">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {isGuestMode ? t('forms:registration.titleGuest') : t('forms:registration.title')}
+            {isGuestMode ? "Dane do e-zwolnienia" : "Rejestracja"}
           </h1>
           <p className="text-muted-foreground mb-8">
-            {isGuestMode ? t('forms:registration.subtitleGuest') : t('forms:registration.subtitle')}
+            {isGuestMode 
+              ? "Wypełnij formularz, aby przejść do procesu uzyskania zwolnienia lekarskiego online" 
+              : "Utwórz konto, aby rozpocząć proces uzyskania zwolnienia lekarskiego online"
+            }
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Personal Data */}
+            {/* Dane osobowe */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground">{t('forms:registration.personalData')}</h2>
+              <h2 className="text-xl font-semibold text-foreground">Dane osobowe</h2>
               
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="reg_first_name">{t('forms:registration.firstName')} *</Label>
+                  <Label htmlFor="reg_first_name">Imię *</Label>
                   <Input
                     id="reg_first_name"
                     {...register("firstName")}
@@ -309,7 +524,7 @@ const Rejestracja = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="reg_last_name">{t('forms:registration.lastName')} *</Label>
+                  <Label htmlFor="reg_last_name">Nazwisko *</Label>
                   <Input
                     id="reg_last_name"
                     {...register("lastName")}
@@ -322,7 +537,7 @@ const Rejestracja = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="reg_email">{t('forms:registration.email')} *</Label>
+                <Label htmlFor="reg_email">E-mail *</Label>
                 <Input
                   id="reg_email"
                   type="email"
@@ -336,21 +551,25 @@ const Rejestracja = () => {
 
               {!isGuestMode && (
                 <div className="space-y-2">
-                  <Label htmlFor="reg_password">{t('forms:registration.password')} *</Label>
+                  <Label htmlFor="reg_password">Hasło *</Label>
                   <Input
                     id="reg_password"
                     type="password"
                     {...register("password")}
+                    placeholder="Minimum 8 znaków"
                     className={errors.password ? "border-destructive" : ""}
                   />
                   {errors.password && (
                     <p className="text-sm text-destructive">{errors.password.message}</p>
                   )}
+                  <p className="text-xs text-muted-foreground">
+                    Hasło pozwoli Ci zalogować się w przyszłości i zarządzać swoimi zwolnieniami
+                  </p>
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="reg_pesel">{t('forms:registration.pesel')} *</Label>
+                <Label htmlFor="reg_pesel">PESEL *</Label>
                 <Input
                   id="reg_pesel"
                   {...register("pesel")}
@@ -365,7 +584,7 @@ const Rejestracja = () => {
 
               <div className="grid md:grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="reg_phone">{t('forms:registration.phone')} *</Label>
+                  <Label htmlFor="reg_phone">Telefon *</Label>
                   <div className="flex gap-2">
                     <Controller
                       name="phonePrefix"
@@ -384,15 +603,15 @@ const Rejestracja = () => {
                             >
                               {field.value
                                 ? phonePrefixes.find((prefix) => prefix.code === field.value)?.flag + " " + field.value
-                                : t('forms:registration.phonePrefix')}
+                                : "Wybierz prefiks"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-[300px] p-0">
                             <Command>
-                              <CommandInput placeholder={t('forms:registration.searchCountry')} />
+                              <CommandInput placeholder="Szukaj kraju..." />
                               <CommandList>
-                                <CommandEmpty>{t('forms:registration.noCountryFound')}</CommandEmpty>
+                                <CommandEmpty>Nie znaleziono kraju.</CommandEmpty>
                                 <CommandGroup>
                                   {phonePrefixes.map((prefix) => (
                                     <CommandItem
@@ -437,12 +656,12 @@ const Rejestracja = () => {
               </div>
             </div>
 
-            {/* Address */}
+            {/* Adres */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground">{t('forms:registration.address')}</h2>
+              <h2 className="text-xl font-semibold text-foreground">Adres zamieszkania</h2>
               
               <div className="space-y-2">
-                <Label htmlFor="reg_street">{t('forms:registration.street')} *</Label>
+                <Label htmlFor="reg_street">Ulica *</Label>
                 <Input
                   id="reg_street"
                   {...register("street")}
@@ -455,7 +674,7 @@ const Rejestracja = () => {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="reg_house_no">{t('forms:registration.houseNo')} *</Label>
+                  <Label htmlFor="reg_house_no">Nr domu *</Label>
                   <Input
                     id="reg_house_no"
                     {...register("houseNo")}
@@ -467,18 +686,21 @@ const Rejestracja = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="reg_flat_no">{t('forms:registration.flatNo')}</Label>
+                  <Label htmlFor="reg_flat_no">Nr mieszkania</Label>
                   <Input
                     id="reg_flat_no"
                     {...register("flatNo")}
                     className={errors.flatNo ? "border-destructive" : ""}
                   />
+                  {errors.flatNo && (
+                    <p className="text-sm text-destructive">{errors.flatNo.message}</p>
+                  )}
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="reg_postcode">{t('forms:registration.postcode')} *</Label>
+                  <Label htmlFor="reg_postcode">Kod pocztowy *</Label>
                   <Input
                     id="reg_postcode"
                     {...register("postcode")}
@@ -492,7 +714,7 @@ const Rejestracja = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="reg_city">{t('forms:registration.city')} *</Label>
+                  <Label htmlFor="reg_city">Miasto *</Label>
                   <Input
                     id="reg_city"
                     {...register("city")}
@@ -505,7 +727,7 @@ const Rejestracja = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="reg_country">{t('forms:registration.country')} *</Label>
+                <Label htmlFor="reg_country">Państwo *</Label>
                 <Controller
                   name="country"
                   control={control}
@@ -523,15 +745,15 @@ const Rejestracja = () => {
                         >
                           {field.value
                             ? countries.find((country) => country.code === field.value)?.flag + " " + countries.find((country) => country.code === field.value)?.name
-                            : t('forms:registration.country')}
+                            : "Wybierz państwo"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                         <Command>
-                          <CommandInput placeholder={t('forms:registration.searchCountry')} />
+                          <CommandInput placeholder="Szukaj państwa..." />
                           <CommandList>
-                            <CommandEmpty>{t('forms:registration.noCountryFound')}</CommandEmpty>
+                            <CommandEmpty>Nie znaleziono państwa.</CommandEmpty>
                             <CommandGroup>
                               {countries.map((country) => (
                                 <CommandItem
@@ -565,11 +787,22 @@ const Rejestracja = () => {
               </div>
             </div>
 
-            {/* Consents */}
+            {/* Zgody */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground">{t('forms:registration.consents')}</h2>
+              <h2 className="text-xl font-semibold text-foreground">Zgody i potwierdzenia</h2>
               
               <div className="space-y-4">
+                <div className="flex items-start space-x-3 pb-3 border-b">
+                  <Checkbox
+                    id="select_all"
+                    checked={allChecked}
+                    onCheckedChange={handleSelectAll}
+                  />
+                  <Label htmlFor="select_all" className="text-sm font-medium cursor-pointer">
+                    Zaznacz wszystkie zgody
+                  </Label>
+                </div>
+
                 <div className="flex items-start space-x-3">
                   <Controller
                     name="consentTerms"
@@ -585,7 +818,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_terms" className="text-sm font-normal cursor-pointer">
-                      {t('forms:registration.consentTerms')} *
+                      Akceptuję <Link to="#" className="text-primary hover:underline">Regulamin</Link> i <Link to="#" className="text-primary hover:underline">Politykę prywatności</Link> *
                     </Label>
                     {errors.consentTerms && (
                       <p className="text-sm text-destructive">{errors.consentTerms.message}</p>
@@ -608,7 +841,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_employment" className="text-sm font-normal cursor-pointer">
-                      {t('forms:registration.consentEmployment')} *
+                      Oświadczam, że jestem aktualnie zatrudniony/a u Pracodawcy wskazanego w ankiecie oraz przysługuje mi prawo do zasiłku chorobowego. *
                     </Label>
                     {errors.consentEmployment && (
                       <p className="text-sm text-destructive">{errors.consentEmployment.message}</p>
@@ -631,7 +864,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_call" className="text-sm font-normal cursor-pointer">
-                      {t('forms:registration.consentCall')} *
+                      Oświadczam, że przyjmuję do wiadomości, iż lekarz może skontaktować się ze mną telefonicznie w celu pogłębienia wywiadu medycznego. *
                     </Label>
                     {errors.consentCall && (
                       <p className="text-sm text-destructive">{errors.consentCall.message}</p>
@@ -654,7 +887,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_no_guarantee" className="text-sm font-normal cursor-pointer">
-                      {t('forms:registration.consentNoGuarantee')} *
+                      Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego e-zwolnienia. Diagnoza oraz decyzja o zasadności i długości e-zwolnienia należą wyłącznie do lekarza, który podejmuje je na podstawie przekazanych przeze mnie informacji i objawów. Data początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy. *
                     </Label>
                     {errors.consentNoGuarantee && (
                       <p className="text-sm text-destructive">{errors.consentNoGuarantee.message}</p>
@@ -677,7 +910,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_truth" className="text-sm font-normal cursor-pointer">
-                      {t('forms:registration.consentTruth')} *
+                      Oświadczam, że nie zatajam żadnych istotnych informacji dotyczących mojego stanu zdrowia *
                     </Label>
                     {errors.consentTruth && (
                       <p className="text-sm text-destructive">{errors.consentTruth.message}</p>
@@ -698,7 +931,7 @@ const Rejestracja = () => {
                     )}
                   />
                   <Label htmlFor="consent_marketing_email" className="text-sm font-normal cursor-pointer">
-                    {t('forms:registration.consentMarketingEmail')}
+                    Wyrażam zgodę na otrzymywanie informacji marketingowych drogą elektroniczną (opcjonalne)
                   </Label>
                 </div>
 
@@ -715,22 +948,22 @@ const Rejestracja = () => {
                     )}
                   />
                   <Label htmlFor="consent_marketing_tel" className="text-sm font-normal cursor-pointer">
-                    {t('forms:registration.consentMarketingTel')}
+                    Wyrażam zgodę na kontakt telefoniczny/SMS/MMS w celach marketingowych (opcjonalne)
                   </Label>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
-              <Link to={getLocalizedPath('/')} className="sm:flex-1">
+              <Link to="/" className="sm:flex-1">
                 <Button type="button" variant="outline" size="lg" className="w-full">
-                  {t('forms:common.cancel')}
+                  Anuluj
                 </Button>
               </Link>
               <Button type="submit" size="lg" className="w-full sm:flex-1" disabled={isSubmitting}>
                 {isSubmitting 
-                  ? t('forms:registration.processing')
-                  : (isGuestMode ? t('forms:registration.continueAsGuest') : t('forms:registration.createAccount'))
+                  ? (isGuestMode ? "Zapisywanie..." : "Rejestracja...") 
+                  : (isGuestMode ? "Zapisz i przejdź dalej" : "Zarejestruj się i przejdź dalej")
                 }
               </Button>
             </div>
@@ -739,9 +972,9 @@ const Rejestracja = () => {
           {!isGuestMode && (
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                {t('forms:registration.alreadyHaveAccount')}{" "}
-                <Link to={getLocalizedPath('/logowanie')} className="text-primary hover:underline font-medium">
-                  {t('forms:registration.login')}
+                Masz już konto?{" "}
+                <Link to="/logowanie" className="text-primary hover:underline font-medium">
+                  Zaloguj się
                 </Link>
               </p>
             </div>

@@ -12,20 +12,11 @@ serve(async (req) => {
   }
 
   try {
-    const { case_number } = await req.json();
+    const { case_number, case_id } = await req.json();
 
-    if (!case_number) {
+    if (!case_number && !case_id) {
       return new Response(
-        JSON.stringify({ error: 'Numer sprawy jest wymagany' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Validate case_number format (EZ-XXXXXXXXX)
-    const caseNumberPattern = /^EZ-[A-Z0-9]{9}$/i;
-    if (!caseNumberPattern.test(case_number.trim())) {
-      return new Response(
-        JSON.stringify({ error: 'Nieprawidłowy format numeru sprawy' }),
+        JSON.stringify({ error: 'Numer sprawy lub ID jest wymagany' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -35,20 +26,62 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Query only non-sensitive status information
-    const { data: caseData, error: caseError } = await supabase
-      .from('cases')
-      .select(`
-        case_number,
-        status,
-        payment_status,
-        illness_start,
-        illness_end,
-        created_at,
-        updated_at
-      `)
-      .eq('case_number', case_number.trim().toUpperCase())
-      .maybeSingle();
+    let caseData = null;
+    let caseError = null;
+
+    if (case_id) {
+      // Lookup by case_id (UUID)
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidPattern.test(case_id)) {
+        return new Response(
+          JSON.stringify({ error: 'Nieprawidłowy format ID sprawy' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const result = await supabase
+        .from('cases')
+        .select(`
+          case_number,
+          status,
+          payment_status,
+          illness_start,
+          illness_end,
+          created_at,
+          updated_at
+        `)
+        .eq('id', case_id)
+        .maybeSingle();
+      
+      caseData = result.data;
+      caseError = result.error;
+    } else {
+      // Lookup by case_number
+      const caseNumberPattern = /^EZ-[A-Z0-9]{9}$/i;
+      if (!caseNumberPattern.test(case_number.trim())) {
+        return new Response(
+          JSON.stringify({ error: 'Nieprawidłowy format numeru sprawy' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const result = await supabase
+        .from('cases')
+        .select(`
+          case_number,
+          status,
+          payment_status,
+          illness_start,
+          illness_end,
+          created_at,
+          updated_at
+        `)
+        .eq('case_number', case_number.trim().toUpperCase())
+        .maybeSingle();
+      
+      caseData = result.data;
+      caseError = result.error;
+    }
 
     if (caseError) {
       console.error('Database error:', caseError);
@@ -60,7 +93,7 @@ serve(async (req) => {
 
     if (!caseData) {
       return new Response(
-        JSON.stringify({ error: 'Nie znaleziono sprawy o podanym numerze' }),
+        JSON.stringify({ error: 'Nie znaleziono sprawy' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

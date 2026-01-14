@@ -133,7 +133,7 @@ export default function Podsumowanie() {
                     : '-'}
                 </span>
               </div>
-              {formData.datyChoroby?.late_justification && (
+              {formData.datyChoroby?.late_justification && formData.datyChoroby.late_justification.trim() !== '' && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t('forms:summary.justification')}:</span>
                   <span className="font-medium text-right max-w-[60%]">{formData.datyChoroby.late_justification}</span>

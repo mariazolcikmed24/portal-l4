@@ -1,0 +1,53 @@
+{
+  "required": "To pole jest wymagane",
+  "email": {
+    "invalid": "Nieprawidłowy adres e-mail",
+    "required": "Adres e-mail jest wymagany"
+  },
+  "phone": {
+    "invalid": "Nieprawidłowy numer telefonu",
+    "required": "Numer telefonu jest wymagany"
+  },
+  "pesel": {
+    "invalid": "Nieprawidłowy numer PESEL",
+    "required": "PESEL jest wymagany",
+    "length": "PESEL musi mieć 11 cyfr"
+  },
+  "firstName": {
+    "required": "Imię jest wymagane",
+    "minLength": "Imię musi mieć co najmniej 2 znaki"
+  },
+  "lastName": {
+    "required": "Nazwisko jest wymagane",
+    "minLength": "Nazwisko musi mieć co najmniej 2 znaki"
+  },
+  "postcode": {
+    "invalid": "Nieprawidłowy kod pocztowy (format: XX-XXX)",
+    "required": "Kod pocztowy jest wymagany"
+  },
+  "city": {
+    "required": "Miasto jest wymagane"
+  },
+  "street": {
+    "required": "Ulica jest wymagana"
+  },
+  "houseNo": {
+    "required": "Numer domu jest wymagany"
+  },
+  "dates": {
+    "startRequired": "Data rozpoczęcia jest wymagana",
+    "endRequired": "Data zakończenia jest wymagana",
+    "endBeforeStart": "Data zakończenia nie może być wcześniejsza niż data rozpoczęcia",
+    "tooFarBack": "Data początkowa może być maksymalnie 3 dni wstecz",
+    "tooLong": "Okres zwolnienia nie może przekraczać 7 dni"
+  },
+  "consent": {
+    "terms": "Musisz zaakceptować regulamin",
+    "truth": "Musisz potwierdzić prawdziwość danych",
+    "noGuarantee": "Musisz zaakceptować informację o braku gwarancji"
+  },
+  "caseNumber": {
+    "invalid": "Nieprawidłowy format numeru sprawy",
+    "required": "Numer sprawy jest wymagany"
+  }
+}

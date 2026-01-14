@@ -8,6 +8,7 @@ import plLanding from './locales/pl/landing.json';
 import plSeo from './locales/pl/seo.json';
 import plValidation from './locales/pl/validation.json';
 import plStatus from './locales/pl/status.json';
+import plForms from './locales/pl/forms.json';
 
 // Import English translations
 import enCommon from './locales/en/common.json';
@@ -15,6 +16,7 @@ import enLanding from './locales/en/landing.json';
 import enSeo from './locales/en/seo.json';
 import enValidation from './locales/en/validation.json';
 import enStatus from './locales/en/status.json';
+import enForms from './locales/en/forms.json';
 
 export const supportedLanguages = ['pl', 'en'] as const;
 export type SupportedLanguage = typeof supportedLanguages[number];
@@ -58,6 +60,7 @@ const resources = {
     seo: plSeo,
     validation: plValidation,
     status: plStatus,
+    forms: plForms,
   },
   en: {
     common: enCommon,
@@ -65,6 +68,7 @@ const resources = {
     seo: enSeo,
     validation: enValidation,
     status: enStatus,
+    forms: enForms,
   },
 };
 
@@ -75,7 +79,7 @@ i18n
     resources,
     fallbackLng: 'pl',
     defaultNS: 'common',
-    ns: ['common', 'landing', 'seo', 'validation', 'status'],
+    ns: ['common', 'landing', 'seo', 'validation', 'status', 'forms'],
     
     detection: {
       order: ['path', 'localStorage', 'navigator'],

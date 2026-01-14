@@ -52,15 +52,12 @@ export default function Platnosc() {
           .single();
         profileId = profile?.id;
       } else {
-        // Dla gościa, znajdź ostatni profil gościa
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('is_guest', true)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-        profileId = profile?.id;
+        // For guests, use localStorage (RLS blocks SELECT for anonymous users)
+        const guestProfile = localStorage.getItem('guestProfile');
+        if (guestProfile) {
+          const parsedProfile = JSON.parse(guestProfile);
+          profileId = parsedProfile.id;
+        }
       }
 
       if (!profileId) {

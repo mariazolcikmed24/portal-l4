@@ -32,6 +32,33 @@ export default function Potwierdzenie() {
           setStatus("pending");
           return;
         }
+        
+        // Fallback for guests: use saved case ID from localStorage
+        const guestCaseId = localStorage.getItem('guestCaseId');
+        if (guestCaseId) {
+          try {
+            // Fetch case status using edge function (service role bypasses RLS)
+            const { data, error } = await supabase.functions.invoke("get-case-status", {
+              body: { case_id: guestCaseId },
+            });
+            
+            if (data?.success && data.case && !error) {
+              setCaseNumber(data.case.case_number);
+              if (data.case.payment_status === "success") {
+                setStatus("success");
+                clearFormData();
+              } else if (data.case.payment_status === "fail") {
+                setStatus("fail");
+              } else {
+                setStatus("pending");
+              }
+              return;
+            }
+          } catch (e) {
+            console.error("Fallback case lookup failed:", e);
+          }
+        }
+        
         setStatus("error");
         setErrorMessage("Brak wymaganych parametrów płatności");
         return;

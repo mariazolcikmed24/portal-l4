@@ -4,7 +4,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 const benefits = [
   {
     icon: Clock,
-    title: "Szybko i wygodnie bez",
+    title: "Szybko i wygodnie",
     description: "Otrzymasz zwolnienie w ciągu 30 minut, bez wychodzenia z domu i czekania w kolejce.",
   },
   {

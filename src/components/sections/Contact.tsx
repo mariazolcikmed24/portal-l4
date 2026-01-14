@@ -1,15 +1,18 @@
 import { Mail, Phone, MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
+  const { t } = useTranslation("landing");
+
   return (
     <section id="kontakt" className="py-16 md:py-24 gradient-subtle">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Skontaktuj się <span className="text-primary">z nami</span>
+            {t("contact.title")} <span className="text-primary">{t("contact.titleHighlight")}</span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground">
-            Masz pytania? Chętnie na nie odpowiemy. Jesteśmy do Twojej dyspozycji.
+            {t("contact.subtitle")}
           </p>
         </div>
 
@@ -17,7 +20,7 @@ const Contact = () => {
           {/* Contact Info */}
           <div className="space-y-6">
             <div className="bg-white p-8 rounded-xl shadow-soft border border-border">
-              <h3 className="text-2xl font-bold text-foreground mb-6">Dane kontaktowe</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-6">{t("contact.contactInfo")}</h3>
               
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
@@ -25,7 +28,7 @@ const Contact = () => {
                     <Mail className="w-5 h-5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">E-mail</p>
+                    <p className="font-semibold text-foreground">{t("contact.email")}</p>
                     <a href="mailto:kontakt@e-zwolnienie.com.pl" className="text-primary hover:underline">
                       kontakt@e-zwolnienie.com.pl
                     </a>
@@ -37,11 +40,11 @@ const Contact = () => {
                     <Phone className="w-5 h-5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">Telefon</p>
+                    <p className="font-semibold text-foreground">{t("contact.phone")}</p>
                     <a href="tel:+48123456789" className="text-primary hover:underline">
                       +48 123 456 789
                     </a>
-                    <p className="text-sm text-muted-foreground">Pon-Pt: 8:00 - 20:00</p>
+                    <p className="text-sm text-muted-foreground">{t("contact.phoneHours")}</p>
                   </div>
                 </div>
 
@@ -50,7 +53,7 @@ const Contact = () => {
                     <MapPin className="w-5 h-5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">Adres</p>
+                    <p className="font-semibold text-foreground">{t("contact.address")}</p>
                     <p className="text-muted-foreground">
                       ul. Medyczna 1<br />
                       00-000 Warszawa
@@ -62,8 +65,8 @@ const Contact = () => {
 
             <div className="bg-secondary/10 p-6 rounded-xl border border-secondary/20">
               <p className="text-sm text-foreground">
-                <strong>Godziny konsultacji medycznych:</strong><br />
-                Jesteśmy dostępni 24/7, aby zapewnić Ci pomoc w każdej chwili.
+                <strong>{t("contact.consultationHours")}</strong><br />
+                {t("contact.available247")}
               </p>
             </div>
           </div>

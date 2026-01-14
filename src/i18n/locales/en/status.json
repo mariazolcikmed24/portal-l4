@@ -1,0 +1,53 @@
+{
+  "status": {
+    "backToHome": "Back to homepage",
+    "title": "Check visit status",
+    "subtitle": "Enter the visit number to see its current status",
+    "searchTitle": "Search for visit",
+    "searchPlaceholder": "Enter visit number (e.g., EZ-ABC123456)",
+    "searching": "Searching...",
+    "search": "Search",
+    "visitInfo": "Visit information",
+    "refresh": "Refresh",
+    "statusUpdated": "Status updated",
+    "errors": {
+      "enterVisitNumber": "Enter visit number",
+      "invalidFormat": "Invalid case number format. Correct format: EZ-XXXXXXXXX",
+      "searchError": "An error occurred while searching",
+      "notFound": "No visit found with the given number"
+    },
+    "states": {
+      "rejected": {
+        "label": "Rejected",
+        "description": "After analyzing the medical interview, the doctor decided not to issue a sick leave certificate."
+      },
+      "completed": {
+        "label": "Completed",
+        "description": "The visit has been completed. The sick leave certificate has been issued."
+      },
+      "paymentFailed": {
+        "label": "Payment failed",
+        "description": "Payment for the visit was not completed. Contact us to complete the process."
+      },
+      "paymentPending": {
+        "label": "Awaiting payment",
+        "description": "We are waiting for payment confirmation for the visit."
+      },
+      "inProgress": {
+        "label": "In progress",
+        "description": "Your visit is currently being reviewed by the doctor. You may receive a call to confirm your details."
+      }
+    },
+    "details": {
+      "startDate": "Leave start date",
+      "endDate": "Leave end date",
+      "submissionDate": "Submission date",
+      "lastUpdate": "Last update"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "description": "Oops! Page not found",
+    "backToHome": "Return to Home"
+  }
+}

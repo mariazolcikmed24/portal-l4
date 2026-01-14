@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { pl } from "date-fns/locale";
+import { pl, enUS } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
+import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 
 interface CaseStatusData {
   case_number: string;
@@ -33,17 +35,22 @@ export default function StatusSprawy() {
   const [isFetchingMed24, setIsFetchingMed24] = useState(false);
   const [caseData, setCaseData] = useState<CaseStatusData | null>(null);
   const [med24Status, setMed24Status] = useState<Med24VisitStatus | null>(null);
+  
+  const { t, i18n } = useTranslation("status");
+  const { getLocalizedPath, currentLanguage } = useLanguageNavigation();
+  
+  const dateLocale = currentLanguage === 'en' ? enUS : pl;
 
   const handleSearch = async () => {
     if (!caseNumber.trim()) {
-      toast.error("Wprowadź numer wizyty");
+      toast.error(t("status.errors.enterVisitNumber"));
       return;
     }
 
     // Validate case number format
     const caseNumberPattern = /^EZ-[A-Z0-9]{9}$/i;
     if (!caseNumberPattern.test(caseNumber.trim())) {
-      toast.error("Nieprawidłowy format numeru sprawy. Prawidłowy format: EZ-XXXXXXXXX");
+      toast.error(t("status.errors.invalidFormat"));
       return;
     }
 
@@ -51,14 +58,13 @@ export default function StatusSprawy() {
     setMed24Status(null);
     
     try {
-      // Use secure edge function instead of direct database query
       const { data, error } = await supabase.functions.invoke('get-case-status', {
         body: { case_number: caseNumber.trim().toUpperCase() }
       });
 
       if (error) {
         console.error('Search error:', error);
-        toast.error("Wystąpił błąd podczas wyszukiwania");
+        toast.error(t("status.errors.searchError"));
         setCaseData(null);
         return;
       }
@@ -70,18 +76,15 @@ export default function StatusSprawy() {
       }
 
       if (!data?.case) {
-        toast.error("Nie znaleziono wizyty o podanym numerze");
+        toast.error(t("status.errors.notFound"));
         setCaseData(null);
         return;
       }
 
       setCaseData(data.case);
-      
-      // Note: Med24 status is not available in public status check for security reasons
-      // Only basic case status is shown
     } catch (error) {
-      console.error('Błąd podczas wyszukiwania:', error);
-      toast.error("Wystąpił błąd podczas wyszukiwania");
+      console.error('Search error:', error);
+      toast.error(t("status.errors.searchError"));
     } finally {
       setIsSearching(false);
     }
@@ -90,19 +93,17 @@ export default function StatusSprawy() {
   const handleRefresh = async () => {
     if (caseData) {
       await handleSearch();
-      toast.success("Status zaktualizowany");
+      toast.success(t("status.statusUpdated"));
     }
   };
 
-  // Unified status logic - based only on case status (no Med24 details for security)
   const getUnifiedStatus = () => {
     if (!caseData) return null;
 
-    // If case is rejected
     if (caseData.status === 'rejected') {
       return {
-        label: "Odrzucona",
-        description: "Lekarz po analizie wywiadu medycznego podjął decyzję o niewystawieniu zwolnienia lekarskiego.",
+        label: t("status.states.rejected.label"),
+        description: t("status.states.rejected.description"),
         icon: XCircle,
         color: "text-destructive",
         bgColor: "bg-destructive/10",
@@ -110,11 +111,10 @@ export default function StatusSprawy() {
       };
     }
 
-    // If case is completed
     if (caseData.status === 'completed') {
       return {
-        label: "Zakończona",
-        description: "Wizyta została zakończona. Zwolnienie lekarskie zostało wystawione.",
+        label: t("status.states.completed.label"),
+        description: t("status.states.completed.description"),
         icon: CheckCircle,
         color: "text-green-500",
         bgColor: "bg-green-50",
@@ -122,11 +122,10 @@ export default function StatusSprawy() {
       };
     }
 
-    // If payment failed
     if (caseData.payment_status === 'fail') {
       return {
-        label: "Płatność nieudana",
-        description: "Płatność za wizytę nie została zrealizowana. Skontaktuj się z nami, aby dokończyć proces.",
+        label: t("status.states.paymentFailed.label"),
+        description: t("status.states.paymentFailed.description"),
         icon: XCircle,
         color: "text-destructive",
         bgColor: "bg-destructive/10",
@@ -134,11 +133,10 @@ export default function StatusSprawy() {
       };
     }
 
-    // If payment pending
     if (caseData.payment_status === 'pending') {
       return {
-        label: "Oczekuje na płatność",
-        description: "Oczekujemy na potwierdzenie płatności za wizytę.",
+        label: t("status.states.paymentPending.label"),
+        description: t("status.states.paymentPending.description"),
         icon: Clock,
         color: "text-yellow-600",
         bgColor: "bg-yellow-50",
@@ -146,10 +144,9 @@ export default function StatusSprawy() {
       };
     }
 
-    // Default: in progress
     return {
-      label: "W trakcie realizacji",
-      description: "Twoja wizyta jest obecnie weryfikowana przez lekarza. Możesz otrzymać telefon w celu potwierdzenia danych.",
+      label: t("status.states.inProgress.label"),
+      description: t("status.states.inProgress.description"),
       icon: Clock,
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
@@ -162,31 +159,31 @@ export default function StatusSprawy() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
+        <Link to={getLocalizedPath("/")} className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
           <ArrowLeft className="w-4 h-4" />
-          Powrót na stronę główną
+          {t("status.backToHome")}
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Sprawdź status wizyty</h1>
-          <p className="text-muted-foreground">Wprowadź numer wizyty, aby zobaczyć jej aktualny status</p>
+          <h1 className="text-3xl font-bold mb-2">{t("status.title")}</h1>
+          <p className="text-muted-foreground">{t("status.subtitle")}</p>
         </div>
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Wyszukaj wizytę</CardTitle>
+            <CardTitle>{t("status.searchTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-3">
               <Input
-                placeholder="Wprowadź numer wizyty (np. EZ-ABC123456)"
+                placeholder={t("status.searchPlaceholder")}
                 value={caseNumber}
                 onChange={(e) => setCaseNumber(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <Button onClick={handleSearch} disabled={isSearching}>
                 <Search className="w-4 h-4 mr-2" />
-                {isSearching ? "Szukam..." : "Szukaj"}
+                {isSearching ? t("status.searching") : t("status.search")}
               </Button>
             </div>
           </CardContent>
@@ -196,7 +193,7 @@ export default function StatusSprawy() {
           <div className="space-y-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Informacje o wizycie</CardTitle>
+                <CardTitle>{t("status.visitInfo")}</CardTitle>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -208,11 +205,10 @@ export default function StatusSprawy() {
                   ) : (
                     <RefreshCw className="w-4 h-4 mr-2" />
                   )}
-                  Odśwież
+                  {t("status.refresh")}
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Unified Status Display */}
                 <div className={`p-4 sm:p-6 rounded-lg border ${status.bgColor} ${status.borderColor}`}>
                   <div className="flex flex-col gap-3 sm:gap-4">
                     <div className="flex items-center gap-3">
@@ -234,23 +230,22 @@ export default function StatusSprawy() {
                   </div>
                 </div>
 
-                {/* Visit Details - only non-sensitive information */}
                 <div className="grid md:grid-cols-2 gap-4 pt-4">
                   <div>
-                    <p className="text-sm text-muted-foreground">Data rozpoczęcia zwolnienia</p>
-                    <p className="font-medium">{format(new Date(caseData.illness_start), 'dd.MM.yyyy', { locale: pl })}</p>
+                    <p className="text-sm text-muted-foreground">{t("status.details.startDate")}</p>
+                    <p className="font-medium">{format(new Date(caseData.illness_start), 'dd.MM.yyyy', { locale: dateLocale })}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Data zakończenia zwolnienia</p>
-                    <p className="font-medium">{format(new Date(caseData.illness_end), 'dd.MM.yyyy', { locale: pl })}</p>
+                    <p className="text-sm text-muted-foreground">{t("status.details.endDate")}</p>
+                    <p className="font-medium">{format(new Date(caseData.illness_end), 'dd.MM.yyyy', { locale: dateLocale })}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Data zgłoszenia</p>
-                    <p className="font-medium">{format(new Date(caseData.created_at), 'dd.MM.yyyy HH:mm', { locale: pl })}</p>
+                    <p className="text-sm text-muted-foreground">{t("status.details.submissionDate")}</p>
+                    <p className="font-medium">{format(new Date(caseData.created_at), 'dd.MM.yyyy HH:mm', { locale: dateLocale })}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Ostatnia aktualizacja</p>
-                    <p className="font-medium">{format(new Date(caseData.updated_at), 'dd.MM.yyyy HH:mm', { locale: pl })}</p>
+                    <p className="text-sm text-muted-foreground">{t("status.details.lastUpdate")}</p>
+                    <p className="font-medium">{format(new Date(caseData.updated_at), 'dd.MM.yyyy HH:mm', { locale: dateLocale })}</p>
                   </div>
                 </div>
               </CardContent>

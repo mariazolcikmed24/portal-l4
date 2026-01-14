@@ -27,10 +27,9 @@ export default function Potwierdzenie() {
 
       if (!serviceId || !orderId || !hash) {
         if (legacyCaseNumber) {
-          // Legacy flow - just show the case number
+          // Legacy flow - just show the case number, don't clear data (status unknown)
           setCaseNumber(legacyCaseNumber);
           setStatus("pending");
-          clearFormData();
           return;
         }
         setStatus("error");
@@ -55,13 +54,13 @@ export default function Potwierdzenie() {
         // Map payment status
         if (data.payment_status === "success") {
           setStatus("success");
-          clearFormData();
+          clearFormData(); // Only clear on confirmed success
         } else if (data.payment_status === "fail") {
           setStatus("fail");
+          // Don't clear - user may want to retry
         } else {
-          // pending - payment is being processed
+          // pending - payment is being processed, don't clear yet
           setStatus("pending");
-          clearFormData();
         }
       } catch (err) {
         console.error("Verification error:", err);
@@ -74,11 +73,13 @@ export default function Potwierdzenie() {
   }, [searchParams]);
 
   const clearFormData = () => {
+    // Clear all form data and guest profile after successful payment
     localStorage.removeItem("formData_datyChoroby");
     localStorage.removeItem("formData_rodzajZwolnienia");
     localStorage.removeItem("formData_wywiadOgolny");
     localStorage.removeItem("formData_wywiadObjawy");
     localStorage.removeItem("uploadedFiles_attachments");
+    localStorage.removeItem("guestProfile");
   };
 
   if (status === "verifying") {

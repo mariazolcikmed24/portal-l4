@@ -201,15 +201,13 @@ const Rejestracja = () => {
           is_guest: true,
         };
 
-        const { data: insertedData, error } = await supabase.from('profiles').insert(guestProfileData).select().single();
+        // IMPORTANT: do not request returned rows (SELECT is blocked for anonymous guests by RLS)
+        const { error } = await supabase.from('profiles').insert([guestProfileData] as any);
 
         if (error) throw error;
 
-        // Save guest profile to localStorage for later use (since RLS blocks SELECT for anonymous users)
-        localStorage.setItem('guestProfile', JSON.stringify({
-          ...guestProfileData,
-          id: insertedData.id,
-        }));
+        // Save guest profile to localStorage for later steps
+        localStorage.setItem('guestProfile', JSON.stringify(guestProfileData));
 
         toast({
           title: t('forms:common.dataSaved'),

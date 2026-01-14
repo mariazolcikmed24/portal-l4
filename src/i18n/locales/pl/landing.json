@@ -1,0 +1,161 @@
+{
+  "hero": {
+    "badge": "100% legalne i zgodne z przepisami",
+    "title": "Zwolnienia lekarskie online",
+    "titleHighlight": "szybko i bez wychodzenia z domu",
+    "description": "Skonsultuj się z lekarzem online i otrzymaj e-zwolnienie w kilka minut. Profesjonalnie, bezpiecznie i zgodnie z RODO.",
+    "trustIndicators": {
+      "realDoctors": "Prawdziwi lekarze",
+      "fullConfidentiality": "Pełna poufność",
+      "upTo30Min": "Do 30 minut"
+    },
+    "cta": "Uzyskaj zwolnienie online",
+    "ctaSecondary": "Zobacz jak to działa",
+    "patients": "Ponad <strong>10 000+</strong> zadowolonych pacjentów",
+    "certifiedDoctors": "Certyfikowani lekarze",
+    "polishLaw": "Zgodne z prawem polskim",
+    "heroImageAlt": "Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-zwolnienie"
+  },
+  "howItWorks": {
+    "title": "Jak uzyskać",
+    "titleHighlight": "zwolnienie lekarskie online?",
+    "subtitle": "Prosty proces w trzech krokach. Wszystko online, bez kolejek i czekania.",
+    "step1": {
+      "title": "Wypełnij formularz",
+      "description": "Uzupełnij krótki formularz medyczny online. To zajmie maksymalnie 5 minut."
+    },
+    "step2": {
+      "title": "Weryfikacja przez lekarza",
+      "description": "Lekarz weryfikuje dane z wypełnionego formularza medycznego i w razie potrzeby kontaktuje się z Tobą."
+    },
+    "step3": {
+      "title": "Otrzymaj e-zwolnienie",
+      "description": "Zwolnienie lekarskie zostanie automatycznie wysłane do ZUS i Twojego pracodawcy."
+    }
+  },
+  "benefits": {
+    "title": "Dlaczego",
+    "titleHighlight": "e-zwolnienie online?",
+    "subtitle": "Nowoczesne podejście do zwolnień lekarskich. Bezpiecznie, szybko i zgodnie z prawem.",
+    "items": {
+      "fast": {
+        "title": "Szybko i wygodnie",
+        "description": "Otrzymasz zwolnienie w ciągu 30 minut, bez wychodzenia z domu i czekania w kolejce."
+      },
+      "legal": {
+        "title": "W 100% legalne",
+        "description": "Zwolnienia wystawiane przez licencjonowanych lekarzy zgodnie z obowiązującymi przepisami."
+      },
+      "secure": {
+        "title": "Bezpieczeństwo danych",
+        "description": "Pełna zgodność z RODO. Twoje dane medyczne są szyfrowane i chronione najwyższymi standardami."
+      },
+      "available": {
+        "title": "Dostępne 24/7",
+        "description": "Skorzystaj z usługi o każdej porze dnia, również w weekendy i święta."
+      },
+      "automatic": {
+        "title": "Automatyczne wysłanie",
+        "description": "e-zwolnienie trafia bezpośrednio do ZUS i Twojego pracodawcy. Nie musisz nic załatwiać."
+      },
+      "experienced": {
+        "title": "Doświadczeni lekarze",
+        "description": "Zespół certyfikowanych specjalistów z wieloletnim doświadczeniem w telemedycynie."
+      }
+    },
+    "guarantee": {
+      "title": "Gwarancja bezpieczeństwa i legalności",
+      "description": "Wszystkie konsultacje prowadzone są przez lekarzy posiadających prawo wykonywania zawodu na terenie Polski. Wystawione zwolnienia są w pełni zgodne z przepisami ZUS i polskim prawem medycznym.",
+      "licensedDoctors": "Licencjonowani lekarze",
+      "gdprCompliant": "Zgodność z RODO",
+      "sslEncryption": "Szyfrowanie SSL",
+      "zusAccepted": "Akceptacja ZUS"
+    }
+  },
+  "testimonials": {
+    "title": "Co mówią nasi",
+    "titleHighlight": "pacjenci",
+    "subtitle": "Dołącz do tysięcy zadowolonych użytkowników, którzy zaufali naszej platformie",
+    "items": [
+      {
+        "name": "Anna K.",
+        "role": "Nauczycielka",
+        "content": "Świetna usługa! Zachorowałam w środku tygodnia i nie miałam siły iść do przychodni. Lekarz zadzwonił do mnie w 20 minut, przeprowadził profesjonalną konsultację i e-zwolnienie było już wysłane. Polecam!"
+      },
+      {
+        "name": "Piotr M.",
+        "role": "Specjalista IT",
+        "content": "Bardzo profesjonalna obsługa. Lekarz był rzeczowy, zadawał konkretne pytania medyczne. Wszystko odbyło się sprawnie i zgodnie z przepisami. Czułem się bezpiecznie przez cały proces."
+      },
+      {
+        "name": "Magdalena W.",
+        "role": "Menadżer projektu",
+        "content": "Korzystałam z usługi już dwa razy. Za każdym razem szybko, profesjonalnie i bez zbędnych formalności. Oszczędność czasu jest niesamowita – nie muszę tracić pół dnia na wizytę w przychodni."
+      },
+      {
+        "name": "Tomasz R.",
+        "role": "Przedsiębiorca",
+        "content": "Idealne rozwiązanie dla osób pracujących. Wszystko online, bez wychodzenia z domu. Lekarz był bardzo pomocny i wyjaśnił mi wszystkie wątpliwości. Zdecydowanie będę korzystał ponownie."
+      }
+    ],
+    "stats": {
+      "patients": "Zadowolonych pacjentów",
+      "rating": "Średnia ocen",
+      "availability": "Dostępność",
+      "avgTime": "Średni czas realizacji"
+    }
+  },
+  "faq": {
+    "title": "Najczęściej zadawane",
+    "titleHighlight": "pytania",
+    "subtitle": "Wszystko, co musisz wiedzieć o zwolnieniach lekarskich online",
+    "notFound": "Nie znalazłeś odpowiedzi na swoje pytanie?",
+    "contactUs": "Skontaktuj się z nami →",
+    "items": [
+      {
+        "question": "Czy zwolnienie lekarskie online jest legalne?",
+        "answer": "Tak, zwolnienia lekarskie wystawiane online są w pełni legalne i zgodne z polskim prawem. Konsultacje prowadzą licencjonowani lekarze posiadający prawo wykonywania zawodu. e-zwolnienie jest akceptowane przez ZUS i pracodawców na takich samych zasadach jak tradycyjne zwolnienie."
+      },
+      {
+        "question": "Jak szybko otrzymam zwolnienie lekarskie?",
+        "answer": "Zwolnienie możesz otrzymać w ciągu 30 minut od zakończenia konsultacji z lekarzem. e-zwolnienie jest automatycznie wysyłane do ZUS i Twojego pracodawcy, więc nie musisz niczego dodatkowo załatwiać."
+      },
+      {
+        "question": "Czy lekarz na pewno wystawi mi zwolnienie?",
+        "answer": "Decyzję o wystawieniu zwolnienia podejmuje lekarz na podstawie przeprowadzonej konsultacji medycznej. Lekarz musi stwierdzić, że stan Twojego zdrowia uzasadnia czasową niezdolność do pracy. To nie jest usługa, która gwarantuje automatyczne wystawienie zwolnienia."
+      },
+      {
+        "question": "Na ile dni mogę otrzymać zwolnienie online?",
+        "answer": "e-zwolnienie może być wystawione na okres do 7 dni. Data początkowa może być maksymalnie 3 dni wstecz od dnia konsultacji. W przypadku konieczności dłuższego zwolnienia, lekarz może zalecić wizytę stacjonarną."
+      },
+      {
+        "question": "Czy moje dane są bezpieczne?",
+        "answer": "Tak, w pełni przestrzegamy przepisów RODO. Wszystkie dane są szyfrowane, przechowywane na bezpiecznych serwerach i dostępne tylko dla uprawnionych osób. Nigdy nie udostępniamy Twoich danych medycznych osobom trzecim bez Twojej zgody."
+      },
+      {
+        "question": "Jak wygląda proces uzyskania zwolnienia?",
+        "answer": "Proces składa się z trzech prostych kroków: 1) Wypełnij formularz medyczny online (5 minut), 2) Lekarz przeprowadzi konsultację telefoniczną, 3) Otrzymasz e-zwolnienie, które automatycznie trafi do ZUS i pracodawcy. Cały proces zajmuje maksymalnie 30 minut."
+      },
+      {
+        "question": "Czy mogę uzyskać zwolnienie na opiekę nad dzieckiem?",
+        "answer": "Tak, oferujemy również zwolnienia na opiekę nad chorym członkiem rodziny. W formularzu należy podać dane osoby chorej oraz pracodawcy. Lekarz oceni sytuację i wydecyduje o wystawieniu zwolnienia opiekuńczego."
+      },
+      {
+        "question": "Co jeśli jestem studentem lub uczniem?",
+        "answer": "Studenci i uczniowie również mogą skorzystać z naszej usługi. W takim przypadku zwolnienie nie jest wysyłane do pracodawcy, ale otrzymujesz dokument w formie PDF, który możesz przedstawić w szkole lub na uczelni."
+      }
+    ]
+  },
+  "contact": {
+    "title": "Skontaktuj się",
+    "titleHighlight": "z nami",
+    "subtitle": "Masz pytania? Chętnie na nie odpowiemy. Jesteśmy do Twojej dyspozycji.",
+    "contactInfo": "Dane kontaktowe",
+    "email": "E-mail",
+    "phone": "Telefon",
+    "phoneHours": "Pon-Pt: 8:00 - 20:00",
+    "address": "Adres",
+    "consultationHours": "Godziny konsultacji medycznych:",
+    "available247": "Jesteśmy dostępni 24/7, aby zapewnić Ci pomoc w każdej chwili."
+  }
+}

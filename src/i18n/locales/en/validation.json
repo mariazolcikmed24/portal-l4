@@ -1,0 +1,53 @@
+{
+  "required": "This field is required",
+  "email": {
+    "invalid": "Invalid email address",
+    "required": "Email address is required"
+  },
+  "phone": {
+    "invalid": "Invalid phone number",
+    "required": "Phone number is required"
+  },
+  "pesel": {
+    "invalid": "Invalid PESEL number",
+    "required": "PESEL is required",
+    "length": "PESEL must have 11 digits"
+  },
+  "firstName": {
+    "required": "First name is required",
+    "minLength": "First name must be at least 2 characters"
+  },
+  "lastName": {
+    "required": "Last name is required",
+    "minLength": "Last name must be at least 2 characters"
+  },
+  "postcode": {
+    "invalid": "Invalid postal code (format: XX-XXX)",
+    "required": "Postal code is required"
+  },
+  "city": {
+    "required": "City is required"
+  },
+  "street": {
+    "required": "Street is required"
+  },
+  "houseNo": {
+    "required": "House number is required"
+  },
+  "dates": {
+    "startRequired": "Start date is required",
+    "endRequired": "End date is required",
+    "endBeforeStart": "End date cannot be earlier than start date",
+    "tooFarBack": "Start date can be at most 3 days in the past",
+    "tooLong": "Leave period cannot exceed 7 days"
+  },
+  "consent": {
+    "terms": "You must accept the terms of service",
+    "truth": "You must confirm the accuracy of the data",
+    "noGuarantee": "You must accept the no-guarantee information"
+  },
+  "caseNumber": {
+    "invalid": "Invalid case number format",
+    "required": "Case number is required"
+  }
+}

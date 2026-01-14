@@ -9,6 +9,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 
+interface CaseStatusData {
+  case_number: string;
+  status: string;
+  payment_status: string;
+  illness_start: string;
+  illness_end: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface Med24VisitStatus {
   id: string;
   is_resolved: boolean;
@@ -21,34 +31,8 @@ export default function StatusSprawy() {
   const [caseNumber, setCaseNumber] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isFetchingMed24, setIsFetchingMed24] = useState(false);
-  const [caseData, setCaseData] = useState<any>(null);
+  const [caseData, setCaseData] = useState<CaseStatusData | null>(null);
   const [med24Status, setMed24Status] = useState<Med24VisitStatus | null>(null);
-
-  const fetchMed24Status = async (visitId: string) => {
-    setIsFetchingMed24(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('med24-get-visit', {
-        body: { visit_id: visitId }
-      });
-
-      if (error) {
-        console.error('Error fetching Med24 status:', error);
-        return null;
-      }
-      
-      if (data?.visit) {
-        setMed24Status(data.visit);
-        return data.visit;
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Error fetching Med24 status:', error);
-      return null;
-    } finally {
-      setIsFetchingMed24(false);
-    }
-  };
 
   const handleSearch = async () => {
     if (!caseNumber.trim()) {
@@ -56,15 +40,21 @@ export default function StatusSprawy() {
       return;
     }
 
+    // Validate case number format
+    const caseNumberPattern = /^EZ-[A-Z0-9]{9}$/i;
+    if (!caseNumberPattern.test(caseNumber.trim())) {
+      toast.error("Nieprawidłowy format numeru sprawy. Prawidłowy format: EZ-XXXXXXXXX");
+      return;
+    }
+
     setIsSearching(true);
     setMed24Status(null);
     
     try {
-      const { data, error } = await supabase
-        .from('cases')
-        .select('*, profiles(*)')
-        .eq('case_number', caseNumber.trim())
-        .maybeSingle();
+      // Use secure edge function instead of direct database query
+      const { data, error } = await supabase.functions.invoke('get-case-status', {
+        body: { case_number: caseNumber.trim().toUpperCase() }
+      });
 
       if (error) {
         console.error('Search error:', error);
@@ -73,17 +63,22 @@ export default function StatusSprawy() {
         return;
       }
       
-      if (!data) {
+      if (data?.error) {
+        toast.error(data.error);
+        setCaseData(null);
+        return;
+      }
+
+      if (!data?.case) {
         toast.error("Nie znaleziono wizyty o podanym numerze");
         setCaseData(null);
         return;
       }
 
-      setCaseData(data);
+      setCaseData(data.case);
       
-      if (data.med24_visit_id) {
-        await fetchMed24Status(data.med24_visit_id);
-      }
+      // Note: Med24 status is not available in public status check for security reasons
+      // Only basic case status is shown
     } catch (error) {
       console.error('Błąd podczas wyszukiwania:', error);
       toast.error("Wystąpił błąd podczas wyszukiwania");
@@ -93,16 +88,18 @@ export default function StatusSprawy() {
   };
 
   const handleRefresh = async () => {
-    if (caseData?.med24_visit_id) {
-      await fetchMed24Status(caseData.med24_visit_id);
+    if (caseData) {
+      await handleSearch();
       toast.success("Status zaktualizowany");
     }
   };
 
-  // Unified status logic
+  // Unified status logic - based only on case status (no Med24 details for security)
   const getUnifiedStatus = () => {
-    // If case is rejected locally
-    if (caseData?.status === 'rejected') {
+    if (!caseData) return null;
+
+    // If case is rejected
+    if (caseData.status === 'rejected') {
       return {
         label: "Odrzucona",
         description: "Lekarz po analizie wywiadu medycznego podjął decyzję o niewystawieniu zwolnienia lekarskiego.",
@@ -113,29 +110,40 @@ export default function StatusSprawy() {
       };
     }
 
-    // If Med24 status is available, use it
-    if (med24Status) {
-      if (med24Status.is_cancelled) {
-        return {
-          label: "Anulowana",
-          description: "Wizyta została anulowana.",
-          icon: XCircle,
-          color: "text-destructive",
-          bgColor: "bg-destructive/10",
-          borderColor: "border-destructive/20"
-        };
-      }
-      
-      if (med24Status.is_resolved) {
-        return {
-          label: "Zakończona",
-          description: "",
-          icon: CheckCircle,
-          color: "text-green-500",
-          bgColor: "bg-green-50",
-          borderColor: "border-green-200"
-        };
-      }
+    // If case is completed
+    if (caseData.status === 'completed') {
+      return {
+        label: "Zakończona",
+        description: "Wizyta została zakończona. Zwolnienie lekarskie zostało wystawione.",
+        icon: CheckCircle,
+        color: "text-green-500",
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200"
+      };
+    }
+
+    // If payment failed
+    if (caseData.payment_status === 'fail') {
+      return {
+        label: "Płatność nieudana",
+        description: "Płatność za wizytę nie została zrealizowana. Skontaktuj się z nami, aby dokończyć proces.",
+        icon: XCircle,
+        color: "text-destructive",
+        bgColor: "bg-destructive/10",
+        borderColor: "border-destructive/20"
+      };
+    }
+
+    // If payment pending
+    if (caseData.payment_status === 'pending') {
+      return {
+        label: "Oczekuje na płatność",
+        description: "Oczekujemy na potwierdzenie płatności za wizytę.",
+        icon: Clock,
+        color: "text-yellow-600",
+        bgColor: "bg-yellow-50",
+        borderColor: "border-yellow-200"
+      };
     }
 
     // Default: in progress
@@ -149,7 +157,7 @@ export default function StatusSprawy() {
     };
   };
 
-  const status = caseData ? getUnifiedStatus() : null;
+  const status = getUnifiedStatus();
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
@@ -193,9 +201,9 @@ export default function StatusSprawy() {
                   variant="outline" 
                   size="sm" 
                   onClick={handleRefresh}
-                  disabled={isFetchingMed24 || !caseData.med24_visit_id}
+                  disabled={isSearching}
                 >
-                  {isFetchingMed24 ? (
+                  {isSearching ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
                     <RefreshCw className="w-4 h-4 mr-2" />
@@ -222,24 +230,11 @@ export default function StatusSprawy() {
                       <p className="text-sm text-muted-foreground">
                         {status.description}
                       </p>
-                      
-                      {med24Status?.documentation_download_url && (
-                        <div className="mt-4">
-                          <a 
-                            href={med24Status.documentation_download_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-                          >
-                            Pobierz dokumentację medyczną
-                          </a>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
 
-                {/* Visit Details */}
+                {/* Visit Details - only non-sensitive information */}
                 <div className="grid md:grid-cols-2 gap-4 pt-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Data rozpoczęcia zwolnienia</p>

@@ -1,106 +1,109 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
 import { Upload } from "lucide-react";
-
-const medicalSchema = z.object({
-  q_pregnant: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  q_preg_leave: z.enum(["yes", "no"]).optional(),
-  upload_preg_card: z.instanceof(FileList).optional(),
-  
-  q_chronic: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  chronic_list: z.array(z.string()).optional(),
-  chronic_other_text: z.string().max(200).optional(),
-  
-  q_allergy: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  allergy_text: z.string().max(500).optional(),
-  
-  q_meds: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  meds_list: z.string().max(500).optional(),
-  
-  q_long_leave: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  upload_prev_docs: z.instanceof(FileList).optional(),
-}).refine((data) => {
-  if (data.q_pregnant === "yes" && data.q_preg_leave === "yes" && (!data.upload_preg_card || data.upload_preg_card.length === 0)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Karta ciąży jest wymagana dla zwolnienia ciążowego",
-  path: ["upload_preg_card"],
-}).refine((data) => {
-  if (data.q_chronic === "yes" && (!data.chronic_list || data.chronic_list.length === 0)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Wybierz co najmniej jedną chorobę",
-  path: ["chronic_list"],
-}).refine((data) => {
-  if (data.q_chronic === "yes" && data.chronic_list?.includes("other") && !data.chronic_other_text) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Opisz inne choroby",
-  path: ["chronic_other_text"],
-}).refine((data) => {
-  if (data.q_allergy === "yes" && !data.allergy_text) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Podaj alergie",
-  path: ["allergy_text"],
-}).refine((data) => {
-  if (data.q_meds === "yes" && !data.meds_list) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Podaj listę leków",
-  path: ["meds_list"],
-}).refine((data) => {
-  if (data.q_long_leave === "yes" && (!data.upload_prev_docs || data.upload_prev_docs.length === 0)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Dokumentacja poprzednich zwolnień jest wymagana",
-  path: ["upload_prev_docs"],
-});
-
-type MedicalFormData = z.infer<typeof medicalSchema>;
-
-const chronicDiseases = [
-  { id: "autoimmune", label: "Choroby autoimmunologiczne" },
-  { id: "respiratory", label: "Choroby układu oddechowego" },
-  { id: "diabetes", label: "Cukrzyca" },
-  { id: "circulatory", label: "Choroby układu krążenia" },
-  { id: "cancer", label: "Nowotwór" },
-  { id: "osteoporosis", label: "Osteoporoza" },
-  { id: "epilepsy", label: "Padaczka" },
-  { id: "aids", label: "AIDS" },
-  { id: "obesity", label: "Otyłość" },
-  { id: "other", label: "Inne" },
-];
+import { Input } from "@/components/ui/input";
+import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 
 export default function WywiadOgolny() {
-  const navigate = useNavigate();
+  const { t } = useTranslation(['forms', 'validation']);
+  const { navigateToLocalized } = useLanguageNavigation();
   const pregCardInputRef = useRef<HTMLInputElement>(null);
   const prevDocsInputRef = useRef<HTMLInputElement>(null);
+
+  // Create schema with translated messages
+  const medicalSchema = useMemo(() => z.object({
+    q_pregnant: z.enum(["yes", "no"], { required_error: t('validation:required') }),
+    q_preg_leave: z.enum(["yes", "no"]).optional(),
+    upload_preg_card: z.instanceof(FileList).optional(),
+    
+    q_chronic: z.enum(["yes", "no"], { required_error: t('validation:required') }),
+    chronic_list: z.array(z.string()).optional(),
+    chronic_other_text: z.string().max(200).optional(),
+    
+    q_allergy: z.enum(["yes", "no"], { required_error: t('validation:required') }),
+    allergy_text: z.string().max(500).optional(),
+    
+    q_meds: z.enum(["yes", "no"], { required_error: t('validation:required') }),
+    meds_list: z.string().max(500).optional(),
+    
+    q_long_leave: z.enum(["yes", "no"], { required_error: t('validation:required') }),
+    upload_prev_docs: z.instanceof(FileList).optional(),
+  }).refine((data) => {
+    if (data.q_pregnant === "yes" && data.q_preg_leave === "yes" && (!data.upload_preg_card || data.upload_preg_card.length === 0)) {
+      return false;
+    }
+    return true;
+  }, {
+    message: t('validation:required'),
+    path: ["upload_preg_card"],
+  }).refine((data) => {
+    if (data.q_chronic === "yes" && (!data.chronic_list || data.chronic_list.length === 0)) {
+      return false;
+    }
+    return true;
+  }, {
+    message: t('validation:required'),
+    path: ["chronic_list"],
+  }).refine((data) => {
+    if (data.q_chronic === "yes" && data.chronic_list?.includes("other") && !data.chronic_other_text) {
+      return false;
+    }
+    return true;
+  }, {
+    message: t('validation:required'),
+    path: ["chronic_other_text"],
+  }).refine((data) => {
+    if (data.q_allergy === "yes" && !data.allergy_text) {
+      return false;
+    }
+    return true;
+  }, {
+    message: t('validation:required'),
+    path: ["allergy_text"],
+  }).refine((data) => {
+    if (data.q_meds === "yes" && !data.meds_list) {
+      return false;
+    }
+    return true;
+  }, {
+    message: t('validation:required'),
+    path: ["meds_list"],
+  }).refine((data) => {
+    if (data.q_long_leave === "yes" && (!data.upload_prev_docs || data.upload_prev_docs.length === 0)) {
+      return false;
+    }
+    return true;
+  }, {
+    message: t('validation:required'),
+    path: ["upload_prev_docs"],
+  }), [t]);
+
+  type MedicalFormData = z.infer<typeof medicalSchema>;
+
+  const chronicDiseases = [
+    { id: "autoimmune", label: t('forms:generalInterview.chronicDiseases.diseases.autoimmune') },
+    { id: "respiratory", label: t('forms:generalInterview.chronicDiseases.diseases.respiratory') },
+    { id: "diabetes", label: t('forms:generalInterview.chronicDiseases.diseases.diabetes') },
+    { id: "circulatory", label: t('forms:generalInterview.chronicDiseases.diseases.circulatory') },
+    { id: "cancer", label: t('forms:generalInterview.chronicDiseases.diseases.cancer') },
+    { id: "osteoporosis", label: t('forms:generalInterview.chronicDiseases.diseases.osteoporosis') },
+    { id: "epilepsy", label: t('forms:generalInterview.chronicDiseases.diseases.epilepsy') },
+    { id: "aids", label: t('forms:generalInterview.chronicDiseases.diseases.aids') },
+    { id: "obesity", label: t('forms:generalInterview.chronicDiseases.diseases.obesity') },
+    { id: "other", label: t('forms:generalInterview.chronicDiseases.diseases.other') },
+  ];
   
   const form = useForm<MedicalFormData>({
     resolver: zodResolver(medicalSchema),
@@ -142,8 +145,8 @@ export default function WywiadOgolny() {
 
   const onSubmit = async (data: MedicalFormData) => {
     console.log("Wywiad ogólny:", data);
-    toast.success("Dane zapisane");
-    navigate("/wywiad-objawy");
+    toast.success(t('forms:common.dataSaved'));
+    navigateToLocalized('/wywiad-objawy');
   };
 
   return (
@@ -152,16 +155,16 @@ export default function WywiadOgolny() {
         <ProgressSteps currentStep={3} />
         
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Wywiad medyczny - pytania ogólne</h1>
-          <p className="text-muted-foreground">Odpowiedz na poniższe pytania dotyczące Twojego stanu zdrowia</p>
+          <h1 className="text-3xl font-bold mb-2">{t('forms:generalInterview.title')}</h1>
+          <p className="text-muted-foreground">{t('forms:generalInterview.subtitle')}</p>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Ciąża */}
+            {/* Pregnancy */}
             <Card>
               <CardHeader>
-                <CardTitle>Ciąża</CardTitle>
+                <CardTitle>{t('forms:generalInterview.pregnancy.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <FormField
@@ -169,16 +172,16 @@ export default function WywiadOgolny() {
                   name="q_pregnant"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Czy jesteś w ciąży? *</FormLabel>
+                      <FormLabel>{t('forms:generalInterview.pregnancy.areYouPregnant')} *</FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value}>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="yes" id="preg_yes" />
-                            <Label htmlFor="preg_yes">Tak</Label>
+                            <Label htmlFor="preg_yes">{t('forms:common.yes')}</Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="no" id="preg_no" />
-                            <Label htmlFor="preg_no">Nie</Label>
+                            <Label htmlFor="preg_no">{t('forms:common.no')}</Label>
                           </div>
                         </RadioGroup>
                       </FormControl>
@@ -194,16 +197,16 @@ export default function WywiadOgolny() {
                       name="q_preg_leave"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Czy potrzebujesz zwolnienia ciążowego? *</FormLabel>
+                          <FormLabel>{t('forms:generalInterview.pregnancy.needPregnancyLeave')} *</FormLabel>
                           <FormControl>
                             <RadioGroup onValueChange={field.onChange} value={field.value}>
                               <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="yes" id="preg_leave_yes" />
-                                <Label htmlFor="preg_leave_yes">Tak</Label>
+                                <Label htmlFor="preg_leave_yes">{t('forms:common.yes')}</Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="no" id="preg_leave_no" />
-                                <Label htmlFor="preg_leave_no">Nie</Label>
+                                <Label htmlFor="preg_leave_no">{t('forms:common.no')}</Label>
                               </div>
                             </RadioGroup>
                           </FormControl>
@@ -218,7 +221,7 @@ export default function WywiadOgolny() {
                         name="upload_preg_card"
                         render={({ field: { value, onChange, ...fieldProps } }) => (
                           <FormItem>
-                            <FormLabel>Karta ciąży *</FormLabel>
+                            <FormLabel>{t('forms:generalInterview.pregnancy.pregnancyCard')} *</FormLabel>
                             <FormControl>
                               <div className="space-y-2">
                                 <Input
@@ -235,16 +238,16 @@ export default function WywiadOgolny() {
                                   size="lg"
                                 >
                                   <Upload className="mr-2 h-4 w-4" />
-                                  Wybierz kartę ciąży
+                                  {t('forms:generalInterview.pregnancy.selectCard')}
                                 </Button>
                                 {uploadPregCard && uploadPregCard.length > 0 && (
                                   <div className="text-sm text-muted-foreground">
-                                    Wybrano: {uploadPregCard[0].name}
+                                    {uploadPregCard[0].name}
                                   </div>
                                 )}
                               </div>
                             </FormControl>
-                            <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB)</p>
+                            <p className="text-sm text-muted-foreground">{t('forms:generalInterview.pregnancy.cardFormat')}</p>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -255,10 +258,10 @@ export default function WywiadOgolny() {
               </CardContent>
             </Card>
 
-            {/* Choroby przewlekłe */}
+            {/* Chronic Diseases */}
             <Card>
               <CardHeader>
-                <CardTitle>Choroby przewlekłe</CardTitle>
+                <CardTitle>{t('forms:generalInterview.chronicDiseases.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <FormField
@@ -266,16 +269,16 @@ export default function WywiadOgolny() {
                   name="q_chronic"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Czy cierpisz na choroby przewlekłe? *</FormLabel>
+                      <FormLabel>{t('forms:generalInterview.chronicDiseases.haveChronicDiseases')} *</FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value}>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="yes" id="chronic_yes" />
-                            <Label htmlFor="chronic_yes">Tak</Label>
+                            <Label htmlFor="chronic_yes">{t('forms:common.yes')}</Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="no" id="chronic_no" />
-                            <Label htmlFor="chronic_no">Nie</Label>
+                            <Label htmlFor="chronic_no">{t('forms:common.no')}</Label>
                           </div>
                         </RadioGroup>
                       </FormControl>
@@ -291,7 +294,7 @@ export default function WywiadOgolny() {
                       name="chronic_list"
                       render={() => (
                         <FormItem>
-                          <FormLabel>Wybierz choroby *</FormLabel>
+                          <FormLabel>{t('forms:generalInterview.chronicDiseases.selectDiseases')} *</FormLabel>
                           <div className="space-y-2">
                             {chronicDiseases.map((disease) => (
                               <FormField
@@ -329,9 +332,9 @@ export default function WywiadOgolny() {
                         name="chronic_other_text"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Opisz inne choroby *</FormLabel>
+                            <FormLabel>{t('forms:generalInterview.chronicDiseases.describeOther')} *</FormLabel>
                             <FormControl>
-                              <Textarea placeholder="Opisz inne choroby przewlekłe..." maxLength={200} {...field} />
+                              <Textarea placeholder={t('forms:generalInterview.chronicDiseases.describeOtherPlaceholder')} maxLength={200} {...field} />
                             </FormControl>
                             <p className="text-sm text-muted-foreground">{field.value?.length || 0}/200</p>
                             <FormMessage />
@@ -344,10 +347,10 @@ export default function WywiadOgolny() {
               </CardContent>
             </Card>
 
-            {/* Alergie */}
+            {/* Allergies */}
             <Card>
               <CardHeader>
-                <CardTitle>Alergie</CardTitle>
+                <CardTitle>{t('forms:generalInterview.allergies.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <FormField
@@ -355,16 +358,16 @@ export default function WywiadOgolny() {
                   name="q_allergy"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Czy masz jakieś alergie? *</FormLabel>
+                      <FormLabel>{t('forms:generalInterview.allergies.haveAllergies')} *</FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value}>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="yes" id="allergy_yes" />
-                            <Label htmlFor="allergy_yes">Tak</Label>
+                            <Label htmlFor="allergy_yes">{t('forms:common.yes')}</Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="no" id="allergy_no" />
-                            <Label htmlFor="allergy_no">Nie</Label>
+                            <Label htmlFor="allergy_no">{t('forms:common.no')}</Label>
                           </div>
                         </RadioGroup>
                       </FormControl>
@@ -379,9 +382,9 @@ export default function WywiadOgolny() {
                     name="allergy_text"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Wymień alergie *</FormLabel>
+                        <FormLabel>{t('forms:generalInterview.allergies.listAllergies')} *</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Np. pyłki, orzechy, penicylina..." maxLength={500} {...field} />
+                          <Textarea placeholder={t('forms:generalInterview.allergies.listAllergiesPlaceholder')} maxLength={500} {...field} />
                         </FormControl>
                         <p className="text-sm text-muted-foreground">{field.value?.length || 0}/500</p>
                         <FormMessage />
@@ -392,10 +395,10 @@ export default function WywiadOgolny() {
               </CardContent>
             </Card>
 
-            {/* Leki */}
+            {/* Medications */}
             <Card>
               <CardHeader>
-                <CardTitle>Leki</CardTitle>
+                <CardTitle>{t('forms:generalInterview.medications.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <FormField
@@ -403,16 +406,16 @@ export default function WywiadOgolny() {
                   name="q_meds"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Czy bierzesz jakieś leki na stałe? *</FormLabel>
+                      <FormLabel>{t('forms:generalInterview.medications.takeMedications')} *</FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value}>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="yes" id="meds_yes" />
-                            <Label htmlFor="meds_yes">Tak</Label>
+                            <Label htmlFor="meds_yes">{t('forms:common.yes')}</Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="no" id="meds_no" />
-                            <Label htmlFor="meds_no">Nie</Label>
+                            <Label htmlFor="meds_no">{t('forms:common.no')}</Label>
                           </div>
                         </RadioGroup>
                       </FormControl>
@@ -427,9 +430,9 @@ export default function WywiadOgolny() {
                     name="meds_list"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Wymień leki *</FormLabel>
+                        <FormLabel>{t('forms:generalInterview.medications.listMedications')} *</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Np. Acard, Concor, Euthyrox..." maxLength={500} {...field} />
+                          <Textarea placeholder={t('forms:generalInterview.medications.listMedicationsPlaceholder')} maxLength={500} {...field} />
                         </FormControl>
                         <p className="text-sm text-muted-foreground">{field.value?.length || 0}/500</p>
                         <FormMessage />
@@ -440,10 +443,10 @@ export default function WywiadOgolny() {
               </CardContent>
             </Card>
 
-            {/* Długie zwolnienie */}
+            {/* Previous Leave */}
             <Card>
               <CardHeader>
-                <CardTitle>Poprzednie zwolnienia</CardTitle>
+                <CardTitle>{t('forms:generalInterview.previousLeave.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <FormField
@@ -451,16 +454,16 @@ export default function WywiadOgolny() {
                   name="q_long_leave"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Czy byłeś na zwolnieniu dłuższym niż 2 tygodnie w ciągu ostatnich 3 miesięcy? *</FormLabel>
+                      <FormLabel>{t('forms:generalInterview.previousLeave.hadLongLeave')} *</FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value}>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="yes" id="long_yes" />
-                            <Label htmlFor="long_yes">Tak</Label>
+                            <RadioGroupItem value="yes" id="long_leave_yes" />
+                            <Label htmlFor="long_leave_yes">{t('forms:common.yes')}</Label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="no" id="long_no" />
-                            <Label htmlFor="long_no">Nie</Label>
+                            <RadioGroupItem value="no" id="long_leave_no" />
+                            <Label htmlFor="long_leave_no">{t('forms:common.no')}</Label>
                           </div>
                         </RadioGroup>
                       </FormControl>
@@ -475,13 +478,12 @@ export default function WywiadOgolny() {
                     name="upload_prev_docs"
                     render={({ field: { value, onChange, ...fieldProps } }) => (
                       <FormItem>
-                        <FormLabel>Dokumentacja poprzednich zwolnień *</FormLabel>
+                        <FormLabel>{t('forms:generalInterview.previousLeave.uploadDocs')} *</FormLabel>
                         <FormControl>
                           <div className="space-y-2">
                             <Input
                               type="file"
                               accept=".pdf,.jpg,.jpeg,.png"
-                              multiple
                               onChange={(e) => onChange(e.target.files)}
                               className="hidden"
                               ref={prevDocsInputRef}
@@ -493,21 +495,16 @@ export default function WywiadOgolny() {
                               size="lg"
                             >
                               <Upload className="mr-2 h-4 w-4" />
-                              Wybierz dokumentację
+                              {t('forms:generalInterview.previousLeave.selectDocs')}
                             </Button>
                             {uploadPrevDocs && uploadPrevDocs.length > 0 && (
                               <div className="text-sm text-muted-foreground">
-                                Wybrano plików: {uploadPrevDocs.length}
-                                <ul className="list-disc list-inside mt-1">
-                                  {Array.from(uploadPrevDocs).map((file, idx) => (
-                                    <li key={idx}>{file.name}</li>
-                                  ))}
-                                </ul>
+                                {uploadPrevDocs[0].name}
                               </div>
                             )}
                           </div>
                         </FormControl>
-                        <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)</p>
+                        <p className="text-sm text-muted-foreground">{t('forms:generalInterview.previousLeave.docsFormat')}</p>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -517,11 +514,11 @@ export default function WywiadOgolny() {
             </Card>
 
             <div className="flex gap-4 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigate("/rodzaj-zwolnienia")} className="flex-1">
-                Wstecz
+              <Button type="button" variant="outline" onClick={() => navigateToLocalized('/rodzaj-zwolnienia')} className="flex-1">
+                {t('forms:common.back')}
               </Button>
               <Button type="submit" className="flex-1">
-                Dalej
+                {t('forms:common.next')}
               </Button>
             </div>
           </form>

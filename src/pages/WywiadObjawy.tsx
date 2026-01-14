@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -14,151 +14,78 @@ import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
 import { Upload, X, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
-const symptomsSchema = z.object({
-  main_category: z.enum([
-    "cold_pain",
-    "gastro",
-    "bladder",
-    "injury",
-    "menstruation",
-    "back_pain",
-    "eye",
-    "migraine",
-    "acute_stress",
-    "psych",
-  ], { required_error: "Kategoria jest wymagana" }),
-  
-  symptom_duration: z.enum(["today", "yesterday", "2_3", "4_5", "gt_5"], { required_error: "Czas trwania jest wymagany" }),
-  
-  symptoms: z.array(z.string()).optional(),
-  
-  free_text_reason: z.string()
-    .min(1, "Opis jest wymagany")
-    .max(1500, "Opis nie może przekraczać 1500 znaków"),
-});
-
-type SymptomsFormData = z.infer<typeof symptomsSchema>;
+import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 
 interface UploadedFile {
   path: string;
   name: string;
 }
 
-const categories = [
-  { value: "cold_pain", label: "Przeziębienie lub bóle" },
-  { value: "gastro", label: "Zatrucie i problemy żołądkowe" },
-  { value: "bladder", label: "Problemy z pęcherzem" },
-  { value: "injury", label: "Urazy" },
-  { value: "menstruation", label: "Menstruacja / miesiączka" },
-  { value: "back_pain", label: "Bóle pleców" },
-  { value: "eye", label: "Problemy z oczami" },
-  { value: "migraine", label: "Migrena" },
-  { value: "acute_stress", label: "Ostre reakcje na stres" },
-  { value: "psych", label: "Problemy psychologiczne" },
-];
-
-const symptomsByCategory: Record<string, { id: string; label: string }[]> = {
-  cold_pain: [
-    { id: "fever", label: "Gorączka >38°C" },
-    { id: "fatigue", label: "Zmęczenie" },
-    { id: "dizziness", label: "Zawroty głowy" },
-    { id: "chills", label: "Dreszcze" },
-    { id: "swollen_tonsils", label: "Spuchnięte migdałki" },
-    { id: "runny_nose", label: "Katar" },
-    { id: "sinusitis", label: "Zapalenie zatok" },
-    { id: "cough", label: "Kaszel" },
-    { id: "hoarseness", label: "Chrypka" },
-    { id: "sore_throat", label: "Ból gardła" },
-    { id: "muscle_pain", label: "Ból mięśni" },
-    { id: "chest_heaviness", label: "Uczucie ciężkości w klatce piersiowej" },
-  ],
-  gastro: [
-    { id: "no_appetite", label: "Brak apetytu" },
-    { id: "diarrhea", label: "Biegunka" },
-    { id: "food_poisoning", label: "Zatrucie pokarmowe" },
-    { id: "vomiting", label: "Wymioty" },
-    { id: "abdominal_pain", label: "Ból brzucha" },
-  ],
-  bladder: [
-    { id: "frequent_urination", label: "Częste oddawanie moczu" },
-    { id: "painful_urination", label: "Bolesne oddawanie moczu" },
-    { id: "bladder_pain", label: "Ból pęcherza" },
-    { id: "urge", label: "Parcie na mocz" },
-    { id: "oliguria", label: "Skąpomocz" },
-  ],
-  injury: [
-    { id: "head", label: "Głowa i czaszka" },
-    { id: "neck", label: "Szyja" },
-    { id: "spine", label: "Kręgosłup" },
-    { id: "chest", label: "Klatka piersiowa" },
-    { id: "abdomen", label: "Brzuch" },
-    { id: "pelvis", label: "Miednica" },
-    { id: "shoulder", label: "Barki i ramię" },
-    { id: "forearm", label: "Przedramię" },
-    { id: "elbow", label: "Łokieć" },
-    { id: "hand", label: "Ręka/nadgarstek" },
-    { id: "hip", label: "Biodro" },
-    { id: "thigh", label: "Udo" },
-    { id: "knee", label: "Kolano" },
-    { id: "shin", label: "Podudzie" },
-    { id: "ankle", label: "Staw skokowy/stopa" },
-  ],
-  menstruation: [
-    { id: "severe_pain", label: "Silne bóle miesiączkowe" },
-    { id: "heavy_bleeding", label: "Obfite krwawienie" },
-    { id: "irritation", label: "Rozdrażnienie" },
-    { id: "painful_start", label: "Bolesny początek miesiączki" },
-  ],
-  back_pain: [
-    { id: "back_spine", label: "Ból pleców/kręgosłupa" },
-    { id: "sciatica", label: "Rwa kulszowa" },
-    { id: "shoulder_radiculopathy", label: "Rwa barkowa" },
-    { id: "cervical_pain", label: "Ból w odcinku szyjnym" },
-    { id: "thoracic_pain", label: "Ból w odcinku piersiowym" },
-    { id: "upper_limb_radiation", label: "Promieniowanie do kończyny górnej" },
-    { id: "lower_limb_radiation", label: "Promieniowanie do kończyny dolnej" },
-    { id: "tingling", label: "Mrowienie w kończynach" },
-    { id: "sitting_pain", label: "Ból w pozycji siedzącej" },
-    { id: "lumbar_pain", label: "Ból w odcinku lędźwiowo-krzyżowym" },
-    { id: "lifting_problem", label: "Problem z podnoszeniem ciężkich przedmiotów" },
-    { id: "standing_pain", label: "Ból w pozycji stojącej" },
-  ],
-  eye: [
-    { id: "burning", label: "Pieczenie" },
-    { id: "redness", label: "Zaczerwienienie oczu" },
-    { id: "tearing", label: "Łzawienie" },
-    { id: "gritty", label: "Uczucie piasku pod powiekami" },
-    { id: "discharge", label: "Ropa w oczach" },
-  ],
-  migraine: [
-    { id: "photophobia", label: "Światłowstręt" },
-    { id: "confusion", label: "Rozkojarzenie" },
-    { id: "history", label: "Migrena rozpoznana w przeszłości" },
-  ],
-  acute_stress: [
-    { id: "family_problems", label: "Problemy rodzinne" },
-    { id: "divorce", label: "Stres (rozwód)" },
-    { id: "family_issues", label: "Stres (problemy rodzinne)" },
-    { id: "death", label: "Stres (śmierć bliskiej osoby)" },
-    { id: "work", label: "Stres (praca)" },
-    { id: "job_loss", label: "Stres (utrata pracy)" },
-  ],
-  psych: [
-    { id: "family_problems", label: "Problemy rodzinne" },
-    { id: "divorce", label: "Stres (rozwód)" },
-    { id: "family_issues", label: "Stres (problemy rodzinne)" },
-    { id: "death", label: "Stres (śmierć bliskiej osoby)" },
-    { id: "work", label: "Stres (praca)" },
-    { id: "job_loss", label: "Stres (utrata pracy)" },
-  ],
+const symptomsByCategory: Record<string, string[]> = {
+  cold_pain: ["fever", "fatigue", "dizziness", "chills", "swollen_tonsils", "runny_nose", "sinusitis", "cough", "hoarseness", "sore_throat", "muscle_pain", "chest_heaviness"],
+  gastro: ["no_appetite", "diarrhea", "food_poisoning", "vomiting", "abdominal_pain"],
+  bladder: ["frequent_urination", "painful_urination", "bladder_pain", "urge", "oliguria"],
+  injury: ["head", "neck", "spine", "chest", "abdomen", "pelvis", "shoulder", "forearm", "elbow", "hand", "hip", "thigh", "knee", "shin", "ankle"],
+  menstruation: ["severe_pain", "heavy_bleeding", "irritation", "painful_start"],
+  back_pain: ["back_spine", "sciatica", "shoulder_radiculopathy", "cervical_pain", "thoracic_pain", "upper_limb_radiation", "lower_limb_radiation", "tingling", "sitting_pain", "lumbar_pain", "lifting_problem", "standing_pain"],
+  eye: ["burning", "redness", "tearing", "gritty", "discharge"],
+  migraine: ["photophobia", "confusion", "history"],
+  acute_stress: ["family_problems", "divorce", "family_issues", "death", "work", "job_loss"],
+  psych: ["family_problems", "divorce", "family_issues", "death", "work", "job_loss"],
 };
 
 export default function WywiadObjawy() {
-  const navigate = useNavigate();
+  const { t } = useTranslation(['forms', 'validation']);
+  const { navigateToLocalized } = useLanguageNavigation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+
+  const symptomsSchema = useMemo(() => z.object({
+    main_category: z.enum([
+      "cold_pain",
+      "gastro",
+      "bladder",
+      "injury",
+      "menstruation",
+      "back_pain",
+      "eye",
+      "migraine",
+      "acute_stress",
+      "psych",
+    ], { required_error: t('validation:required') }),
+    
+    symptom_duration: z.enum(["today", "yesterday", "2_3", "4_5", "gt_5"], { required_error: t('validation:required') }),
+    
+    symptoms: z.array(z.string()).optional(),
+    
+    free_text_reason: z.string()
+      .min(1, t('validation:required'))
+      .max(1500),
+  }), [t]);
+
+  type SymptomsFormData = z.infer<typeof symptomsSchema>;
+
+  const categories = [
+    { value: "cold_pain", label: t('forms:symptoms.categories.cold_pain') },
+    { value: "gastro", label: t('forms:symptoms.categories.gastro') },
+    { value: "bladder", label: t('forms:symptoms.categories.bladder') },
+    { value: "injury", label: t('forms:symptoms.categories.injury') },
+    { value: "menstruation", label: t('forms:symptoms.categories.menstruation') },
+    { value: "back_pain", label: t('forms:symptoms.categories.back_pain') },
+    { value: "eye", label: t('forms:symptoms.categories.eye') },
+    { value: "migraine", label: t('forms:symptoms.categories.migraine') },
+    { value: "acute_stress", label: t('forms:symptoms.categories.acute_stress') },
+    { value: "psych", label: t('forms:symptoms.categories.psych') },
+  ];
+
+  const durations = [
+    { value: "today", label: t('forms:symptoms.durations.today') },
+    { value: "yesterday", label: t('forms:symptoms.durations.yesterday') },
+    { value: "2_3", label: t('forms:symptoms.durations.2_3') },
+    { value: "4_5", label: t('forms:symptoms.durations.4_5') },
+    { value: "gt_5", label: t('forms:symptoms.durations.gt_5') },
+  ];
   
   const form = useForm<SymptomsFormData>({
     resolver: zodResolver(symptomsSchema),
@@ -193,7 +120,7 @@ export default function WywiadObjawy() {
     if (!files || files.length === 0) return;
     
     if (uploadedFiles.length + files.length > 3) {
-      toast.error("Maksymalnie możesz załączyć 3 pliki");
+      toast.error(t('forms:common.maxFiles', { count: 3 }));
       return;
     }
     
@@ -202,17 +129,14 @@ export default function WywiadObjawy() {
     
     for (const file of Array.from(files)) {
       if (file.size > 10 * 1024 * 1024) {
-        toast.error(`Plik ${file.name} jest za duży (max 10MB)`);
+        toast.error(`${file.name} - max 10MB`);
         continue;
       }
       
       try {
-        // Generate unique path
         const timestamp = Date.now();
         const randomId = Math.random().toString(36).substring(7);
         const filePath = `attachments/${timestamp}-${randomId}-${file.name}`;
-        
-        console.log(`Uploading file: ${file.name} to ${filePath}`);
         
         const { error: uploadError } = await supabase.storage
           .from('case-attachments')
@@ -220,15 +144,12 @@ export default function WywiadObjawy() {
         
         if (uploadError) {
           console.error('Upload error:', uploadError);
-          toast.error(`Błąd przesyłania pliku ${file.name}`);
           continue;
         }
         
         newUploadedFiles.push({ path: filePath, name: file.name });
-        console.log(`Successfully uploaded: ${file.name}`);
       } catch (error) {
         console.error('Error uploading file:', error);
-        toast.error(`Błąd przesyłania pliku ${file.name}`);
       }
     }
     
@@ -236,7 +157,7 @@ export default function WywiadObjawy() {
       const allFiles = [...uploadedFiles, ...newUploadedFiles];
       setUploadedFiles(allFiles);
       localStorage.setItem('uploadedFiles_attachments', JSON.stringify(allFiles));
-      toast.success(`Przesłano ${newUploadedFiles.length} plik(ów)`);
+      toast.success(t('forms:common.dataSaved'));
     }
     
     setIsUploading(false);
@@ -251,18 +172,18 @@ export default function WywiadObjawy() {
       const updatedFiles = uploadedFiles.filter(f => f.path !== filePath);
       setUploadedFiles(updatedFiles);
       localStorage.setItem('uploadedFiles_attachments', JSON.stringify(updatedFiles));
-      toast.success("Plik usunięty");
     } catch (error) {
       console.error('Error removing file:', error);
-      toast.error("Błąd usuwania pliku");
     }
   };
 
   const onSubmit = async (data: SymptomsFormData) => {
     console.log("Wywiad objawy:", data);
-    toast.success("Dane zapisane");
-    navigate("/podsumowanie");
+    toast.success(t('forms:common.dataSaved'));
+    navigateToLocalized('/podsumowanie');
   };
+
+  const currentSymptoms = mainCategory ? symptomsByCategory[mainCategory] || [] : [];
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
@@ -270,8 +191,8 @@ export default function WywiadObjawy() {
         <ProgressSteps currentStep={4} />
         
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Wywiad medyczny - objawy</h1>
-          <p className="text-muted-foreground">Opisz swoją główną dolegliwość i objawy</p>
+          <h1 className="text-3xl font-bold mb-2">{t('forms:symptoms.title')}</h1>
+          <p className="text-muted-foreground">{t('forms:symptoms.subtitle')}</p>
         </div>
 
         <Form {...form}>
@@ -281,11 +202,11 @@ export default function WywiadObjawy() {
               name="main_category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kategoria głównej dolegliwości *</FormLabel>
+                  <FormLabel>{t('forms:symptoms.mainCategory')} *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Wybierz kategorię" />
+                        <SelectValue placeholder={t('forms:symptoms.selectCategory')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -306,19 +227,19 @@ export default function WywiadObjawy() {
               name="symptom_duration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Czas trwania objawów *</FormLabel>
+                  <FormLabel>{t('forms:symptoms.duration')} *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Wybierz czas trwania" />
+                        <SelectValue placeholder={t('forms:symptoms.selectDuration')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="today">Dzisiaj</SelectItem>
-                      <SelectItem value="yesterday">Wczoraj</SelectItem>
-                      <SelectItem value="2_3">2-3 dni</SelectItem>
-                      <SelectItem value="4_5">4-5 dni</SelectItem>
-                      <SelectItem value="gt_5">Ponad 5 dni</SelectItem>
+                      {durations.map((dur) => (
+                        <SelectItem key={dur.value} value={dur.value}>
+                          {dur.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -326,34 +247,36 @@ export default function WywiadObjawy() {
               )}
             />
 
-            {mainCategory && symptomsByCategory[mainCategory] && (
+            {mainCategory && currentSymptoms.length > 0 && (
               <FormField
                 control={form.control}
                 name="symptoms"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Wybierz objawy (opcjonalnie)</FormLabel>
+                    <FormLabel>{t('forms:symptoms.selectSymptoms')} {t('forms:common.optional')}</FormLabel>
                     <div className="space-y-2 max-h-64 overflow-y-auto border rounded-md p-4">
-                      {symptomsByCategory[mainCategory].map((symptom) => (
+                      {currentSymptoms.map((symptomId) => (
                         <FormField
-                          key={symptom.id}
+                          key={symptomId}
                           control={form.control}
                           name="symptoms"
                           render={({ field }) => (
                             <FormItem className="flex items-center space-x-2">
                               <FormControl>
                                 <Checkbox
-                                  checked={field.value?.includes(symptom.id)}
+                                  checked={field.value?.includes(symptomId)}
                                   onCheckedChange={(checked) => {
                                     const current = field.value || [];
                                     const updated = checked
-                                      ? [...current, symptom.id]
-                                      : current.filter((id) => id !== symptom.id);
+                                      ? [...current, symptomId]
+                                      : current.filter((id) => id !== symptomId);
                                     field.onChange(updated);
                                   }}
                                 />
                               </FormControl>
-                              <Label className="!mt-0 font-normal">{symptom.label}</Label>
+                              <Label className="!mt-0 font-normal">
+                                {t(`forms:symptoms.symptomLabels.${symptomId}`)}
+                              </Label>
                             </FormItem>
                           )}
                         />
@@ -370,17 +293,17 @@ export default function WywiadObjawy() {
               name="free_text_reason"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opisz dokładnie powód potrzeby otrzymania zwolnienia *</FormLabel>
+                  <FormLabel>{t('forms:symptoms.describeReason')} *</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Opisz szczegółowo swoje objawy, okoliczności ich wystąpienia oraz wpływ na Twoją zdolność do pracy..."
+                      placeholder={t('forms:symptoms.describeReasonPlaceholder')}
                       className="min-h-[200px]"
                       maxLength={1500}
                       {...field}
                     />
                   </FormControl>
                   <p className="text-sm text-muted-foreground">
-                    {field.value?.length || 0}/1500 znaków
+                    {field.value?.length || 0}/1500 {t('forms:common.characters')}
                   </p>
                   <FormMessage />
                 </FormItem>
@@ -388,7 +311,7 @@ export default function WywiadObjawy() {
             />
 
             <FormItem>
-              <FormLabel>Załącz dokumentację medyczną (opcjonalnie)</FormLabel>
+              <FormLabel>{t('forms:symptoms.attachDocumentation')} {t('forms:common.optional')}</FormLabel>
               <div className="space-y-2">
                 <Input
                   type="file"
@@ -410,19 +333,19 @@ export default function WywiadObjawy() {
                   {isUploading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Przesyłanie...
+                      {t('forms:common.uploading')}
                     </>
                   ) : (
                     <>
                       <Upload className="mr-2 h-4 w-4" />
-                      Wybierz pliki
+                      {t('forms:common.selectFiles')}
                     </>
                   )}
                 </Button>
                 
                 {uploadedFiles.length > 0 && (
                   <div className="space-y-2 mt-2">
-                    <p className="text-sm text-muted-foreground">Przesłane pliki ({uploadedFiles.length}/3):</p>
+                    <p className="text-sm text-muted-foreground">{t('forms:symptoms.uploadedFiles', { count: uploadedFiles.length })}</p>
                     {uploadedFiles.map((file) => (
                       <div key={file.path} className="flex items-center justify-between bg-muted/50 p-2 rounded">
                         <span className="text-sm truncate flex-1">{file.name}</span>
@@ -440,16 +363,16 @@ export default function WywiadObjawy() {
                 )}
               </div>
               <p className="text-sm text-muted-foreground">
-                Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)
+                {t('forms:common.fileFormat')}
               </p>
             </FormItem>
 
             <div className="flex gap-4 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigate("/wywiad-ogolny")} className="flex-1">
-                Wstecz
+              <Button type="button" variant="outline" onClick={() => navigateToLocalized('/wywiad-ogolny')} className="flex-1">
+                {t('forms:common.back')}
               </Button>
               <Button type="submit" className="flex-1" disabled={isUploading}>
-                Dalej do podsumowania
+                {t('forms:common.next')}
               </Button>
             </div>
           </form>

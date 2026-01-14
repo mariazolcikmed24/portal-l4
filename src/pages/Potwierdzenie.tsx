@@ -32,12 +32,40 @@ export default function Potwierdzenie() {
           setStatus("pending");
           return;
         }
+
+        // Fallback 1: cid=OrderID passed via ReturnURL (works even across domains)
+        const cid = searchParams.get('cid');
+        if (cid) {
+          const caseId = cid.length === 32
+            ? `${cid.slice(0, 8)}-${cid.slice(8, 12)}-${cid.slice(12, 16)}-${cid.slice(16, 20)}-${cid.slice(20)}`
+            : cid;
+
+          try {
+            const { data, error } = await supabase.functions.invoke("get-case-status", {
+              body: { case_id: caseId },
+            });
+
+            if (data?.success && data.case && !error) {
+              setCaseNumber(data.case.case_number);
+              if (data.case.payment_status === "success") {
+                setStatus("success");
+                clearFormData();
+              } else if (data.case.payment_status === "fail") {
+                setStatus("fail");
+              } else {
+                setStatus("pending");
+              }
+              return;
+            }
+          } catch (e) {
+            console.error("CID fallback lookup failed:", e);
+          }
+        }
         
-        // Fallback for guests: use saved case ID from localStorage
+        // Fallback 2 (same-domain only): use saved case ID from localStorage
         const guestCaseId = localStorage.getItem('guestCaseId');
         if (guestCaseId) {
           try {
-            // Fetch case status using edge function (service role bypasses RLS)
             const { data, error } = await supabase.functions.invoke("get-case-status", {
               body: { case_id: guestCaseId },
             });

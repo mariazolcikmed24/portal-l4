@@ -225,9 +225,11 @@ Deno.serve(async (req) => {
     // Production: https://pay.autopay.eu/payment
     const baseUrl = isTest ? "https://testpay.autopay.eu/payment" : "https://pay.autopay.eu/payment";
 
-    // Return URL after payment - Autopay will redirect here with ServiceID, OrderID, Hash
-    // Must match URL registered in Autopay panel
-    const returnUrl = Deno.env.get("AUTOPAY_RETURN_URL") || "https://preview--portal-l4.lovable.app/potwierdzenie";
+    // Return URL after payment.
+    // IMPORTANT: We attach a stable identifier (cid=OrderID) so we can recover the case even
+    // if the gateway does not append ServiceID/OrderID/Hash on return.
+    // NOTE: Base URL must match what is allowed in the Autopay panel.
+    const returnUrlBase = Deno.env.get("AUTOPAY_RETURN_URL") || "https://preview--portal-l4.lovable.app/potwierdzenie";
 
     const params = new URLSearchParams({
       ServiceID: serviceId,
@@ -239,9 +241,10 @@ Deno.serve(async (req) => {
       CustomerEmail: customerEmail,
     });
 
-    // ReturnURL - only add if provided (testing without it now)
-    if (returnUrl) {
-      // params.set("ReturnURL", returnUrl); // DISABLED FOR TESTING
+    // ReturnURL is excluded from the hash (per our integration rules)
+    if (returnUrlBase) {
+      const joiner = returnUrlBase.includes("?") ? "&" : "?";
+      params.set("ReturnURL", `${returnUrlBase}${joiner}cid=${orderId}`);
     }
 
     // Omit GatewayID when it's the paywall default ("0") to match Autopay hash expectations.

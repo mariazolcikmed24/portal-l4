@@ -1,4 +1,5 @@
 import { Shield, Clock, Lock, CheckCircle, Smartphone, FileCheck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Carousel,
   CarouselContent,
@@ -7,49 +8,51 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-const benefits = [
-  {
-    icon: Clock,
-    title: "Szybko i wygodnie",
-    description: "Otrzymasz zwolnienie w ciągu 30 minut, bez wychodzenia z domu i czekania w kolejce."
-  },
-  {
-    icon: Shield,
-    title: "W 100% legalne",
-    description: "Zwolnienia wystawiane przez licencjonowanych lekarzy zgodnie z obowiązującymi przepisami."
-  },
-  {
-    icon: Lock,
-    title: "Bezpieczeństwo danych",
-    description: "Pełna zgodność z RODO. Twoje dane medyczne są szyfrowane i chronione najwyższymi standardami."
-  },
-  {
-    icon: Smartphone,
-    title: "Dostępne 24/7",
-    description: "Skorzystaj z usługi o każdej porze dnia, również w weekendy i święta."
-  },
-  {
-    icon: FileCheck,
-    title: "Automatyczne wysłanie",
-    description: "e-zwolnienie trafia bezpośrednio do ZUS i Twojego pracodawcy. Nie musisz nic załatwiać."
-  },
-  {
-    icon: CheckCircle,
-    title: "Doświadczeni lekarze",
-    description: "Zespół certyfikowanych specjalistów z wieloletnim doświadczeniem w telemedycynie."
-  }
-];
-
 const Benefits = () => {
+  const { t } = useTranslation("landing");
+
+  const benefits = [
+    {
+      icon: Clock,
+      title: t("benefits.items.fast.title"),
+      description: t("benefits.items.fast.description")
+    },
+    {
+      icon: Shield,
+      title: t("benefits.items.legal.title"),
+      description: t("benefits.items.legal.description")
+    },
+    {
+      icon: Lock,
+      title: t("benefits.items.secure.title"),
+      description: t("benefits.items.secure.description")
+    },
+    {
+      icon: Smartphone,
+      title: t("benefits.items.available.title"),
+      description: t("benefits.items.available.description")
+    },
+    {
+      icon: FileCheck,
+      title: t("benefits.items.automatic.title"),
+      description: t("benefits.items.automatic.description")
+    },
+    {
+      icon: CheckCircle,
+      title: t("benefits.items.experienced.title"),
+      description: t("benefits.items.experienced.description")
+    }
+  ];
+
   return (
     <section id="zalety" className="py-16 md:py-24 gradient-subtle">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Dlaczego <span className="text-primary">e-zwolnienie online?</span>
+            {t("benefits.title")} <span className="text-primary">{t("benefits.titleHighlight")}</span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground">
-            Nowoczesne podejście do zwolnień lekarskich. Bezpiecznie, szybko i zgodnie z prawem.
+            {t("benefits.subtitle")}
           </p>
         </div>
 
@@ -117,28 +120,27 @@ const Benefits = () => {
           <div className="text-center">
             <Shield className="w-16 h-16 text-primary mx-auto mb-6" aria-hidden="true" />
             <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-              Gwarancja bezpieczeństwa i legalności
+              {t("benefits.guarantee.title")}
             </h3>
             <p className="text-lg text-muted-foreground mb-6">
-              Wszystkie konsultacje prowadzone są przez lekarzy posiadających prawo wykonywania zawodu na terenie Polski. 
-              Wystawione zwolnienia są w pełni zgodne z przepisami ZUS i polskim prawem medycznym.
+              {t("benefits.guarantee.description")}
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span>Licencjonowani lekarze</span>
+                <span>{t("benefits.guarantee.licensedDoctors")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span>Zgodność z RODO</span>
+                <span>{t("benefits.guarantee.gdprCompliant")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span>Szyfrowanie SSL</span>
+                <span>{t("benefits.guarantee.sslEncryption")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span>Akceptacja ZUS</span>
+                <span>{t("benefits.guarantee.zusAccepted")}</span>
               </div>
             </div>
           </div>

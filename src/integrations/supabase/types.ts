@@ -315,6 +315,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_use_profile_for_case: {
+        Args: { p_profile_id: string }
+        Returns: boolean
+      }
       delete_user_data: { Args: { target_user_id: string }; Returns: Json }
       generate_case_number: { Args: never; Returns: string }
       log_api_key_usage: { Args: { p_api_key: string }; Returns: undefined }

@@ -16,7 +16,7 @@ export default function Podsumowanie() {
 
   useEffect(() => {
     const loadData = async () => {
-      // Pobierz dane profilu z Supabase
+      // Pobierz dane profilu z Supabase (tylko dla zalogowanych użytkowników)
       if (user) {
         const { data } = await supabase
           .from('profiles')
@@ -25,15 +25,19 @@ export default function Podsumowanie() {
           .single();
         setProfileData(data);
       } else {
-        // Tryb gościa - spróbuj pobrać ostatni profil gościa
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('is_guest', true)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-        setProfileData(data);
+        // Tryb gościa - pobierz dane z localStorage
+        const guestProfile = localStorage.getItem('guestProfileData');
+        if (guestProfile) {
+          setProfileData(JSON.parse(guestProfile));
+        } else {
+          // Fallback - utwórz pusty profil
+          setProfileData({
+            first_name: '',
+            last_name: '',
+            email: '',
+            pesel: ''
+          });
+        }
       }
 
       // Pobierz dane z localStorage

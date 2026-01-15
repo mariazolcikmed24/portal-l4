@@ -52,15 +52,8 @@ export default function Platnosc() {
           .single();
         profileId = profile?.id;
       } else {
-        // Dla gościa, znajdź ostatni profil gościa
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('is_guest', true)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-        profileId = profile?.id;
+        // Dla gościa, pobierz ID z localStorage
+        profileId = localStorage.getItem('guestProfileId');
       }
 
       if (!profileId) {

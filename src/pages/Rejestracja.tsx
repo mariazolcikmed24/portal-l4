@@ -388,7 +388,7 @@ const Rejestracja = () => {
       
       if (isGuestMode) {
         // Guest mode: Save profile without creating auth account
-        const { error } = await supabase.from('profiles').insert({
+        const { data: insertedProfile, error } = await supabase.from('profiles').insert({
           first_name: data.firstName,
           last_name: data.lastName,
           email: data.email,
@@ -409,9 +409,18 @@ const Rejestracja = () => {
           consent_marketing_email: data.consentMarketingEmail || false,
           consent_marketing_tel: data.consentMarketingTel || false,
           is_guest: true,
-        });
+        }).select().single();
 
         if (error) throw error;
+
+        // Zapisz dane gościa do localStorage dla stron Podsumowanie i Platnosc
+        localStorage.setItem('guestProfileId', insertedProfile.id);
+        localStorage.setItem('guestProfileData', JSON.stringify({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          pesel: data.pesel,
+        }));
 
         toast({
           title: "Dane zapisane",

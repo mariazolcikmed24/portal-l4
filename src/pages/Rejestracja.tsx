@@ -387,34 +387,37 @@ const Rejestracja = () => {
       const fullPhone = data.phonePrefix + data.phoneNumber;
       
       if (isGuestMode) {
-        // Guest mode: Save profile without creating auth account
-        const { data: insertedProfile, error } = await supabase.from('profiles').insert({
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          pesel: data.pesel,
-          date_of_birth: extractDateOfBirthFromPesel(data.pesel),
-          phone: fullPhone,
-          street: data.street,
-          house_no: data.houseNo,
-          flat_no: data.flatNo || null,
-          postcode: data.postcode,
-          city: data.city,
-          country: data.country,
-          consent_terms: data.consentTerms,
-          consent_employment: data.consentEmployment,
-          consent_call: data.consentCall,
-          consent_no_guarantee: data.consentNoGuarantee,
-          consent_truth: data.consentTruth,
-          consent_marketing_email: data.consentMarketingEmail || false,
-          consent_marketing_tel: data.consentMarketingTel || false,
-          is_guest: true,
-        }).select().single();
+        // Guest mode: Save profile via edge function (bypasses RLS)
+        const { data: response, error } = await supabase.functions.invoke('create-guest-profile', {
+          body: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            email: data.email,
+            pesel: data.pesel,
+            date_of_birth: extractDateOfBirthFromPesel(data.pesel),
+            phone: fullPhone,
+            street: data.street,
+            house_no: data.houseNo,
+            flat_no: data.flatNo || null,
+            postcode: data.postcode,
+            city: data.city,
+            country: data.country,
+            consent_terms: data.consentTerms,
+            consent_employment: data.consentEmployment,
+            consent_call: data.consentCall,
+            consent_no_guarantee: data.consentNoGuarantee,
+            consent_truth: data.consentTruth,
+            consent_marketing_email: data.consentMarketingEmail || false,
+            consent_marketing_tel: data.consentMarketingTel || false,
+          }
+        });
 
-        if (error) throw error;
+        if (error || !response?.profile) {
+          throw new Error(response?.error || 'Nie udało się utworzyć profilu');
+        }
 
         // Zapisz dane gościa do localStorage dla stron Podsumowanie i Platnosc
-        localStorage.setItem('guestProfileId', insertedProfile.id);
+        localStorage.setItem('guestProfileId', response.profile.id);
         localStorage.setItem('guestProfileData', JSON.stringify({
           first_name: data.firstName,
           last_name: data.lastName,
@@ -435,6 +438,7 @@ const Rejestracja = () => {
             description: "Hasło jest wymagane do rejestracji.",
             variant: "destructive",
           });
+          setIsSubmitting(false);
           return;
         }
 
@@ -462,27 +466,17 @@ const Rejestracja = () => {
               consent_truth: data.consentTruth,
               consent_marketing_email: data.consentMarketingEmail || false,
               consent_marketing_tel: data.consentMarketingTel || false,
-            },
-          },
+            }
+          }
         });
 
-        if (error) {
-          if (error.message.includes('already registered')) {
-            toast({
-              title: "Użytkownik już istnieje",
-              description: "Ten adres e-mail jest już zarejestrowany. Zaloguj się.",
-              variant: "destructive",
-            });
-          } else {
-            throw error;
-          }
-        } else {
-          toast({
-            title: "Rejestracja pomyślna",
-            description: "Przejdź do formularza medycznego.",
-          });
-          navigate("/daty-choroby");
-        }
+        if (error) throw error;
+
+        toast({
+          title: "Konto utworzone",
+          description: "Sprawdź e-mail, aby potwierdzić rejestrację.",
+        });
+        navigate("/daty-choroby");
       }
     } catch (error: any) {
       toast({

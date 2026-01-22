@@ -160,6 +160,10 @@ export default function RodzajZwolnienia() {
                         <Label htmlFor="pl_employer">Polski pracodawca</Label>
                       </div>
                       <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="care" id="care" />
+                        <Label htmlFor="care">Zwolnienie na dziecko</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
                         <RadioGroupItem value="uniformed" id="uniformed" />
                         <Label htmlFor="uniformed">Służby mundurowe</Label>
                       </div>
@@ -170,10 +174,6 @@ export default function RodzajZwolnienia() {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="foreign_employer" id="foreign_employer" />
                         <Label htmlFor="foreign_employer">Pracodawca zagraniczny</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="care" id="care" />
-                        <Label htmlFor="care">Zwolnienie na dziecko</Label>
                       </div>
                     </RadioGroup>
                   </FormControl>

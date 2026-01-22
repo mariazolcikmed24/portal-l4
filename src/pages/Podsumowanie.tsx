@@ -63,7 +63,7 @@ export default function Podsumowanie() {
       'uniformed': 'Służby mundurowe',
       'student': 'Student/Uczeń',
       'foreign_employer': 'Pracodawca zagraniczny',
-      'care': 'Zwolnienie na opiekę'
+      'care': 'Zwolnienie na dziecko'
     };
     return labels[type] || type;
   };

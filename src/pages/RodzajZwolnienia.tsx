@@ -164,12 +164,12 @@ export default function RodzajZwolnienia() {
                         <Label htmlFor="care">Zwolnienie na dziecko</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="uniformed" id="uniformed" />
-                        <Label htmlFor="uniformed">Służby mundurowe</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
                         <RadioGroupItem value="student" id="student" />
                         <Label htmlFor="student">Student/Uczeń</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="uniformed" id="uniformed" />
+                        <Label htmlFor="uniformed">Służby mundurowe</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="foreign_employer" id="foreign_employer" />

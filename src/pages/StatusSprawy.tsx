@@ -60,11 +60,10 @@ export default function StatusSprawy() {
     setMed24Status(null);
     
     try {
-      const { data, error } = await supabase
-        .from('cases')
-        .select('*, profiles(*)')
-        .eq('case_number', caseNumber.trim())
-        .maybeSingle();
+      // Use edge function to bypass RLS and get public status
+      const { data, error } = await supabase.functions.invoke('get-case-status', {
+        body: { case_number: caseNumber.trim() }
+      });
 
       if (error) {
         console.error('Search error:', error);
@@ -73,16 +72,22 @@ export default function StatusSprawy() {
         return;
       }
       
-      if (!data) {
+      if (data?.error) {
+        toast.error(data.error);
+        setCaseData(null);
+        return;
+      }
+
+      if (!data?.case) {
         toast.error("Nie znaleziono wizyty o podanym numerze");
         setCaseData(null);
         return;
       }
 
-      setCaseData(data);
+      setCaseData(data.case);
       
-      if (data.med24_visit_id) {
-        await fetchMed24Status(data.med24_visit_id);
+      if (data.case.med24_visit_id) {
+        await fetchMed24Status(data.case.med24_visit_id);
       }
     } catch (error) {
       console.error('Błąd podczas wyszukiwania:', error);

@@ -60,17 +60,18 @@ export default function Platnosc() {
         throw new Error('Nie znaleziono profilu użytkownika');
       }
 
-      // Zapisz sprawę do bazy danych z payment_status: "pending"
-      const { data: caseData, error } = await supabase
-        .from('cases')
-        .insert({
+      // Utwórz sprawę po stronie backendu (działa również dla gościa)
+      const recipient_type = rodzajZwolnienia.leave_type === 'pl_employer' ? 'pl_employer' : 
+                            rodzajZwolnienia.leave_type === 'foreign_employer' ? 'foreign_employer' :
+                            rodzajZwolnienia.leave_type === 'uniformed' ? 'uniformed' :
+                            rodzajZwolnienia.leave_type === 'care' ? 'care' : 'student';
+
+      const { data: createCaseRes, error: createCaseErr } = await supabase.functions.invoke('create-case-for-payment', {
+        body: {
           profile_id: profileId,
           illness_start: datyChoroby.illness_start,
           illness_end: datyChoroby.illness_end,
-          recipient_type: rodzajZwolnienia.leave_type === 'pl_employer' ? 'pl_employer' : 
-                         rodzajZwolnienia.leave_type === 'foreign_employer' ? 'foreign_employer' :
-                         rodzajZwolnienia.leave_type === 'uniformed' ? 'uniformed' :
-                         rodzajZwolnienia.leave_type === 'care' ? 'care' : 'student',
+          recipient_type,
           pregnant: wywiadOgolny.q_pregnant === 'yes',
           pregnancy_leave: wywiadOgolny.q_preg_leave === 'yes',
           has_allergy: wywiadOgolny.q_allergy === 'yes',
@@ -85,14 +86,19 @@ export default function Platnosc() {
           symptoms: wywiadObjawy.symptoms || [],
           free_text_reason: wywiadObjawy.free_text_reason,
           attachment_file_ids: attachmentPaths,
-          payment_status: 'pending',
-          status: 'draft',
           late_justification: datyChoroby.late_justification,
-        })
-        .select('case_number, id')
-        .single();
+        }
+      });
 
-      if (error) throw error;
+      if (createCaseErr) {
+        console.error('Case creation error:', createCaseErr);
+        throw new Error((createCaseErr as any)?.message || 'Nie udało się utworzyć sprawy');
+      }
+
+      const caseData = (createCaseRes as any)?.case;
+      if (!caseData?.id) {
+        throw new Error('Nie udało się utworzyć sprawy (brak ID)');
+      }
 
       console.log('Case created:', caseData);
 
@@ -136,7 +142,7 @@ export default function Platnosc() {
 
     } catch (error: any) {
       console.error('Błąd podczas zapisywania sprawy:', error);
-      toast.error("Wystąpił błąd podczas przetwarzania płatności");
+      toast.error(error?.message || "Wystąpił błąd podczas przetwarzania płatności");
       setIsProcessing(false);
     }
   };

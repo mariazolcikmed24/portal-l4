@@ -134,7 +134,7 @@ serve(async (req) => {
         'uniformed': 'Sluzby mundurowe',
         'student': 'Student/Uczen',
         'foreign_employer': 'Pracodawca zagraniczny',
-        'care': 'Zwolnienie na opieke',
+        'care': 'Zwolnienie na dziecko',
       };
       return labels[type] || type;
     };

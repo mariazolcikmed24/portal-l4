@@ -173,7 +173,7 @@ export default function RodzajZwolnienia() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="care" id="care" />
-                        <Label htmlFor="care">Zwolnienie na opiekę</Label>
+                        <Label htmlFor="care">Zwolnienie na dziecko</Label>
                       </div>
                     </RadioGroup>
                   </FormControl>

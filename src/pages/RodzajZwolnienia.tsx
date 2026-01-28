@@ -172,7 +172,7 @@ export default function RodzajZwolnienia() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="uniformed" id="uniformed" />
-                        <Label htmlFor="uniformed">Służby mundurowe</Label>
+                        <Label htmlFor="uniformed">Służby mundurowe/Studenci służb mundurowych</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="foreign_employer" id="foreign_employer" />

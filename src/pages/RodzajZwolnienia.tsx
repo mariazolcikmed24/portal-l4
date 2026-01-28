@@ -55,6 +55,12 @@ const leaveTypeSchema = z.discriminatedUnion("leave_type", [
     leave_type: z.literal("krus"),
     krus_number: z.string().min(1, "Numer KRUS jest wymagany").max(20, "Maksymalnie 20 znaków"),
   }),
+  z.object({
+    leave_type: z.literal("care_family"),
+    care_family_first_name: z.string().min(1, "Imię jest wymagane").max(50),
+    care_family_last_name: z.string().min(1, "Nazwisko jest wymagane").max(50),
+    care_family_pesel: z.string().refine(validatePESEL, "Nieprawidłowy PESEL"),
+  }),
 ]);
 
 type LeaveTypeFormData = z.infer<typeof leaveTypeSchema>;
@@ -178,6 +184,10 @@ export default function RodzajZwolnienia() {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="foreign_employer" id="foreign_employer" />
                         <Label htmlFor="foreign_employer">Pracodawca zagraniczny</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="care_family" id="care_family" />
+                        <Label htmlFor="care_family">Opieka nad członkiem rodziny</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="krus" id="krus" />
@@ -366,6 +376,51 @@ export default function RodzajZwolnienia() {
                   </FormItem>
                 )}
               />
+            )}
+
+            {leaveType === "care_family" && (
+              <div className="space-y-4">
+                <h3 className="font-semibold">Dane osoby chorej</h3>
+                <FormField
+                  control={form.control}
+                  name="care_family_first_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Imię *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Jan" maxLength={50} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="care_family_last_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nazwisko *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Kowalski" maxLength={50} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="care_family_pesel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>PESEL *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="00000000000" maxLength={11} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             )}
 
             <div className="flex gap-4 pt-4">

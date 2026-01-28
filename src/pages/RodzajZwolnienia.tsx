@@ -51,6 +51,9 @@ const leaveTypeSchema = z.discriminatedUnion("leave_type", [
     care_last_name: z.string().min(1, "Nazwisko jest wymagane").max(50),
     care_pesel: z.string().refine(validatePESEL, "Nieprawidłowy PESEL"),
   }),
+  z.object({
+    leave_type: z.literal("krus"),
+  }),
 ]);
 
 type LeaveTypeFormData = z.infer<typeof leaveTypeSchema>;
@@ -174,6 +177,10 @@ export default function RodzajZwolnienia() {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="foreign_employer" id="foreign_employer" />
                         <Label htmlFor="foreign_employer">Pracodawca zagraniczny</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="krus" id="krus" />
+                        <Label htmlFor="krus">KRUS</Label>
                       </div>
                     </RadioGroup>
                   </FormControl>

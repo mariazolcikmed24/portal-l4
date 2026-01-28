@@ -57,6 +57,7 @@ const leaveTypeSchema = z.discriminatedUnion("leave_type", [
   }),
   z.object({
     leave_type: z.literal("care_family"),
+    care_family_nip: z.string().refine(validateNIP, "Nieprawidłowy NIP"),
     care_family_first_name: z.string().min(1, "Imię jest wymagane").max(50),
     care_family_last_name: z.string().min(1, "Nazwisko jest wymagane").max(50),
     care_family_pesel: z.string().refine(validatePESEL, "Nieprawidłowy PESEL"),
@@ -380,7 +381,21 @@ export default function RodzajZwolnienia() {
 
             {leaveType === "care_family" && (
               <div className="space-y-4">
-                <h3 className="font-semibold">Dane osoby chorej</h3>
+                <FormField
+                  control={form.control}
+                  name="care_family_nip"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>NIP pracodawcy *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="0000000000" maxLength={10} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="pt-4 border-t">
+                  <h3 className="font-semibold mb-4">Dane osoby chorej</h3>
                 <FormField
                   control={form.control}
                   name="care_family_first_name"
@@ -420,6 +435,7 @@ export default function RodzajZwolnienia() {
                     </FormItem>
                   )}
                 />
+                </div>
               </div>
             )}
 

@@ -159,7 +159,7 @@ export default function DatyChoroby() {
               name="illness_end"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Data zakończenia *</FormLabel>
+                  <FormLabel>Zwolnienie do dnia: *</FormLabel>
                   <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>

@@ -360,6 +360,7 @@ export type Database = {
         | "student"
         | "foreign_employer"
         | "care"
+        | "krus"
       symptom_duration: "today" | "yesterday" | "2_3" | "4_5" | "gt_5"
     }
     CompositeTypes: {
@@ -508,6 +509,7 @@ export const Constants = {
         "student",
         "foreign_employer",
         "care",
+        "krus",
       ],
       symptom_duration: ["today", "yesterday", "2_3", "4_5", "gt_5"],
     },

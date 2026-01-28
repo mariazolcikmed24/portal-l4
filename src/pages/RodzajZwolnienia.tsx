@@ -3,14 +3,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Plus, X, HelpCircle } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
 
@@ -387,19 +386,7 @@ export default function RodzajZwolnienia() {
                   name="care_family_nip"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-1">
-                        NIP pracodawcy *
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger type="button" className="cursor-help">
-                              <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              <p>Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </FormLabel>
+                      <FormLabel>NIP pracodawcy *</FormLabel>
                       <FormControl>
                         <Input placeholder="0000000000" maxLength={10} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
                       </FormControl>

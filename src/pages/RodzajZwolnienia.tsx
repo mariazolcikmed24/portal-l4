@@ -53,6 +53,7 @@ const leaveTypeSchema = z.discriminatedUnion("leave_type", [
   }),
   z.object({
     leave_type: z.literal("krus"),
+    krus_number: z.string().min(1, "Numer KRUS jest wymagany").max(20, "Maksymalnie 20 znaków"),
   }),
 ]);
 
@@ -180,7 +181,7 @@ export default function RodzajZwolnienia() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="krus" id="krus" />
-                        <Label htmlFor="krus">KRUS</Label>
+                        <Label htmlFor="krus">Ubezpieczeni w KRUS</Label>
                       </div>
                     </RadioGroup>
                   </FormControl>
@@ -349,6 +350,22 @@ export default function RodzajZwolnienia() {
                   />
                 </div>
               </>
+            )}
+
+            {leaveType === "krus" && (
+              <FormField
+                control={form.control}
+                name="krus_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Numer KRUS *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Wprowadź numer KRUS" maxLength={20} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             )}
 
             <div className="flex gap-4 pt-4">

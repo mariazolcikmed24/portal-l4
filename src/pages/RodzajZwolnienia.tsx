@@ -160,7 +160,7 @@ export default function RodzajZwolnienia() {
                     <RadioGroup onValueChange={field.onChange} value={field.value}>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="pl_employer" id="pl_employer" />
-                        <Label htmlFor="pl_employer">Zwolnienie dla mnie - ubezpieczony w ZUS</Label>
+                        <Label htmlFor="pl_employer">Zwolnienie dla ubezpieczonych w ZUS</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="care" id="care" />

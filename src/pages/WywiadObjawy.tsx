@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, Baby } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const symptomsSchema = z.object({
@@ -56,6 +56,18 @@ const categories = [
   { value: "migraine", label: "Migrena" },
   { value: "acute_stress", label: "Ostre reakcje na stres" },
   { value: "psych", label: "Problemy psychologiczne" },
+];
+
+// Categories appropriate for children (excluding menstruation and some adult-only conditions)
+const childCategories = [
+  { value: "cold_pain", label: "Przeziębienie lub bóle" },
+  { value: "gastro", label: "Zatrucie i problemy żołądkowe" },
+  { value: "bladder", label: "Problemy z pęcherzem" },
+  { value: "injury", label: "Urazy" },
+  { value: "back_pain", label: "Bóle pleców" },
+  { value: "eye", label: "Problemy z oczami" },
+  { value: "migraine", label: "Ból głowy / migrena" },
+  { value: "acute_stress", label: "Ostre reakcje na stres" },
 ];
 
 const symptomsByCategory: Record<string, { id: string; label: string }[]> = {
@@ -155,11 +167,35 @@ const symptomsByCategory: Record<string, { id: string; label: string }[]> = {
   ],
 };
 
+// Child-specific stress symptoms
+const childStressSymptoms = [
+  { id: "family_problems", label: "Problemy rodzinne" },
+  { id: "school_stress", label: "Stres związany ze szkołą" },
+  { id: "peer_issues", label: "Problemy z rówieśnikami" },
+  { id: "family_issues", label: "Stres (problemy rodzinne)" },
+  { id: "death", label: "Stres (śmierć bliskiej osoby)" },
+];
+
 export default function WywiadObjawy() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Check if this is a child care leave
+  const [isChildCare, setIsChildCare] = useState(false);
+  const [childName, setChildName] = useState("");
+  
+  useEffect(() => {
+    const savedLeaveData = localStorage.getItem('formData_rodzajZwolnienia');
+    if (savedLeaveData) {
+      const parsed = JSON.parse(savedLeaveData);
+      if (parsed.leave_type === 'care') {
+        setIsChildCare(true);
+        setChildName(parsed.care_first_name || "dziecka");
+      }
+    }
+  }, []);
   
   const form = useForm<SymptomsFormData>({
     resolver: zodResolver(symptomsSchema),
@@ -265,14 +301,41 @@ export default function WywiadObjawy() {
     navigate("/podsumowanie");
   };
 
+  // Get categories based on leave type
+  const availableCategories = isChildCare ? childCategories : categories;
+  
+  // Get symptoms based on category and leave type
+  const getSymptoms = (category: string) => {
+    if (isChildCare && category === 'acute_stress') {
+      return childStressSymptoms;
+    }
+    return symptomsByCategory[category] || [];
+  };
+
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <ProgressSteps currentStep={4} />
         
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Wywiad medyczny - objawy</h1>
-          <p className="text-muted-foreground">Opisz swoją główną dolegliwość i objawy</p>
+          <h1 className="text-3xl font-bold mb-2">
+            {isChildCare ? "Wywiad medyczny - objawy dziecka" : "Wywiad medyczny - objawy"}
+          </h1>
+          <p className="text-muted-foreground">
+            {isChildCare 
+              ? `Opisz główną dolegliwość i objawy ${childName}`
+              : "Opisz swoją główną dolegliwość i objawy"
+            }
+          </p>
+          
+          {isChildCare && (
+            <div className="mt-4 flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20">
+              <Baby className="h-5 w-5 text-primary" />
+              <span className="text-sm font-medium">
+                Formularz dotyczy stanu zdrowia dziecka: <strong>{childName}</strong>
+              </span>
+            </div>
+          )}
         </div>
 
         <Form {...form}>
@@ -282,7 +345,12 @@ export default function WywiadObjawy() {
               name="main_category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kategoria głównej dolegliwości *</FormLabel>
+                  <FormLabel>
+                    {isChildCare 
+                      ? "Kategoria głównej dolegliwości dziecka *"
+                      : "Kategoria głównej dolegliwości *"
+                    }
+                  </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -290,7 +358,7 @@ export default function WywiadObjawy() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((cat) => (
+                      {availableCategories.map((cat) => (
                         <SelectItem key={cat.value} value={cat.value}>
                           {cat.label}
                         </SelectItem>
@@ -307,7 +375,12 @@ export default function WywiadObjawy() {
               name="symptom_duration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Czas trwania objawów *</FormLabel>
+                  <FormLabel>
+                    {isChildCare 
+                      ? "Od kiedy dziecko ma te objawy? *"
+                      : "Czas trwania objawów *"
+                    }
+                  </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -327,15 +400,20 @@ export default function WywiadObjawy() {
               )}
             />
 
-            {mainCategory && symptomsByCategory[mainCategory] && (
+            {mainCategory && getSymptoms(mainCategory).length > 0 && (
               <FormField
                 control={form.control}
                 name="symptoms"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Wybierz objawy (opcjonalnie)</FormLabel>
+                    <FormLabel>
+                      {isChildCare 
+                        ? "Wybierz objawy dziecka (opcjonalnie)"
+                        : "Wybierz objawy (opcjonalnie)"
+                      }
+                    </FormLabel>
                     <div className="space-y-2 max-h-64 overflow-y-auto border rounded-md p-4">
-                      {symptomsByCategory[mainCategory].map((symptom) => (
+                      {getSymptoms(mainCategory).map((symptom) => (
                         <FormField
                           key={symptom.id}
                           control={form.control}
@@ -371,10 +449,18 @@ export default function WywiadObjawy() {
               name="free_text_reason"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opisz objawy zdrowotne oraz okoliczności, które uniemożliwiają Ci wykonywanie pracy *</FormLabel>
+                  <FormLabel>
+                    {isChildCare 
+                      ? "Opisz objawy zdrowotne dziecka oraz okoliczności, które wymagają Twojej opieki nad nim *"
+                      : "Opisz objawy zdrowotne oraz okoliczności, które uniemożliwiają Ci wykonywanie pracy *"
+                    }
+                  </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Opisz szczegółowo swoje objawy, okoliczności ich wystąpienia oraz wpływ na Twoją zdolność do pracy..."
+                      placeholder={isChildCare 
+                        ? "Opisz szczegółowo objawy dziecka, okoliczności ich wystąpienia oraz dlaczego wymaga Twojej osobistej opieki..."
+                        : "Opisz szczegółowo swoje objawy, okoliczności ich wystąpienia oraz wpływ na Twoją zdolność do pracy..."
+                      }
                       className="min-h-[200px]"
                       maxLength={1500}
                       {...field}
@@ -389,7 +475,12 @@ export default function WywiadObjawy() {
             />
 
             <FormItem>
-              <FormLabel>Załącz dokumentację medyczną (opcjonalnie)</FormLabel>
+              <FormLabel>
+                {isChildCare 
+                  ? "Załącz dokumentację medyczną dziecka (opcjonalnie)"
+                  : "Załącz dokumentację medyczną (opcjonalnie)"
+                }
+              </FormLabel>
               <div className="space-y-2">
                 <Input
                   type="file"
@@ -449,8 +540,8 @@ export default function WywiadObjawy() {
               <Button type="button" variant="outline" onClick={() => navigate("/wywiad-ogolny")} className="flex-1">
                 Wstecz
               </Button>
-              <Button type="submit" className="flex-1" disabled={isUploading}>
-                Dalej do podsumowania
+              <Button type="submit" className="flex-1">
+                Dalej
               </Button>
             </div>
           </form>

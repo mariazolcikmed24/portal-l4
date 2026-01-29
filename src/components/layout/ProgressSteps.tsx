@@ -23,50 +23,59 @@ interface ProgressStepsProps {
 export const ProgressSteps = ({ currentStep }: ProgressStepsProps) => {
   return (
     <div className="w-full max-w-3xl mx-auto mb-8">
-      <div className="flex items-center justify-between">
-        {steps.map((step, index) => (
-          <div key={step.number} className={cn("flex items-center", index < steps.length - 1 ? "flex-1" : "")}>
-            <div className="flex flex-col items-center">
-              <div
-                className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all",
-                  currentStep > step.number
-                    ? "bg-primary text-primary-foreground"
-                    : currentStep === step.number
-                    ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
-                {currentStep > step.number ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  step.number
-                )}
-              </div>
-              <span
-                className={cn(
-                  "text-xs mt-2 text-center hidden sm:block",
-                  currentStep >= step.number
-                    ? "text-foreground font-medium"
-                    : "text-muted-foreground"
-                )}
-              >
-                {step.label}
-              </span>
+      {/* Progress bar container */}
+      <div className="relative flex items-center justify-between">
+        {/* Background line - spans full width */}
+        <div className="absolute top-5 left-0 right-0 h-0.5 bg-muted" style={{ left: '20px', right: '20px' }} />
+        
+        {/* Progress line - fills based on current step */}
+        <div 
+          className="absolute top-5 h-0.5 bg-primary transition-all duration-300"
+          style={{ 
+            left: '20px',
+            width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - ${currentStep === steps.length ? 0 : 20}px)`
+          }}
+        />
+        
+        {/* Steps */}
+        {steps.map((step) => (
+          <div key={step.number} className="relative z-10 flex flex-col items-center">
+            <div
+              className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all border-4 border-background",
+                currentStep > step.number
+                  ? "bg-primary text-primary-foreground"
+                  : currentStep === step.number
+                  ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                  : "bg-muted text-muted-foreground"
+              )}
+            >
+              {currentStep > step.number ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                step.number
+              )}
             </div>
-            {index < steps.length - 1 && (
-              <div
-                className={cn(
-                  "h-1 flex-1 mx-2 transition-all",
-                  currentStep > step.number ? "bg-primary" : "bg-muted"
-                )}
-              />
-            )}
+            <span
+              className={cn(
+                "text-xs mt-2 text-center hidden sm:block whitespace-nowrap",
+                currentStep >= step.number
+                  ? "text-foreground font-medium"
+                  : "text-muted-foreground"
+              )}
+            >
+              {step.label}
+            </span>
           </div>
         ))}
       </div>
-      <div className="mt-4 text-center">
-        <p className="text-sm text-muted-foreground">
+      
+      {/* Mobile step indicator */}
+      <div className="mt-4 text-center sm:hidden">
+        <p className="text-sm font-medium text-foreground">
+          {steps.find(s => s.number === currentStep)?.label}
+        </p>
+        <p className="text-xs text-muted-foreground mt-1">
           Krok {currentStep} z {steps.length}
         </p>
       </div>

@@ -28,7 +28,7 @@ const Hero = () => {
     };
   }, []);
 
-  return <section className="relative pt-20 pb-8 md:pt-24 md:pb-12 overflow-hidden gradient-subtle">
+  return <section className="relative pt-20 pb-8 md:pt-28 md:pb-12 lg:pt-24 overflow-hidden gradient-subtle">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       

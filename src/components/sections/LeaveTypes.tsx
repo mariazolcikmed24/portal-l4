@@ -17,7 +17,7 @@ const leaveTypes = [
     subtitle: "Opieka nad chorym dzieckiem",
     price: "79 zł",
     icon: Baby,
-    features: ["Legalne zwolnienie L4", "Opieka do 14 lat", "Szybka realizacja"],
+    features: ["Legalne zwolnienie L4", "Szybka realizacja"],
     link: "/rejestracja?guest=true&type=child",
     popular: false,
   },

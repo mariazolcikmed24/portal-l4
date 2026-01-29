@@ -1,13 +1,23 @@
+import { lazy, Suspense, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/sections/Hero";
-import LeaveTypes from "@/components/sections/LeaveTypes";
-import HowItWorks from "@/components/sections/HowItWorks";
-import Benefits from "@/components/sections/Benefits";
-import FAQ from "@/components/sections/FAQ";
-import Testimonials from "@/components/sections/Testimonials";
-import Contact from "@/components/sections/Contact";
-import { useEffect } from "react";
+
+// Lazy load sections below the fold
+const LeaveTypes = lazy(() => import("@/components/sections/LeaveTypes"));
+const HowItWorks = lazy(() => import("@/components/sections/HowItWorks"));
+const Benefits = lazy(() => import("@/components/sections/Benefits"));
+const FAQ = lazy(() => import("@/components/sections/FAQ"));
+const Testimonials = lazy(() => import("@/components/sections/Testimonials"));
+const Contact = lazy(() => import("@/components/sections/Contact"));
+
+// Minimal section loader
+const SectionLoader = () => (
+  <div className="py-12 flex justify-center">
+    <div className="animate-pulse bg-muted rounded-lg h-48 w-full max-w-4xl mx-4"></div>
+  </div>
+);
+
 const Index = () => {
   useEffect(() => {
     // Schema.org BreadcrumbList and WebPage
@@ -63,18 +73,37 @@ const Index = () => {
       document.head.removeChild(webPageScript);
     };
   }, []);
-  return <div className="min-h-screen flex flex-col">
+
+  return (
+    <div className="min-h-screen flex flex-col">
       <Header />
       <main>
+        {/* Hero loads immediately - above the fold */}
         <Hero />
-        <LeaveTypes />
-        <HowItWorks />
-        <Benefits />
-        <Testimonials />
-        <FAQ />
-        <Contact />
+        
+        {/* Sections below the fold - lazy loaded */}
+        <Suspense fallback={<SectionLoader />}>
+          <LeaveTypes />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <HowItWorks />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <Benefits />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <Testimonials />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <FAQ />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <Contact />
+        </Suspense>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Index;

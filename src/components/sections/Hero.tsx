@@ -37,7 +37,7 @@ const Hero = () => {
           {/* Left column - Content */}
           <div className="space-y-4 md:space-y-5">
             {/* Mobile & Tablet: Rotating badges */}
-            <div className="lg:hidden relative h-11 overflow-hidden">
+            <div className="lg:hidden relative h-12 overflow-visible">
               <div 
                 className={`absolute inset-0 flex items-center transition-all duration-500 ease-in-out ${
                   activeBadge === 0 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'

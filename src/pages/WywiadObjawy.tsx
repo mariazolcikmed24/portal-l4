@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
-import { Upload, X, Loader2, Baby } from "lucide-react";
+import { Upload, X, Loader2, Baby, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const symptomsSchema = z.object({
@@ -182,17 +182,23 @@ export default function WywiadObjawy() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   
-  // Check if this is a child care leave
+  // Check if this is a care leave (child or family member)
+  const [isCareLeave, setIsCareLeave] = useState(false);
   const [isChildCare, setIsChildCare] = useState(false);
-  const [childName, setChildName] = useState("");
+  const [patientName, setPatientName] = useState("");
   
   useEffect(() => {
     const savedLeaveData = localStorage.getItem('formData_rodzajZwolnienia');
     if (savedLeaveData) {
       const parsed = JSON.parse(savedLeaveData);
       if (parsed.leave_type === 'care') {
+        setIsCareLeave(true);
         setIsChildCare(true);
-        setChildName(parsed.care_first_name || "dziecka");
+        setPatientName(parsed.care_first_name || "dziecka");
+      } else if (parsed.leave_type === 'care_family') {
+        setIsCareLeave(true);
+        setIsChildCare(false);
+        setPatientName(parsed.care_family_first_name || "podopiecznego");
       }
     }
   }, []);
@@ -312,6 +318,13 @@ export default function WywiadObjawy() {
     return symptomsByCategory[category] || [];
   };
 
+  // Get label for the patient based on leave type
+  const getPatientLabel = () => {
+    if (isChildCare) return "dziecka";
+    if (isCareLeave) return "osoby chorej";
+    return "";
+  };
+
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
@@ -319,20 +332,27 @@ export default function WywiadObjawy() {
         
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
-            {isChildCare ? "Wywiad medyczny - objawy dziecka" : "Wywiad medyczny - objawy"}
+            {isCareLeave 
+              ? `Wywiad medyczny - objawy ${getPatientLabel()}`
+              : "Wywiad medyczny - objawy"
+            }
           </h1>
           <p className="text-muted-foreground">
-            {isChildCare 
-              ? `Opisz główną dolegliwość i objawy ${childName}`
+            {isCareLeave 
+              ? `Opisz główną dolegliwość i objawy ${patientName}`
               : "Opisz swoją główną dolegliwość i objawy"
             }
           </p>
           
-          {isChildCare && (
+          {isCareLeave && (
             <div className="mt-4 flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20">
-              <Baby className="h-5 w-5 text-primary" />
+              {isChildCare ? (
+                <Baby className="h-5 w-5 text-primary" />
+              ) : (
+                <Users className="h-5 w-5 text-primary" />
+              )}
               <span className="text-sm font-medium">
-                Formularz dotyczy stanu zdrowia dziecka: <strong>{childName}</strong>
+                Formularz dotyczy stanu zdrowia {getPatientLabel()}: <strong>{patientName}</strong>
               </span>
             </div>
           )}
@@ -346,8 +366,8 @@ export default function WywiadObjawy() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {isChildCare 
-                      ? "Kategoria głównej dolegliwości dziecka *"
+                    {isCareLeave 
+                      ? `Kategoria głównej dolegliwości ${getPatientLabel()} *`
                       : "Kategoria głównej dolegliwości *"
                     }
                   </FormLabel>
@@ -376,8 +396,8 @@ export default function WywiadObjawy() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {isChildCare 
-                      ? "Od kiedy dziecko ma te objawy? *"
+                    {isCareLeave 
+                      ? `Od kiedy ${patientName} ma te objawy? *`
                       : "Czas trwania objawów *"
                     }
                   </FormLabel>
@@ -407,8 +427,8 @@ export default function WywiadObjawy() {
                 render={() => (
                   <FormItem>
                     <FormLabel>
-                      {isChildCare 
-                        ? "Wybierz objawy dziecka (opcjonalnie)"
+                      {isCareLeave 
+                        ? `Wybierz objawy ${getPatientLabel()} (opcjonalnie)`
                         : "Wybierz objawy (opcjonalnie)"
                       }
                     </FormLabel>
@@ -450,15 +470,15 @@ export default function WywiadObjawy() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {isChildCare 
-                      ? "Opisz objawy zdrowotne dziecka oraz okoliczności, które wymagają Twojej opieki nad nim *"
+                    {isCareLeave 
+                      ? `Opisz objawy zdrowotne ${getPatientLabel()} oraz okoliczności, które wymagają Twojej opieki *`
                       : "Opisz objawy zdrowotne oraz okoliczności, które uniemożliwiają Ci wykonywanie pracy *"
                     }
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={isChildCare 
-                        ? "Opisz szczegółowo objawy dziecka, okoliczności ich wystąpienia oraz dlaczego wymaga Twojej osobistej opieki..."
+                      placeholder={isCareLeave 
+                        ? `Opisz szczegółowo objawy ${getPatientLabel()}, okoliczności ich wystąpienia oraz dlaczego wymaga Twojej osobistej opieki...`
                         : "Opisz szczegółowo swoje objawy, okoliczności ich wystąpienia oraz wpływ na Twoją zdolność do pracy..."
                       }
                       className="min-h-[200px]"
@@ -476,8 +496,8 @@ export default function WywiadObjawy() {
 
             <FormItem>
               <FormLabel>
-                {isChildCare 
-                  ? "Załącz dokumentację medyczną dziecka (opcjonalnie)"
+                {isCareLeave 
+                  ? `Załącz dokumentację medyczną ${getPatientLabel()} (opcjonalnie)`
                   : "Załącz dokumentację medyczną (opcjonalnie)"
                 }
               </FormLabel>

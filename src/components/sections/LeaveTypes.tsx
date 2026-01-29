@@ -8,7 +8,7 @@ const leaveTypes = [
     subtitle: "Zwolnienie lekarskie L4",
     price: "79 zł",
     icon: FileText,
-    features: ["Oficjalne L4 do ZUS", "Realizacja w 24h", "100% online"],
+    features: ["Oficjalne L4 do ZUS", "Realizacja nawet w 15 minut", "100% online"],
     link: "/rejestracja?guest=true&type=zus",
     popular: true,
   },

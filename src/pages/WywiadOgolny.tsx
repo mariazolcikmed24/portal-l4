@@ -143,10 +143,15 @@ export default function WywiadOgolny() {
     }
   }, []);
 
-  // Set default value for child care (pregnancy question not applicable)
+  // Set default values for child care (pregnancy and long leave questions not applicable)
   useEffect(() => {
-    if (isChildCare && !form.getValues("q_pregnant")) {
-      form.setValue("q_pregnant", "no");
+    if (isChildCare) {
+      if (!form.getValues("q_pregnant")) {
+        form.setValue("q_pregnant", "no");
+      }
+      if (!form.getValues("q_long_leave")) {
+        form.setValue("q_long_leave", "no");
+      }
     }
   }, [isChildCare, form]);
 
@@ -504,82 +509,81 @@ export default function WywiadOgolny() {
               </CardContent>
             </Card>
 
-            {/* Długotrwałe zwolnienie */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Poprzednie zwolnienia</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="q_long_leave"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {getSubjectText(
-                          `Czy w ciągu ostatniego roku ${childName} miało zwolnienia lekarskie przekraczające łącznie 33 dni? *`,
-                          "Czy w ciągu ostatniego roku miałeś/aś zwolnienia lekarskie przekraczające łącznie 33 dni? *"
-                        )}
-                      </FormLabel>
-                      <FormControl>
-                        <RadioGroup onValueChange={field.onChange} value={field.value}>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="yes" id="long_yes" />
-                            <Label htmlFor="long_yes">Tak</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="no" id="long_no" />
-                            <Label htmlFor="long_no">Nie</Label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {qLongLeave === "yes" && (
+            {/* Długotrwałe zwolnienie - nie dotyczy opieki nad dzieckiem */}
+            {!isChildCare && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Poprzednie zwolnienia</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="upload_prev_docs"
-                    render={({ field: { value, onChange, ...fieldProps } }) => (
+                    name="q_long_leave"
+                    render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Dokumentacja poprzednich zwolnień *</FormLabel>
+                        <FormLabel>
+                          Czy w ciągu ostatniego roku miałeś/aś zwolnienia lekarskie przekraczające łącznie 33 dni? *
+                        </FormLabel>
                         <FormControl>
-                          <div className="space-y-2">
-                            <Input
-                              type="file"
-                              accept=".pdf,.jpg,.jpeg,.png"
-                              multiple
-                              onChange={(e) => onChange(e.target.files)}
-                              className="hidden"
-                              ref={prevDocsInputRef}
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => prevDocsInputRef.current?.click()}
-                              className="w-full"
-                              size="lg"
-                            >
-                              <Upload className="mr-2 h-4 w-4" />
-                              Wybierz dokumenty
-                            </Button>
-                            {uploadPrevDocs && uploadPrevDocs.length > 0 && (
-                              <div className="text-sm text-muted-foreground">
-                                Wybrano: {Array.from(uploadPrevDocs).map(f => f.name).join(", ")}
-                              </div>
-                            )}
-                          </div>
+                          <RadioGroup onValueChange={field.onChange} value={field.value}>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="yes" id="long_yes" />
+                              <Label htmlFor="long_yes">Tak</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="no" id="long_no" />
+                              <Label htmlFor="long_no">Nie</Label>
+                            </div>
+                          </RadioGroup>
                         </FormControl>
-                        <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB)</p>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                )}
-              </CardContent>
-            </Card>
+
+                  {qLongLeave === "yes" && (
+                    <FormField
+                      control={form.control}
+                      name="upload_prev_docs"
+                      render={({ field: { value, onChange, ...fieldProps } }) => (
+                        <FormItem>
+                          <FormLabel>Dokumentacja poprzednich zwolnień *</FormLabel>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <Input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                multiple
+                                onChange={(e) => onChange(e.target.files)}
+                                className="hidden"
+                                ref={prevDocsInputRef}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => prevDocsInputRef.current?.click()}
+                                className="w-full"
+                                size="lg"
+                              >
+                                <Upload className="mr-2 h-4 w-4" />
+                                Wybierz dokumenty
+                              </Button>
+                              {uploadPrevDocs && uploadPrevDocs.length > 0 && (
+                                <div className="text-sm text-muted-foreground">
+                                  Wybrano: {Array.from(uploadPrevDocs).map(f => f.name).join(", ")}
+                                </div>
+                              )}
+                            </div>
+                          </FormControl>
+                          <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB)</p>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             <div className="flex gap-4 pt-4">
               <Button type="button" variant="outline" onClick={() => navigate("/rodzaj-zwolnienia")} className="flex-1">

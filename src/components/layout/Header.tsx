@@ -22,7 +22,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center transition-smooth hover:opacity-80">
-            <span className="text-xl font-bold text-foreground">e-<span className="text-primary">zwolnienie</span></span>
+            <span className="text-xl font-bold text-foreground">e-<span className="text-primary">zwolnienie</span>.com.pl</span>
           </Link>
 
           {/* Desktop Menu */}

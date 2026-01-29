@@ -36,8 +36,8 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
           {/* Left column - Content */}
           <div className="space-y-4 md:space-y-5">
-            {/* Mobile: Rotating badges */}
-            <div className="md:hidden relative h-10 overflow-hidden">
+            {/* Mobile & Tablet: Rotating badges */}
+            <div className="lg:hidden relative h-10 overflow-hidden">
               <div 
                 className={`absolute inset-0 transition-all duration-500 ease-in-out ${
                   activeBadge === 0 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
@@ -64,7 +64,7 @@ const Hero = () => {
             </div>
 
             {/* Desktop: Both badges visible */}
-            <div className="hidden md:flex flex-wrap items-center gap-3">
+            <div className="hidden lg:flex flex-wrap items-center gap-3">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-semibold shadow-soft">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>

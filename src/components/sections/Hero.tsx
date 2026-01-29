@@ -6,17 +6,26 @@ import heroImage from "@/assets/hero-doctor.jpg";
 
 const Hero = () => {
   const [doctorsOnline, setDoctorsOnline] = useState(10);
+  const [activeBadge, setActiveBadge] = useState(0);
 
   useEffect(() => {
     // Set random number on mount
     setDoctorsOnline(Math.floor(Math.random() * 7) + 7); // 7-13
     
-    // Update every 30 seconds for dynamic feel
-    const interval = setInterval(() => {
+    // Update doctors count every 30 seconds
+    const doctorsInterval = setInterval(() => {
       setDoctorsOnline(Math.floor(Math.random() * 7) + 7);
     }, 30000);
     
-    return () => clearInterval(interval);
+    // Auto-rotate badges on mobile every 3 seconds
+    const badgeInterval = setInterval(() => {
+      setActiveBadge(prev => (prev === 0 ? 1 : 0));
+    }, 3000);
+    
+    return () => {
+      clearInterval(doctorsInterval);
+      clearInterval(badgeInterval);
+    };
   }, []);
 
   return <section className="relative pt-20 pb-8 md:pt-24 md:pb-12 overflow-hidden gradient-subtle">
@@ -27,18 +36,46 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
           {/* Left column - Content */}
           <div className="space-y-4 md:space-y-5">
-            {/* Doctors online badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-semibold shadow-soft">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
-              </span>
-              <span>{doctorsOnline} lekarzy online</span>
+            {/* Mobile: Rotating badges */}
+            <div className="md:hidden relative h-10 overflow-hidden">
+              <div 
+                className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                  activeBadge === 0 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+                }`}
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-semibold shadow-soft">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                  </span>
+                  <span>{doctorsOnline} lekarzy online</span>
+                </div>
+              </div>
+              <div 
+                className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                  activeBadge === 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
+                }`}
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft">
+                  <Users className="w-4 h-4" aria-hidden="true" />
+                  <span><strong>250 000+</strong> zadowolonych pacjentów</span>
+                </div>
+              </div>
             </div>
 
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft ml-2">
-              <Users className="w-4 h-4" aria-hidden="true" />
-              <span><strong>250 000+</strong> zadowolonych pacjentów</span>
+            {/* Desktop: Both badges visible */}
+            <div className="hidden md:flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-semibold shadow-soft">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                </span>
+                <span>{doctorsOnline} lekarzy online</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft">
+                <Users className="w-4 h-4" aria-hidden="true" />
+                <span><strong>250 000+</strong> zadowolonych pacjentów</span>
+              </div>
             </div>
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">

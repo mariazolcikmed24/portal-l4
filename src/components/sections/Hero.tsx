@@ -35,7 +35,7 @@ const Hero = () => {
             <div className="flex flex-wrap gap-3 text-sm">
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">Prawdziwi lekarze</span>
+                <span className="text-foreground">Legalnie i zgodnie z przepisami</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-secondary" aria-hidden="true" />

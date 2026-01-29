@@ -75,7 +75,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Contact & Company Info */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Kontakt</h3>
             <ul className="space-y-2 text-sm text-gray-300">
@@ -84,14 +84,17 @@ const Footer = () => {
                   kontakt@e-zwolnienie.com.pl
                 </a>
               </li>
-              <li>
-                <a href="tel:+48123456789" className="hover:text-primary transition-smooth">
-                  +48 123 456 789
-                </a>
-              </li>
-              <li>ul. Medyczna 1</li>
-              <li>00-000 Warszawa</li>
+              <li>ul. Berezyńska 39</li>
+              <li>03-908 Warszawa</li>
             </ul>
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Med24 Holding sp. z o.o.<br />
+                KRS: 0000875629<br />
+                NIP: 5252847595<br />
+                REGON: 387834113
+              </p>
+            </div>
           </div>
         </div>
 

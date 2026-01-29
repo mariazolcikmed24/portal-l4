@@ -21,6 +21,10 @@ const Potwierdzenie = lazy(() => import("./pages/Potwierdzenie"));
 const StatusSprawy = lazy(() => import("./pages/StatusSprawy"));
 const PanelUzytkownika = lazy(() => import("./pages/PanelUzytkownika"));
 const DokumentacjaAPI = lazy(() => import("./pages/DokumentacjaAPI"));
+const PolitykaPrywatnosci = lazy(() => import("./pages/PolitykaPrywatnosci"));
+const Regulamin = lazy(() => import("./pages/Regulamin"));
+const RODO = lazy(() => import("./pages/RODO"));
+const Cookies = lazy(() => import("./pages/Cookies"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -56,6 +60,10 @@ const App = () => (
               <Route path="/status-sprawy" element={<StatusSprawy />} />
               <Route path="/panel" element={<PanelUzytkownika />} />
               <Route path="/api-docs" element={<DokumentacjaAPI />} />
+              <Route path="/polityka-prywatnosci" element={<PolitykaPrywatnosci />} />
+              <Route path="/regulamin" element={<Regulamin />} />
+              <Route path="/rodo" element={<RODO />} />
+              <Route path="/cookies" element={<Cookies />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

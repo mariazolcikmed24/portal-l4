@@ -67,7 +67,7 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
-        <LeaveTypes className="" />
+        <LeaveTypes />
         <HowItWorks />
         <Benefits />
         <Testimonials />

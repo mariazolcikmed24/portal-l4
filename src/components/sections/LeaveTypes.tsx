@@ -25,7 +25,7 @@ const leaveTypes = [
 
 const LeaveTypes = () => {
   return (
-    <section className="py-16 md:py-24 bg-muted/30">
+    <section className="pt-8 pb-16 md:pt-12 md:pb-24 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {leaveTypes.map((type, index) => (

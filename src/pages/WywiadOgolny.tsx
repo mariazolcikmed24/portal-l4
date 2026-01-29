@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
-import { Upload, Baby } from "lucide-react";
+import { Upload, Baby, Users } from "lucide-react";
 
 const medicalSchema = z.object({
   q_pregnant: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
@@ -102,20 +102,33 @@ export default function WywiadOgolny() {
   const pregCardInputRef = useRef<HTMLInputElement>(null);
   const prevDocsInputRef = useRef<HTMLInputElement>(null);
   
-  // Check if this is a child care leave
+  // Check if this is a care leave (child or family member)
+  const [isCareLeave, setIsCareLeave] = useState(false);
   const [isChildCare, setIsChildCare] = useState(false);
-  const [childName, setChildName] = useState("");
+  const [patientName, setPatientName] = useState("");
   
   useEffect(() => {
     const savedLeaveData = localStorage.getItem('formData_rodzajZwolnienia');
     if (savedLeaveData) {
       const parsed = JSON.parse(savedLeaveData);
       if (parsed.leave_type === 'care') {
+        setIsCareLeave(true);
         setIsChildCare(true);
-        setChildName(parsed.care_first_name || "dziecka");
+        setPatientName(parsed.care_first_name || "dziecka");
+      } else if (parsed.leave_type === 'care_family') {
+        setIsCareLeave(true);
+        setIsChildCare(false);
+        setPatientName(parsed.care_family_first_name || "podopiecznego");
       }
     }
   }, []);
+  
+  // Get label for the patient based on leave type
+  const getPatientLabel = () => {
+    if (isChildCare) return "dziecka";
+    if (isCareLeave) return "osoby chorej";
+    return "";
+  };
   
   const form = useForm<MedicalFormData>({
     resolver: zodResolver(medicalSchema),
@@ -143,9 +156,9 @@ export default function WywiadOgolny() {
     }
   }, []);
 
-  // Set default values for child care (pregnancy and long leave questions not applicable)
+  // Set default values for care leave (pregnancy and long leave questions not applicable)
   useEffect(() => {
-    if (isChildCare) {
+    if (isCareLeave) {
       if (!form.getValues("q_pregnant")) {
         form.setValue("q_pregnant", "no");
       }
@@ -153,7 +166,7 @@ export default function WywiadOgolny() {
         form.setValue("q_long_leave", "no");
       }
     }
-  }, [isChildCare, form]);
+  }, [isCareLeave, form]);
 
   // Save data to localStorage on change
   useEffect(() => {
@@ -174,8 +187,8 @@ export default function WywiadOgolny() {
   };
 
   // Helper function to get subject text based on leave type
-  const getSubjectText = (forChild: string, forSelf: string) => {
-    return isChildCare ? forChild : forSelf;
+  const getSubjectText = (forCare: string, forSelf: string) => {
+    return isCareLeave ? forCare : forSelf;
   };
 
   return (
@@ -185,20 +198,27 @@ export default function WywiadOgolny() {
         
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
-            {isChildCare ? "Wywiad medyczny - stan zdrowia dziecka" : "Wywiad medyczny - pytania ogólne"}
+            {isCareLeave 
+              ? `Wywiad medyczny - stan zdrowia ${getPatientLabel()}`
+              : "Wywiad medyczny - pytania ogólne"
+            }
           </h1>
           <p className="text-muted-foreground">
-            {isChildCare 
-              ? `Odpowiedz na poniższe pytania dotyczące stanu zdrowia ${childName}`
+            {isCareLeave 
+              ? `Odpowiedz na poniższe pytania dotyczące stanu zdrowia ${patientName}`
               : "Odpowiedz na poniższe pytania dotyczące Twojego stanu zdrowia"
             }
           </p>
           
-          {isChildCare && (
+          {isCareLeave && (
             <div className="mt-4 flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20">
-              <Baby className="h-5 w-5 text-primary" />
+              {isChildCare ? (
+                <Baby className="h-5 w-5 text-primary" />
+              ) : (
+                <Users className="h-5 w-5 text-primary" />
+              )}
               <span className="text-sm font-medium">
-                Formularz dotyczy stanu zdrowia dziecka: <strong>{childName}</strong>
+                Formularz dotyczy stanu zdrowia {getPatientLabel()}: <strong>{patientName}</strong>
               </span>
             </div>
           )}
@@ -206,8 +226,8 @@ export default function WywiadOgolny() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Ciąża - tylko dla dorosłych */}
-            {!isChildCare && (
+            {/* Ciąża - tylko dla własnego zwolnienia (nie opieki) */}
+            {!isCareLeave && (
               <Card>
                 <CardHeader>
                   <CardTitle>Ciąża</CardTitle>
@@ -318,7 +338,7 @@ export default function WywiadOgolny() {
                     <FormItem>
                       <FormLabel>
                         {getSubjectText(
-                          `Czy ${childName} cierpi na choroby przewlekłe? *`,
+                          `Czy ${patientName} cierpi na choroby przewlekłe? *`,
                           "Czy cierpisz na choroby przewlekłe? *"
                         )}
                       </FormLabel>
@@ -412,7 +432,7 @@ export default function WywiadOgolny() {
                     <FormItem>
                       <FormLabel>
                         {getSubjectText(
-                          `Czy ${childName} ma jakieś alergie? *`,
+                          `Czy ${patientName} ma jakieś alergie? *`,
                           "Czy masz jakieś alergie? *"
                         )}
                       </FormLabel>
@@ -467,7 +487,7 @@ export default function WywiadOgolny() {
                     <FormItem>
                       <FormLabel>
                         {getSubjectText(
-                          `Czy ${childName} bierze jakieś leki na stałe? *`,
+                          `Czy ${patientName} bierze jakieś leki na stałe? *`,
                           "Czy bierzesz jakieś leki na stałe? *"
                         )}
                       </FormLabel>

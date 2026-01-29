@@ -371,7 +371,7 @@ export default function WywiadObjawy() {
               name="free_text_reason"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opisz dokładnie powód potrzeby otrzymania zwolnienia *</FormLabel>
+                  <FormLabel>Opisz objawy zdrowotne oraz okoliczności, które uniemożliwiają Ci wykonywanie pracy *</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Opisz szczegółowo swoje objawy, okoliczności ich wystąpienia oraz wpływ na Twoją zdolność do pracy..."

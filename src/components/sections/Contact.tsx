@@ -1,8 +1,6 @@
 import { Mail, Phone, MapPin } from "lucide-react";
-
 const Contact = () => {
-  return (
-    <section id="kontakt" className="py-16 md:py-24 gradient-subtle">
+  return <section id="kontakt" className="py-16 md:py-24 gradient-subtle">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
@@ -52,8 +50,9 @@ const Contact = () => {
                   <div>
                     <p className="font-semibold text-foreground">Adres</p>
                     <p className="text-muted-foreground">
-                      ul. Medyczna 1<br />
-                      00-000 Warszawa
+                      ul. Berezyńska 39
+                    <br />
+                      03-908 Warszawa
                     </p>
                   </div>
                 </div>
@@ -69,8 +68,6 @@ const Contact = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Contact;

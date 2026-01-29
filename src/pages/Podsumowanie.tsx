@@ -7,12 +7,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
+import { Baby } from "lucide-react";
 
 export default function Podsumowanie() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [profileData, setProfileData] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
+
+  // Check if this is child care leave
+  const isChildCare = formData.rodzajZwolnienia?.leave_type === 'care';
+  const childName = formData.rodzajZwolnienia?.care_first_name || 'dziecka';
+  const childLastName = formData.rodzajZwolnienia?.care_last_name || '';
+  const childPesel = formData.rodzajZwolnienia?.care_pesel || '';
 
   useEffect(() => {
     const loadData = async () => {
@@ -63,7 +70,8 @@ export default function Podsumowanie() {
       'uniformed': 'Służby mundurowe',
       'student': 'Student/Uczeń',
       'foreign_employer': 'Pracodawca zagraniczny',
-      'care': 'Zwolnienie na dziecko'
+      'care': 'Zwolnienie na opiekę nad dzieckiem',
+      'krus': 'Ubezpieczeni w KRUS'
     };
     return labels[type] || type;
   };
@@ -179,6 +187,9 @@ export default function Podsumowanie() {
       'death': 'Stres (śmierć bliskiej osoby)',
       'work': 'Stres (praca)',
       'job_loss': 'Stres (utrata pracy)',
+      // child-specific stress
+      'school_stress': 'Stres związany ze szkołą',
+      'peer_issues': 'Problemy z rówieśnikami',
     };
     return labels[symptom] || symptom;
   };
@@ -215,9 +226,10 @@ export default function Podsumowanie() {
         </div>
 
         <div className="space-y-6">
+          {/* Dane wnioskującego (rodzica/opiekuna) */}
           <Card>
             <CardHeader>
-              <CardTitle>Dane osobowe</CardTitle>
+              <CardTitle>{isChildCare ? "Dane rodzica / opiekuna" : "Dane osobowe"}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex justify-between">
@@ -234,6 +246,28 @@ export default function Podsumowanie() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Dane dziecka - tylko dla opieki nad dzieckiem */}
+          {isChildCare && (
+            <Card className="border-primary/30 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Baby className="h-5 w-5 text-primary" />
+                  Dane dziecka
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Imię i nazwisko dziecka:</span>
+                  <span className="font-medium">{childName} {childLastName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">PESEL dziecka:</span>
+                  <span className="font-medium">{childPesel}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
@@ -280,20 +314,25 @@ export default function Podsumowanie() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Wywiad medyczny</CardTitle>
+              <CardTitle>
+                {isChildCare ? "Wywiad medyczny dziecka" : "Wywiad medyczny"}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Wywiad ogólny:</h4>
+                <h4 className="font-semibold text-sm">
+                  {isChildCare ? "Stan zdrowia dziecka:" : "Wywiad ogólny:"}
+                </h4>
                 
-                {formData.wywiadOgolny?.q_pregnant && (
+                {/* Ciąża - tylko dla dorosłych */}
+                {!isChildCare && formData.wywiadOgolny?.q_pregnant && (
                   <div>
                     <span className="text-muted-foreground">Ciąża: </span>
                     <span className="font-medium">{formData.wywiadOgolny.q_pregnant === 'yes' ? 'Tak' : 'Nie'}</span>
                   </div>
                 )}
                 
-                {formData.wywiadOgolny?.q_pregnant === 'yes' && formData.wywiadOgolny?.q_preg_leave && (
+                {!isChildCare && formData.wywiadOgolny?.q_pregnant === 'yes' && formData.wywiadOgolny?.q_preg_leave && (
                   <div>
                     <span className="text-muted-foreground">Zwolnienie związane z ciążą: </span>
                     <span className="font-medium">{formData.wywiadOgolny.q_preg_leave === 'yes' ? 'Tak' : 'Nie'}</span>
@@ -302,7 +341,9 @@ export default function Podsumowanie() {
                 
                 {formData.wywiadOgolny?.q_chronic && (
                   <div>
-                    <span className="text-muted-foreground">Choroby przewlekłe: </span>
+                    <span className="text-muted-foreground">
+                      {isChildCare ? "Choroby przewlekłe dziecka: " : "Choroby przewlekłe: "}
+                    </span>
                     <span className="font-medium">{formData.wywiadOgolny.q_chronic === 'yes' ? 'Tak' : 'Nie'}</span>
                     {formData.wywiadOgolny.q_chronic === 'yes' && formData.wywiadOgolny.chronic_list?.length > 0 && (
                       <div className="ml-4 mt-1 text-sm">
@@ -318,7 +359,9 @@ export default function Podsumowanie() {
                 
                 {formData.wywiadOgolny?.q_allergy && (
                   <div>
-                    <span className="text-muted-foreground">Alergie: </span>
+                    <span className="text-muted-foreground">
+                      {isChildCare ? "Alergie dziecka: " : "Alergie: "}
+                    </span>
                     <span className="font-medium">{formData.wywiadOgolny.q_allergy === 'yes' ? 'Tak' : 'Nie'}</span>
                     {formData.wywiadOgolny.q_allergy === 'yes' && formData.wywiadOgolny.allergy_text && (
                       <div className="ml-4 mt-1 text-sm">{formData.wywiadOgolny.allergy_text}</div>
@@ -328,7 +371,9 @@ export default function Podsumowanie() {
                 
                 {formData.wywiadOgolny?.q_meds && (
                   <div>
-                    <span className="text-muted-foreground">Przyjmowane leki: </span>
+                    <span className="text-muted-foreground">
+                      {isChildCare ? "Leki przyjmowane przez dziecko: " : "Przyjmowane leki: "}
+                    </span>
                     <span className="font-medium">{formData.wywiadOgolny.q_meds === 'yes' ? 'Tak' : 'Nie'}</span>
                     {formData.wywiadOgolny.q_meds === 'yes' && formData.wywiadOgolny.meds_list && (
                       <div className="ml-4 mt-1 text-sm">{formData.wywiadOgolny.meds_list}</div>
@@ -336,7 +381,8 @@ export default function Podsumowanie() {
                   </div>
                 )}
                 
-                {formData.wywiadOgolny?.q_long_leave && (
+                {/* Długotrwałe zwolnienie - tylko dla dorosłych */}
+                {!isChildCare && formData.wywiadOgolny?.q_long_leave && (
                   <div>
                     <span className="text-muted-foreground">Długotrwałe zwolnienie (powyżej 33 dni w roku): </span>
                     <span className="font-medium">{formData.wywiadOgolny.q_long_leave === 'yes' ? 'Tak' : 'Nie'}</span>
@@ -345,7 +391,9 @@ export default function Podsumowanie() {
               </div>
 
               <div className="space-y-2 pt-4 border-t">
-                <h4 className="font-semibold text-sm">Objawy i dolegliwości:</h4>
+                <h4 className="font-semibold text-sm">
+                  {isChildCare ? "Objawy i dolegliwości dziecka:" : "Objawy i dolegliwości:"}
+                </h4>
                 
                 {formData.wywiadObjawy?.main_category && (
                   <div>
@@ -356,7 +404,9 @@ export default function Podsumowanie() {
                 
                 {formData.wywiadObjawy?.symptom_duration && (
                   <div>
-                    <span className="text-muted-foreground">Czas trwania objawów: </span>
+                    <span className="text-muted-foreground">
+                      {isChildCare ? "Czas trwania objawów dziecka: " : "Czas trwania objawów: "}
+                    </span>
                     <span className="font-medium">
                       {getDurationLabel(formData.wywiadObjawy.symptom_duration)}
                     </span>
@@ -376,7 +426,9 @@ export default function Podsumowanie() {
                 
                 {formData.wywiadObjawy?.free_text_reason && (
                   <div>
-                    <span className="text-muted-foreground">Opis dolegliwości: </span>
+                    <span className="text-muted-foreground">
+                      {isChildCare ? "Opis dolegliwości dziecka: " : "Opis dolegliwości: "}
+                    </span>
                     <div className="mt-1 text-sm bg-muted/30 p-2 rounded">{formData.wywiadObjawy.free_text_reason}</div>
                   </div>
                 )}

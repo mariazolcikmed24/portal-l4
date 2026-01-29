@@ -24,7 +24,7 @@ const leaveTypes = [
   {
     title: "Zaświadczenie Student/Uczeń",
     subtitle: "Usprawiedliwienie nieobecności",
-    price: "49 zł",
+    price: "79 zł",
     icon: GraduationCap,
     features: ["Dla studentów i uczniów", "Akceptowane przez uczelnie", "Natychmiastowa realizacja"],
     link: "/rejestracja?guest=true&type=student",

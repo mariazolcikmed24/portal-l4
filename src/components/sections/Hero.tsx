@@ -36,8 +36,8 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
           {/* Left column - Content */}
           <div className="space-y-4 md:space-y-5">
-            {/* Mobile & Tablet: Rotating badges */}
-            <div className="lg:hidden relative h-10 overflow-hidden">
+            {/* Mobile only: Rotating badges */}
+            <div className="md:hidden relative h-10 overflow-hidden">
               <div 
                 className={`absolute inset-0 transition-all duration-500 ease-in-out ${
                   activeBadge === 0 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
@@ -60,6 +60,14 @@ const Hero = () => {
                   <Users className="w-4 h-4" aria-hidden="true" />
                   <span><strong>250 000+</strong> zadowolonych pacjentów</span>
                 </div>
+              </div>
+            </div>
+
+            {/* Tablet only: Only patients badge */}
+            <div className="hidden md:block lg:hidden">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft">
+                <Users className="w-4 h-4" aria-hidden="true" />
+                <span><strong>250 000+</strong> zadowolonych pacjentów</span>
               </div>
             </div>
 

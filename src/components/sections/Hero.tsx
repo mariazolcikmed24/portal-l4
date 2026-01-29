@@ -122,7 +122,16 @@ const Hero = () => {
           {/* Right column - Image */}
           <div className="relative hidden md:block">
             <div className="relative rounded-2xl overflow-hidden shadow-strong">
-              <img src={heroImage} alt="Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-zwolnienie" className="w-full h-auto object-cover" loading="eager" />
+              <img 
+                src={heroImage} 
+                alt="Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-zwolnienie" 
+                className="w-full h-auto object-cover aspect-[4/3]"
+                width={600}
+                height={450}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
             </div>
             

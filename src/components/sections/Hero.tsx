@@ -1,8 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Shield, Clock, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-doctor.jpg";
+
 const Hero = () => {
+  const [doctorsOnline, setDoctorsOnline] = useState(10);
+
+  useEffect(() => {
+    // Set random number on mount
+    setDoctorsOnline(Math.floor(Math.random() * 7) + 7); // 7-13
+    
+    // Update every 30 seconds for dynamic feel
+    const interval = setInterval(() => {
+      setDoctorsOnline(Math.floor(Math.random() * 7) + 7);
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return <section className="relative pt-20 pb-8 md:pt-24 md:pb-12 overflow-hidden gradient-subtle">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
@@ -11,7 +27,16 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
           {/* Left column - Content */}
           <div className="space-y-4 md:space-y-5">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft">
+            {/* Doctors online badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-semibold shadow-soft">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+              </span>
+              <span>{doctorsOnline} lekarzy online</span>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft ml-2">
               <Users className="w-4 h-4" aria-hidden="true" />
               <span><strong>250 000+</strong> zadowolonych pacjentów</span>
             </div>

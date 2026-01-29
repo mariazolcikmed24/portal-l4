@@ -57,15 +57,16 @@ const FAQ = () => {
           </p>
         </div>
 
+        {/* FAQ content always in DOM - answers hidden with CSS, not conditional render */}
         <div className="max-w-4xl mx-auto">
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="bg-gradient-card border border-border rounded-xl px-6 shadow-soft hover:shadow-medium transition-smooth"
+                className="bg-gradient-card border border-border rounded-xl px-6 shadow-soft hover:shadow-medium transition-smooth overflow-hidden"
               >
-                <AccordionTrigger className="text-left text-lg font-semibold text-foreground hover:text-primary py-6">
+                <AccordionTrigger className="text-left text-lg font-semibold text-foreground hover:text-primary py-6 hover:no-underline">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
@@ -74,6 +75,16 @@ const FAQ = () => {
               </AccordionItem>
             ))}
           </Accordion>
+        </div>
+
+        {/* Hidden FAQ content for SEO - always in DOM */}
+        <div className="sr-only" aria-hidden="true">
+          {faqs.map((faq, index) => (
+            <div key={`seo-${index}`}>
+              <h3>{faq.question}</h3>
+              <p>{faq.answer}</p>
+            </div>
+          ))}
         </div>
 
         {/* Additional help */}
@@ -90,21 +101,7 @@ const FAQ = () => {
         </div>
       </div>
 
-      {/* Schema.org FAQPage markup */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "mainEntity": faqs.map(faq => ({
-            "@type": "Question",
-            "name": faq.question,
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": faq.answer
-            }
-          }))
-        })}
-      </script>
+      {/* Schema.org markup moved to index.html <head> for early loading */}
     </section>
   );
 };

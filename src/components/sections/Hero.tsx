@@ -2,10 +2,8 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Shield, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-doctor.jpg";
-
 const Hero = () => {
-  return (
-    <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden gradient-subtle">
+  return <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden gradient-subtle">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       
@@ -39,7 +37,7 @@ const Hero = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">Do 30 minut</span>
+                <span className="text-foreground">Nawet w 15 minut</span>
               </div>
             </div>
 
@@ -59,19 +57,14 @@ const Hero = () => {
 
             {/* Trust badge */}
             <p className="text-sm text-muted-foreground">
-              ✓ Ponad <strong className="text-foreground">10 000+</strong> zadowolonych pacjentów
+              ✓ Ponad <strong className="text-foreground">250 000+</strong> zadowolonych pacjentów
             </p>
           </div>
 
           {/* Right column - Image */}
           <div className="relative hidden md:block">
             <div className="relative rounded-2xl overflow-hidden shadow-strong">
-              <img
-                src={heroImage}
-                alt="Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-zwolnienie"
-                className="w-full h-auto object-cover"
-                loading="eager"
-              />
+              <img src={heroImage} alt="Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-zwolnienie" className="w-full h-auto object-cover" loading="eager" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
             </div>
             
@@ -90,8 +83,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;

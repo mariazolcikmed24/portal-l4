@@ -26,7 +26,7 @@ const leaveTypes = [
     subtitle: "Usprawiedliwienie nieobecności",
     price: "79 zł",
     icon: GraduationCap,
-    features: ["Dla studentów i uczniów", "Akceptowane przez uczelnie", "Natychmiastowa realizacja"],
+    features: ["Akceptowane przez uczelnie", "Natychmiastowa realizacja"],
     link: "/rejestracja?guest=true&type=student",
     popular: false,
   },

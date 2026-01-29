@@ -11,9 +11,9 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
           {/* Left column - Content */}
           <div className="space-y-4 md:space-y-5">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary/10 text-secondary-foreground rounded-full text-sm font-semibold border border-secondary/20">
-              <Users className="w-4 h-4 text-secondary" aria-hidden="true" />
-              <span><strong className="text-foreground">250 000+</strong> zadowolonych pacjentów</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft">
+              <Users className="w-4 h-4" aria-hidden="true" />
+              <span><strong>250 000+</strong> zadowolonych pacjentów</span>
             </div>
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">

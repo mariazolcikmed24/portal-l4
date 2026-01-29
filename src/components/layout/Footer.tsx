@@ -104,34 +104,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Schema.org Organization markup */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "MedicalOrganization",
-          "name": "e-zwolnienie - Zwolnienia Lekarskie Online",
-          "description": "Profesjonalna platforma medyczna oferująca zwolnienia lekarskie online. Konsultacje z licencjonowanymi lekarzami, legalne e-zwolnienia zgodne z przepisami ZUS.",
-          "url": "https://e-zwolnienie.com.pl/",
-          "logo": "https://e-zwolnienie.com.pl/logo.png",
-          "telephone": "+48123456789",
-          "email": "kontakt@e-zwolnienie.com.pl",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "ul. Medyczna 1",
-            "addressLocality": "Warszawa",
-            "postalCode": "00-000",
-            "addressCountry": "PL"
-          },
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+48123456789",
-            "contactType": "customer service",
-            "availableLanguage": "pl",
-            "areaServed": "PL"
-          },
-          "medicalSpecialty": "Telemedycyna"
-        })}
-      </script>
+      {/* Schema.org markup moved to index.html <head> for early loading */}
     </footer>
   );
 };

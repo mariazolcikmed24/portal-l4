@@ -58,7 +58,7 @@ const leaveTypeSchema = z.discriminatedUnion("leave_type", [
   }),
   z.object({
     leave_type: z.literal("care_family"),
-    care_family_nip: z.string().refine(validateNIP, "Nieprawidłowy NIP"),
+    care_family_nips: z.array(z.string().refine(validateNIP, "Nieprawidłowy NIP")).min(1, "Wymagany co najmniej jeden NIP"),
     care_family_first_name: z.string().min(1, "Imię jest wymagane").max(50),
     care_family_last_name: z.string().min(1, "Nazwisko jest wymagane").max(50),
     care_family_pesel: z.string().refine(validatePESEL, "Nieprawidłowy PESEL"),
@@ -71,6 +71,7 @@ export default function RodzajZwolnienia() {
   const navigate = useNavigate();
   const [employerNips, setEmployerNips] = useState<string[]>([""]);
   const [careNips, setCareNips] = useState<string[]>([""]);
+  const [careFamilyNips, setCareFamilyNips] = useState<string[]>([""]);
   const [showStudentDialog, setShowStudentDialog] = useState(false);
   
   const form = useForm<LeaveTypeFormData>({
@@ -89,12 +90,14 @@ export default function RodzajZwolnienia() {
     if (savedData) {
       const parsed = JSON.parse(savedData);
       form.reset(parsed);
-      if (parsed.nips && parsed.nips.length > 0) {
-        if (parsed.leave_type === "pl_employer") {
-          setEmployerNips(parsed.nips);
-        } else if (parsed.leave_type === "pl_care") {
-          setCareNips(parsed.nips);
-        }
+      if (parsed.leave_type === "pl_employer" && parsed.nips && parsed.nips.length > 0) {
+        setEmployerNips(parsed.nips);
+      }
+      if (parsed.leave_type === "care" && parsed.care_nips && parsed.care_nips.length > 0) {
+        setCareNips(parsed.care_nips);
+      }
+      if (parsed.leave_type === "care_family" && parsed.care_family_nips && parsed.care_family_nips.length > 0) {
+        setCareFamilyNips(parsed.care_family_nips);
       }
     }
   }, []);
@@ -145,6 +148,23 @@ export default function RodzajZwolnienia() {
     newNips[index] = value;
   setCareNips(newNips);
   form.setValue("care_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
+  };
+
+  const addCareFamilyNip = () => {
+    setCareFamilyNips([...careFamilyNips, ""]);
+  };
+
+  const removeCareFamilyNip = (index: number) => {
+    const newNips = careFamilyNips.filter((_, i) => i !== index);
+    setCareFamilyNips(newNips);
+    form.setValue("care_family_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
+  };
+
+  const updateCareFamilyNip = (index: number, value: string) => {
+    const newNips = [...careFamilyNips];
+    newNips[index] = value;
+    setCareFamilyNips(newNips);
+    form.setValue("care_family_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
   };
 
   return (
@@ -408,8 +428,8 @@ export default function RodzajZwolnienia() {
               <div className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="care_family_nip"
-                  render={({ field }) => (
+                  name="care_family_nips"
+                  render={() => (
                     <FormItem>
                       <div className="flex items-center gap-1">
                         <FormLabel>NIP pracodawcy *</FormLabel>
@@ -424,9 +444,38 @@ export default function RodzajZwolnienia() {
                           </Tooltip>
                         </TooltipProvider>
                       </div>
-                      <FormControl>
-                        <Input placeholder="0000000000" maxLength={10} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
-                      </FormControl>
+                      <div className="space-y-2">
+                        {careFamilyNips.map((nip, index) => (
+                          <div key={index} className="flex gap-2">
+                            <Input
+                              placeholder="0000000000"
+                              maxLength={10}
+                              value={nip}
+                              onChange={(e) => updateCareFamilyNip(index, e.target.value.replace(/\D/g, ''))}
+                            />
+                            {careFamilyNips.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => removeCareFamilyNip(index)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addCareFamilyNip}
+                        className="mt-2"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Dodaj kolejnego pracodawcę
+                      </Button>
                       <FormMessage />
                     </FormItem>
                   )}

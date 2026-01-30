@@ -3,7 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, HelpCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -203,7 +204,19 @@ export default function RodzajZwolnienia() {
 
             {leaveType === "pl_employer" && (
               <div className="space-y-4">
-                <Label>NIP pracodawcy *</Label>
+                <div className="flex items-center gap-1">
+                  <Label>NIP pracodawcy *</Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground">
+                        <HelpCircle className="h-4 w-4" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p>Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 {employerNips.map((nip, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
@@ -291,7 +304,19 @@ export default function RodzajZwolnienia() {
             {leaveType === "care" && (
               <>
                 <div className="space-y-4">
-                  <Label>NIP pracodawcy *</Label>
+                  <div className="flex items-center gap-1">
+                    <Label>NIP pracodawcy *</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground">
+                          <HelpCircle className="h-4 w-4" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   {careNips.map((nip, index) => (
                     <div key={index} className="flex gap-2">
                       <Input
@@ -386,7 +411,19 @@ export default function RodzajZwolnienia() {
                   name="care_family_nip"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>NIP pracodawcy *</FormLabel>
+                      <div className="flex items-center gap-1">
+                        <FormLabel>NIP pracodawcy *</FormLabel>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground">
+                              <HelpCircle className="h-4 w-4" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p>Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <FormControl>
                         <Input placeholder="0000000000" maxLength={10} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
                       </FormControl>

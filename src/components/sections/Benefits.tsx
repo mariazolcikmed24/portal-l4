@@ -109,7 +109,7 @@ const Benefits = () => {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span>Akceptacja ZUS</span>
+                <span>Bezpieczne i poufne</span>
               </div>
             </div>
           </div>

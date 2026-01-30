@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Baby } from "lucide-react";
+import { Baby, User } from "lucide-react";
 
 export default function Podsumowanie() {
   const navigate = useNavigate();
@@ -276,7 +276,7 @@ export default function Podsumowanie() {
             <Card className="border-primary/30 bg-primary/5">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Baby className="h-5 w-5 text-primary" />
+                  {isChildCare ? <Baby className="h-5 w-5 text-primary" /> : <User className="h-5 w-5 text-primary" />}
                   {isChildCare ? "Dane dziecka" : "Dane osoby chorej"}
                 </CardTitle>
               </CardHeader>

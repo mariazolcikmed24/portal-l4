@@ -105,7 +105,7 @@ const Benefits = () => {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />
-                <span>Szyfrowanie SSL</span>
+                <span>Legalnie i zgodnie z przepisami</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-secondary" aria-hidden="true" />

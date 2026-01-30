@@ -12,10 +12,10 @@ const Hero = () => {
     // Set random number on mount
     setDoctorsOnline(Math.floor(Math.random() * 7) + 7); // 7-13
     
-    // Update doctors count every 30 seconds
+    // Update doctors count every 5 minutes
     const doctorsInterval = setInterval(() => {
       setDoctorsOnline(Math.floor(Math.random() * 7) + 7);
-    }, 30000);
+    }, 300000);
     
     // Auto-rotate badges on mobile every 3 seconds
     const badgeInterval = setInterval(() => {

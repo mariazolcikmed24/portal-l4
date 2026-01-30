@@ -39,7 +39,7 @@ const Contact = () => {
                     <a href="tel:+48123456789" className="text-primary hover:underline">
                       +48 123 456 789
                     </a>
-                    <p className="text-sm text-muted-foreground">Pon-Pt: 8:00 - 20:00</p>
+                    <p className="text-sm text-muted-foreground">Pon-Pt: 9:00 - 17:00</p>
                   </div>
                 </div>
 

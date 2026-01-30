@@ -89,14 +89,22 @@ export default function RodzajZwolnienia() {
     const savedData = localStorage.getItem('formData_rodzajZwolnienia');
     if (savedData) {
       const parsed = JSON.parse(savedData);
+      
+      // Migrate old care_family_nip (string) to care_family_nips (array)
+      if (parsed.leave_type === "care_family" && parsed.care_family_nip && !parsed.care_family_nips) {
+        parsed.care_family_nips = [parsed.care_family_nip];
+        delete parsed.care_family_nip;
+      }
+      
       form.reset(parsed);
-      if (parsed.leave_type === "pl_employer" && parsed.nips && parsed.nips.length > 0) {
+      
+      if (parsed.leave_type === "pl_employer" && Array.isArray(parsed.nips) && parsed.nips.length > 0) {
         setEmployerNips(parsed.nips);
       }
-      if (parsed.leave_type === "care" && parsed.care_nips && parsed.care_nips.length > 0) {
+      if (parsed.leave_type === "care" && Array.isArray(parsed.care_nips) && parsed.care_nips.length > 0) {
         setCareNips(parsed.care_nips);
       }
-      if (parsed.leave_type === "care_family" && parsed.care_family_nips && parsed.care_family_nips.length > 0) {
+      if (parsed.leave_type === "care_family" && Array.isArray(parsed.care_family_nips) && parsed.care_family_nips.length > 0) {
         setCareFamilyNips(parsed.care_family_nips);
       }
     }

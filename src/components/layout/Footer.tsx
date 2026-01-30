@@ -9,8 +9,8 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8 md:gap-12 mb-8">
           {/* Logo & Description */}
           <div className="md:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <span className="text-xl font-bold">e-<span className="text-primary">zwolnienie</span></span>
+            <Link to="/" className="flex items-center mb-4 transition-smooth hover:opacity-80">
+              <span className="text-xl font-bold">e-<span className="text-primary">zwolnienie</span>.com.pl</span>
             </Link>
             <p className="text-sm text-gray-300 leading-relaxed">
               Profesjonalne zwolnienia lekarskie online. Szybko, bezpiecznie i zgodnie z prawem.

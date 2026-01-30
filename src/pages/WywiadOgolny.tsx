@@ -187,8 +187,10 @@ export default function WywiadOgolny() {
   };
 
   // Helper function to get subject text based on leave type
-  const getSubjectText = (forCare: string, forSelf: string) => {
-    return isCareLeave ? forCare : forSelf;
+  const getSubjectText = (forChildCare: string, forFamilyCare: string, forSelf: string) => {
+    if (isChildCare) return forChildCare;
+    if (isCareLeave) return forFamilyCare;
+    return forSelf;
   };
 
   return (
@@ -339,6 +341,7 @@ export default function WywiadOgolny() {
                       <FormLabel>
                         {getSubjectText(
                           `Czy ${patientName} cierpi na choroby przewlekłe? *`,
+                          `Czy ${patientName} cierpi na choroby przewlekłe? *`,
                           "Czy cierpisz na choroby przewlekłe? *"
                         )}
                       </FormLabel>
@@ -433,6 +436,7 @@ export default function WywiadOgolny() {
                       <FormLabel>
                         {getSubjectText(
                           `Czy ${patientName} ma jakieś alergie? *`,
+                          `Czy ${patientName} ma jakieś alergie? *`,
                           "Czy masz jakieś alergie? *"
                         )}
                       </FormLabel>
@@ -460,7 +464,7 @@ export default function WywiadOgolny() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          {getSubjectText("Wymień alergie dziecka *", "Wymień alergie *")}
+                          {getSubjectText("Wymień alergie dziecka *", "Wymień alergie *", "Wymień alergie *")}
                         </FormLabel>
                         <FormControl>
                           <Textarea placeholder="Np. pyłki, orzechy, penicylina..." maxLength={500} {...field} />
@@ -487,6 +491,7 @@ export default function WywiadOgolny() {
                     <FormItem>
                       <FormLabel>
                         {getSubjectText(
+                          `Czy ${patientName} bierze jakieś leki na stałe? *`,
                           `Czy ${patientName} bierze jakieś leki na stałe? *`,
                           "Czy bierzesz jakieś leki na stałe? *"
                         )}
@@ -515,7 +520,7 @@ export default function WywiadOgolny() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          {getSubjectText("Podaj leki przyjmowane przez dziecko *", "Podaj listę leków *")}
+                          {getSubjectText("Podaj leki przyjmowane przez dziecko *", "Podaj leki przyjmowane przez podopiecznego *", "Podaj listę leków *")}
                         </FormLabel>
                         <FormControl>
                           <Textarea placeholder="Nazwa leku, dawka, częstotliwość przyjmowania..." maxLength={500} {...field} />

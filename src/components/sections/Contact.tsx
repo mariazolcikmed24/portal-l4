@@ -58,13 +58,6 @@ const Contact = () => {
                 </div>
               </div>
             </div>
-
-            <div className="bg-secondary/10 p-6 rounded-xl border border-secondary/20">
-              <p className="text-sm text-foreground">
-                <strong>Godziny konsultacji medycznych:</strong><br />
-                Jesteśmy dostępni 24/7, aby zapewnić Ci pomoc w każdej chwili.
-              </p>
-            </div>
           </div>
         </div>
       </div>

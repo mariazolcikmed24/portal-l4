@@ -164,8 +164,8 @@ serve(async (req) => {
 
     // Leave dates
     drawSection('OKRES ZWOLNIENIA');
-    drawText(`Data rozpoczecia: ${formatDate(caseData.illness_start)}`);
-    drawText(`Data zakonczenia: ${formatDate(caseData.illness_end)}`);
+    drawText(`Zwolnienie od dnia: ${formatDate(caseData.illness_start)}`);
+    drawText(`Zwolnienie do dnia: ${formatDate(caseData.illness_end)}`);
     if (caseData.late_justification) {
       drawText(`Uzasadnienie poznego zgloszenia: ${caseData.late_justification}`);
     }

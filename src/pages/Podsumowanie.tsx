@@ -303,7 +303,7 @@ export default function Podsumowanie() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Data rozpoczęcia:</span>
+                <span className="text-muted-foreground">Zwolnienie od dnia:</span>
                 <span className="font-medium">
                   {formData.datyChoroby?.illness_start 
                     ? format(new Date(formData.datyChoroby.illness_start), 'dd.MM.yyyy', { locale: pl })
@@ -311,7 +311,7 @@ export default function Podsumowanie() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Data zakończenia:</span>
+                <span className="text-muted-foreground">Zwolnienie do dnia:</span>
                 <span className="font-medium">
                   {formData.datyChoroby?.illness_end 
                     ? format(new Date(formData.datyChoroby.illness_end), 'dd.MM.yyyy', { locale: pl })

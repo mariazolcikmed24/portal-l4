@@ -1,4 +1,3 @@
-import { Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -11,9 +10,6 @@ const Footer = () => {
           {/* Logo & Description */}
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 gradient-hero rounded-lg flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" aria-hidden="true" />
-              </div>
               <span className="text-xl font-bold">e-<span className="text-primary">zwolnienie</span></span>
             </Link>
             <p className="text-sm text-gray-300 leading-relaxed">

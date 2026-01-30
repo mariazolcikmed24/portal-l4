@@ -469,12 +469,11 @@ export default function RodzajZwolnienia() {
                       <Button
                         type="button"
                         variant="outline"
-                        size="sm"
                         onClick={addCareFamilyNip}
-                        className="mt-2"
+                        className="w-full"
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Dodaj kolejnego pracodawcę
+                        Dodaj pracodawcę
                       </Button>
                       <FormMessage />
                     </FormItem>

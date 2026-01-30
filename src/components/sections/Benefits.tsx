@@ -101,7 +101,9 @@ const Benefits = () => {
         {/* Trust section */}
         <div className="mt-12 md:mt-16 bg-white p-8 md:p-12 rounded-2xl shadow-medium max-w-4xl mx-auto border-2 border-primary/20">
           <div className="text-center">
-            <Shield className="w-16 h-16 text-primary mx-auto mb-6" aria-hidden="true" />
+            <div className="mb-6">
+              <span className="text-2xl md:text-3xl font-bold">e-<span className="text-primary">zwolnienie</span>.com.pl</span>
+            </div>
             <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               Gwarancja bezpieczeństwa i legalności
             </h3>

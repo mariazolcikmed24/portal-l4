@@ -385,7 +385,21 @@ serve(async (req) => {
         'suicidal_thoughts': 'Mysli samobojcze',
       };
       const symptomsList = caseData.symptoms.map((s: string) => symptomLabels[s] || s).join(', ');
-      drawText(`Objawy: ${symptomsList}`);
+      // Wrap symptoms text across multiple lines
+      const symptomsFullText = `Objawy: ${symptomsList}`;
+      const maxChars = 80;
+      let symptomsRemaining = symptomsFullText;
+      while (symptomsRemaining.length > 0) {
+        if (symptomsRemaining.length <= maxChars) {
+          drawText(symptomsRemaining);
+          break;
+        }
+        let splitPos = symptomsRemaining.lastIndexOf(', ', maxChars);
+        if (splitPos === -1) splitPos = symptomsRemaining.lastIndexOf(' ', maxChars);
+        if (splitPos === -1) splitPos = maxChars;
+        drawText(symptomsRemaining.substring(0, splitPos + 1));
+        symptomsRemaining = symptomsRemaining.substring(splitPos + 1).trim();
+      }
     }
 
     // Free text description

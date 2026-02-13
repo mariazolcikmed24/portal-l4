@@ -20,6 +20,11 @@ interface Med24BookVisitPatientSchema {
   city?: string | null;
 }
 
+interface Med24ConsentSchema {
+  kind: "marketing_l4_portal_email" | "marketing_l4_portal_phone";
+  is_given: boolean;
+}
+
 interface Med24BookVisitUrgentSchema {
   channel_kind: "video_call" | "text_message" | "phone_call";
   service_id?: string | null;
@@ -27,6 +32,7 @@ interface Med24BookVisitUrgentSchema {
   external_tag?: string | null;
   booking_intent: "reserve" | "finalize";
   queue: "urgent";
+  consents?: Med24ConsentSchema[];
 }
 
 interface CreateVisitRequest {
@@ -111,6 +117,12 @@ serve(async (req) => {
       city: profile.city || null,
     };
 
+    // Build marketing consents from profile
+    const consents: Med24ConsentSchema[] = [
+      { kind: "marketing_l4_portal_email", is_given: profile.consent_marketing_email ?? false },
+      { kind: "marketing_l4_portal_phone", is_given: profile.consent_marketing_tel ?? false },
+    ];
+
     // Create Med24 visit payload
     const visitPayload: Med24BookVisitUrgentSchema = {
       channel_kind,
@@ -118,6 +130,7 @@ serve(async (req) => {
       patient,
       booking_intent,
       queue: "urgent",
+      consents,
     };
 
     console.log('Sending request to Med24 API:', JSON.stringify(visitPayload, null, 2));

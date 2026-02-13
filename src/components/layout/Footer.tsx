@@ -83,11 +83,6 @@ const Footer = () => {
               <li>ul. Berezyńska 39</li>
               <li>03-908 Warszawa</li>
             </ul>
-            <div className="mt-4 pt-4 border-t border-gray-700">
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Podmiot leczniczy wpisany do Rejestru podmiotów wykonujących działalność leczniczą pod numerem: 000000234071
-              </p>
-            </div>
           </div>
         </div>
 
@@ -97,6 +92,9 @@ const Footer = () => {
             <p>&copy; {currentYear} e-zwolnienie. Wszelkie prawa zastrzeżone.</p>
             <p>Zwolnienia lekarskie online zgodne z przepisami ZUS</p>
           </div>
+          <p className="text-xs text-gray-500 text-center mt-4">
+            Podmiot leczniczy wpisany do Rejestru podmiotów wykonujących działalność leczniczą pod numerem: 000000234071
+          </p>
         </div>
       </div>
 

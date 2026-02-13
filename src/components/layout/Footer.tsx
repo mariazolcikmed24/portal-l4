@@ -12,9 +12,9 @@ const Footer = () => {
             <Link to="/" className="flex items-center mb-4 transition-smooth hover:opacity-80">
               <span className="text-xl font-bold">e-<span className="text-primary">zwolnienie</span>.com.pl</span>
             </Link>
-            <p className="text-sm text-gray-300 leading-relaxed">
-              Profesjonalne zwolnienia lekarskie online. Szybko, bezpiecznie i zgodnie z prawem.
-            </p>
+            
+
+
             <p className="text-xs text-gray-500 leading-relaxed mt-4">
               Podmiot leczniczy wpisany do Rejestru podmiotów wykonujących działalność leczniczą pod numerem: 000000234071
             </p>
@@ -99,8 +99,8 @@ const Footer = () => {
       </div>
 
       {/* Schema.org markup moved to index.html <head> for early loading */}
-    </footer>
-  );
+    </footer>);
+
 };
 
 export default Footer;

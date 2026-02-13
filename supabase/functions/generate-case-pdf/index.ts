@@ -130,11 +130,13 @@ serve(async (req) => {
 
     const getRecipientLabel = (type: string) => {
       const labels: Record<string, string> = {
-        'pl_employer': 'Polski pracodawca',
-        'uniformed': 'Sluzby mundurowe',
-        'student': 'Student/Uczen',
-        'foreign_employer': 'Pracodawca zagraniczny',
+        'pl_employer': 'Zwolnienie dla ubezpieczonych w ZUS',
         'care': 'Zwolnienie na dziecko',
+        'student': 'Student/Uczen',
+        'care_family': 'Opieka nad czlonkiem rodziny',
+        'krus': 'Ubezpieczeni w KRUS',
+        'uniformed': 'Sluzby mundurowe/Studenci sluzb mundurowych',
+        'foreign_employer': 'Pracodawca zagraniczny',
       };
       return labels[type] || type;
     };

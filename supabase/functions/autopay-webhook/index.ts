@@ -500,6 +500,10 @@ async function createMed24Visit(supabase: any, caseId: string) {
       },
       booking_intent: "finalize",
       queue: "urgent",
+      consents: [
+        { kind: "marketing_l4_portal_email", is_given: profile.consent_marketing_email ?? false },
+        { kind: "marketing_l4_portal_phone", is_given: profile.consent_marketing_tel ?? false },
+      ],
     };
 
     console.log("Creating Med24 visit:", JSON.stringify(visitPayload, null, 2));

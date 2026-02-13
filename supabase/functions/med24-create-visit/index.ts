@@ -67,7 +67,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Parse request body
-    const { case_id, channel_kind = "phone_call", booking_intent = "finalize" }: CreateVisitRequest = await req.json();
+    const { case_id, channel_kind = "phone_call", booking_intent = "finalize", skip_consents = false } = await req.json();
 
     if (!case_id) {
       return new Response(
@@ -130,8 +130,10 @@ serve(async (req) => {
       patient,
       booking_intent,
       queue: "urgent",
-      consents,
+      ...(skip_consents ? {} : { consents }),
     };
+
+    console.log('skip_consents:', skip_consents);
 
     console.log('Sending request to Med24 API:', JSON.stringify(visitPayload, null, 2));
 

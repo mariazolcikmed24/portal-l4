@@ -439,6 +439,7 @@ serve(async (req) => {
       .from('case-attachments')
       .upload(filePath, pdfBytes, {
         contentType: 'application/pdf',
+        upsert: true,
       });
 
     if (uploadError) {

@@ -86,15 +86,16 @@ const Footer = () => {
           </div>
         </div>
 
+        <p className="text-xs text-gray-500 text-center mb-8">
+          Podmiot leczniczy wpisany do Rejestru podmiotów wykonujących działalność leczniczą pod numerem: 000000234071
+        </p>
+
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
             <p>&copy; {currentYear} e-zwolnienie. Wszelkie prawa zastrzeżone.</p>
             <p>Zwolnienia lekarskie online zgodne z przepisami ZUS</p>
           </div>
-          <p className="text-xs text-gray-500 text-center mt-4">
-            Podmiot leczniczy wpisany do Rejestru podmiotów wykonujących działalność leczniczą pod numerem: 000000234071
-          </p>
         </div>
       </div>
 

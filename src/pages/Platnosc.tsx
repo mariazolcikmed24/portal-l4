@@ -64,7 +64,19 @@ export default function Platnosc() {
       const recipient_type = rodzajZwolnienia.leave_type === 'pl_employer' ? 'pl_employer' : 
                             rodzajZwolnienia.leave_type === 'foreign_employer' ? 'foreign_employer' :
                             rodzajZwolnienia.leave_type === 'uniformed' ? 'uniformed' :
-                            rodzajZwolnienia.leave_type === 'care' ? 'care' : 'student';
+                            rodzajZwolnienia.leave_type === 'care' ? 'care' :
+                            rodzajZwolnienia.leave_type === 'care_family' ? 'care' :
+                            rodzajZwolnienia.leave_type === 'krus' ? 'krus' : 'student';
+
+      // Build employers array from NIPs
+      const employers: { nip: string }[] = [];
+      if (rodzajZwolnienia.leave_type === 'pl_employer' && Array.isArray(rodzajZwolnienia.nips)) {
+        rodzajZwolnienia.nips.forEach((nip: string) => employers.push({ nip }));
+      } else if (rodzajZwolnienia.leave_type === 'care' && Array.isArray(rodzajZwolnienia.care_nips)) {
+        rodzajZwolnienia.care_nips.forEach((nip: string) => employers.push({ nip }));
+      } else if (rodzajZwolnienia.leave_type === 'care_family' && Array.isArray(rodzajZwolnienia.care_family_nips)) {
+        rodzajZwolnienia.care_family_nips.forEach((nip: string) => employers.push({ nip }));
+      }
 
       const { data: createCaseRes, error: createCaseErr } = await supabase.functions.invoke('create-case-for-payment', {
         body: {
@@ -87,6 +99,12 @@ export default function Platnosc() {
           free_text_reason: wywiadObjawy.free_text_reason,
           attachment_file_ids: attachmentPaths,
           late_justification: datyChoroby.late_justification,
+          employers,
+          uniformed_service_name: rodzajZwolnienia.uniformed_service_name || null,
+          uniformed_nip: rodzajZwolnienia.uniformed_nip || null,
+          care_first_name: rodzajZwolnienia.care_first_name || rodzajZwolnienia.care_family_first_name || null,
+          care_last_name: rodzajZwolnienia.care_last_name || rodzajZwolnienia.care_family_last_name || null,
+          care_pesel: rodzajZwolnienia.care_pesel || rodzajZwolnienia.care_family_pesel || null,
         }
       });
 

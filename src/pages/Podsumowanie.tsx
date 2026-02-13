@@ -411,12 +411,60 @@ export default function Podsumowanie() {
             <CardHeader>
               <CardTitle>Typ zwolnienia</CardTitle>
             </CardHeader>
-            <CardContent>
-              <span className="font-medium">
-                {formData.rodzajZwolnienia?.leave_type 
-                  ? getLeaveTypeLabel(formData.rodzajZwolnienia.leave_type)
-                  : '-'}
-              </span>
+            <CardContent className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Typ:</span>
+                <span className="font-medium">
+                  {formData.rodzajZwolnienia?.leave_type 
+                    ? getLeaveTypeLabel(formData.rodzajZwolnienia.leave_type)
+                    : '-'}
+                </span>
+              </div>
+              {/* NIP pracodawcy - pl_employer */}
+              {formData.rodzajZwolnienia?.leave_type === 'pl_employer' && formData.rodzajZwolnienia?.nips?.length > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">NIP pracodawcy:</span>
+                  <span className="font-medium">{formData.rodzajZwolnienia.nips.join(', ')}</span>
+                </div>
+              )}
+              {/* NIP - care */}
+              {formData.rodzajZwolnienia?.leave_type === 'care' && formData.rodzajZwolnienia?.care_nips?.length > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">NIP pracodawcy:</span>
+                  <span className="font-medium">{formData.rodzajZwolnienia.care_nips.join(', ')}</span>
+                </div>
+              )}
+              {/* NIP - care_family */}
+              {formData.rodzajZwolnienia?.leave_type === 'care_family' && formData.rodzajZwolnienia?.care_family_nips?.length > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">NIP pracodawcy:</span>
+                  <span className="font-medium">{formData.rodzajZwolnienia.care_family_nips.join(', ')}</span>
+                </div>
+              )}
+              {/* Służby mundurowe */}
+              {formData.rodzajZwolnienia?.leave_type === 'uniformed' && (
+                <>
+                  {formData.rodzajZwolnienia?.uniformed_service_name && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Formacja:</span>
+                      <span className="font-medium">{formData.rodzajZwolnienia.uniformed_service_name}</span>
+                    </div>
+                  )}
+                  {formData.rodzajZwolnienia?.uniformed_nip && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">NIP:</span>
+                      <span className="font-medium">{formData.rodzajZwolnienia.uniformed_nip}</span>
+                    </div>
+                  )}
+                </>
+              )}
+              {/* KRUS */}
+              {formData.rodzajZwolnienia?.leave_type === 'krus' && formData.rodzajZwolnienia?.krus_number && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Numer KRUS:</span>
+                  <span className="font-medium">{formData.rodzajZwolnienia.krus_number}</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -89,13 +89,13 @@ export default function Podsumowanie() {
 
   const getLeaveTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
-      'pl_employer': 'Polski pracodawca',
-      'uniformed': 'Służby mundurowe',
+      'pl_employer': 'Zwolnienie dla ubezpieczonych w ZUS',
+      'care': 'Zwolnienie na dziecko',
       'student': 'Student/Uczeń',
-      'foreign_employer': 'Pracodawca zagraniczny',
-      'care': 'Zwolnienie na opiekę nad dzieckiem',
       'care_family': 'Opieka nad członkiem rodziny',
-      'krus': 'Ubezpieczeni w KRUS'
+      'krus': 'Ubezpieczeni w KRUS',
+      'uniformed': 'Służby mundurowe/Studenci służb mundurowych',
+      'foreign_employer': 'Pracodawca zagraniczny',
     };
     return labels[type] || type;
   };

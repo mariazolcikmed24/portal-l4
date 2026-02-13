@@ -83,14 +83,6 @@ const Footer = () => {
               <li>ul. Berezyńska 39</li>
               <li>03-908 Warszawa</li>
             </ul>
-            <div className="mt-4 pt-4 border-t border-gray-700">
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Med24 Holding sp. z o.o.<br />
-                KRS: 0000875629<br />
-                NIP: 5252847595<br />
-                REGON: 387834113
-              </p>
-            </div>
           </div>
         </div>
 

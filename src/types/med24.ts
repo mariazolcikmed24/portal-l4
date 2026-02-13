@@ -19,6 +19,13 @@ export interface Med24BookVisitPatientSchema {
   city?: string | null;
 }
 
+export type Med24ConsentKind = "marketing_l4_portal_email" | "marketing_l4_portal_phone";
+
+export interface Med24ConsentSchema {
+  kind: Med24ConsentKind;
+  is_given: boolean;
+}
+
 export interface Med24BookVisitUrgentSchema {
   channel_kind: Med24ChannelKind;
   service_id?: string | null; // UUID
@@ -26,6 +33,7 @@ export interface Med24BookVisitUrgentSchema {
   external_tag?: string | null;
   booking_intent: Med24BookingIntent;
   queue: "urgent"; // Always "urgent" for urgent visits
+  consents?: Med24ConsentSchema[];
 }
 
 export interface Med24VisitStatusSchema {
@@ -91,8 +99,15 @@ export function createUrgentVisitPayload(
     serviceId?: string;
     externalTag?: string;
     bookingIntent?: Med24BookingIntent;
+    consentMarketingEmail?: boolean;
+    consentMarketingPhone?: boolean;
   } = {}
 ): Med24BookVisitUrgentSchema {
+  const consents: Med24ConsentSchema[] = [
+    { kind: "marketing_l4_portal_email", is_given: options.consentMarketingEmail ?? false },
+    { kind: "marketing_l4_portal_phone", is_given: options.consentMarketingPhone ?? false },
+  ];
+
   return {
     channel_kind: options.channelKind || "text_message",
     service_id: options.serviceId || null,
@@ -100,5 +115,6 @@ export function createUrgentVisitPayload(
     external_tag: options.externalTag || null,
     booking_intent: options.bookingIntent || "finalize",
     queue: "urgent",
+    consents,
   };
 }

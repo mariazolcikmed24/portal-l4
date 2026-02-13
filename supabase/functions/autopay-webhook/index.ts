@@ -518,8 +518,20 @@ async function createMed24Visit(supabase: any, caseId: string) {
       body: JSON.stringify(visitPayload),
     });
 
-    const med24Data = await med24Response.json();
-    console.log("Med24 API response:", med24Response.status, JSON.stringify(med24Data, null, 2));
+    const med24ResponseText = await med24Response.text();
+    console.log("Med24 API response status:", med24Response.status);
+    console.log("Med24 API response content-type:", med24Response.headers.get("content-type"));
+
+    let med24Data: any;
+    try {
+      med24Data = JSON.parse(med24ResponseText);
+    } catch {
+      console.error("Med24 API returned non-JSON response:", med24ResponseText.substring(0, 500));
+      console.error("This likely indicates a Med24 server error (502/503) or wrong endpoint URL:", med24ApiUrl);
+      return;
+    }
+
+    console.log("Med24 API parsed response:", JSON.stringify(med24Data, null, 2));
 
     if (med24Response.ok) {
       // Update case with Med24 visit data

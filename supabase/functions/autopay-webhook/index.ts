@@ -509,31 +509,64 @@ async function createMed24Visit(supabase: any, caseId: string) {
     console.log("Creating Med24 visit:", JSON.stringify(visitPayload, null, 2));
 
     const basicAuth = btoa(`${med24Username}:${med24Password}`);
-    const med24Response = await fetch(`${med24ApiUrl}/api/v2/external/visit`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${basicAuth}`,
-      },
-      body: JSON.stringify(visitPayload),
-    });
+    const maxRetries = 3;
+    const retryDelayMs = 5000;
+    let med24Data: any = null;
+    let med24ResponseOk = false;
 
-    const med24ResponseText = await med24Response.text();
-    console.log("Med24 API response status:", med24Response.status);
-    console.log("Med24 API response content-type:", med24Response.headers.get("content-type"));
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Med24 API attempt ${attempt}/${maxRetries}`);
+        const med24Response = await fetch(`${med24ApiUrl}/api/v2/external/visit`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${basicAuth}`,
+          },
+          body: JSON.stringify(visitPayload),
+        });
 
-    let med24Data: any;
-    try {
-      med24Data = JSON.parse(med24ResponseText);
-    } catch {
-      console.error("Med24 API returned non-JSON response:", med24ResponseText.substring(0, 500));
-      console.error("This likely indicates a Med24 server error (502/503) or wrong endpoint URL:", med24ApiUrl);
-      return;
+        const med24ResponseText = await med24Response.text();
+        console.log("Med24 API response status:", med24Response.status);
+        console.log("Med24 API response content-type:", med24Response.headers.get("content-type"));
+
+        try {
+          med24Data = JSON.parse(med24ResponseText);
+        } catch {
+          console.error(`Med24 API returned non-JSON response (attempt ${attempt}):`, med24ResponseText.substring(0, 500));
+          if (attempt < maxRetries) {
+            console.log(`Retrying in ${retryDelayMs / 1000}s...`);
+            await new Promise((r) => setTimeout(r, retryDelayMs));
+            continue;
+          }
+          console.error("All retry attempts exhausted. Med24 endpoint:", med24ApiUrl);
+          return;
+        }
+
+        // If server error (5xx), retry
+        if (med24Response.status >= 500 && attempt < maxRetries) {
+          console.error(`Med24 API server error ${med24Response.status} (attempt ${attempt}):`, JSON.stringify(med24Data));
+          console.log(`Retrying in ${retryDelayMs / 1000}s...`);
+          await new Promise((r) => setTimeout(r, retryDelayMs));
+          continue;
+        }
+
+        med24ResponseOk = med24Response.ok;
+        console.log("Med24 API parsed response:", JSON.stringify(med24Data, null, 2));
+        break; // Success or non-retryable error
+      } catch (fetchError) {
+        console.error(`Med24 API fetch error (attempt ${attempt}):`, fetchError);
+        if (attempt < maxRetries) {
+          console.log(`Retrying in ${retryDelayMs / 1000}s...`);
+          await new Promise((r) => setTimeout(r, retryDelayMs));
+          continue;
+        }
+        console.error("All retry attempts exhausted due to network errors");
+        return;
+      }
     }
 
-    console.log("Med24 API parsed response:", JSON.stringify(med24Data, null, 2));
-
-    if (med24Response.ok) {
+    if (med24ResponseOk && med24Data) {
       // Update case with Med24 visit data
       await supabase
         .from("cases")

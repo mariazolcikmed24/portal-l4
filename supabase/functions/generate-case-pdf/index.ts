@@ -175,6 +175,24 @@ serve(async (req) => {
     // Leave type
     drawSection('TYP ZWOLNIENIA');
     drawText(`Odbiorca: ${getRecipientLabel(caseData.recipient_type)}`);
+    
+    // Show employer NIPs
+    if (caseData.employers && Array.isArray(caseData.employers) && caseData.employers.length > 0) {
+      const nipsList = caseData.employers.map((e: any) => e.nip).filter(Boolean).join(', ');
+      if (nipsList) {
+        drawText(`NIP pracodawcy: ${nipsList}`);
+      }
+    }
+    
+    // Uniformed service details
+    if (caseData.recipient_type === 'uniformed') {
+      if (caseData.uniformed_service_name) {
+        drawText(`Formacja: ${removeDiacritics(caseData.uniformed_service_name)}`);
+      }
+      if (caseData.uniformed_nip) {
+        drawText(`NIP: ${caseData.uniformed_nip}`);
+      }
+    }
 
     // General medical history
     drawSection('WYWIAD OGOLNY');

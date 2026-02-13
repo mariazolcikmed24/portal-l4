@@ -10,7 +10,8 @@ type RecipientType =
   | "uniformed"
   | "student"
   | "foreign_employer"
-  | "care";
+  | "care"
+  | "krus";
 
 interface CreateCaseForPaymentRequest {
   profile_id: string;
@@ -33,6 +34,12 @@ interface CreateCaseForPaymentRequest {
   long_leave?: boolean | null;
   late_justification?: string | null;
   attachment_file_ids?: string[] | null;
+  employers?: { nip: string }[] | null;
+  uniformed_service_name?: string | null;
+  uniformed_nip?: string | null;
+  care_first_name?: string | null;
+  care_last_name?: string | null;
+  care_pesel?: string | null;
 }
 
 function json(status: number, body: unknown) {
@@ -113,6 +120,12 @@ Deno.serve(async (req) => {
         long_leave: body.long_leave ?? null,
         late_justification: body.late_justification ?? null,
         attachment_file_ids: body.attachment_file_ids ?? [],
+        employers: body.employers ?? [],
+        uniformed_service_name: body.uniformed_service_name ?? null,
+        uniformed_nip: body.uniformed_nip ?? null,
+        care_first_name: body.care_first_name ?? null,
+        care_last_name: body.care_last_name ?? null,
+        care_pesel: body.care_pesel ?? null,
         payment_status: "pending",
         status: "draft",
       })

@@ -15,7 +15,7 @@ const Footer = () => {
             
 
 
-            <p className="text-xs text-gray-500 leading-relaxed mt-4">
+            <p className="text-xs text-gray-400 leading-relaxed mt-4">
               Podmiot leczniczy wpisany do Rejestru podmiotów wykonujących działalność leczniczą pod numerem: 000000234071
             </p>
           </div>

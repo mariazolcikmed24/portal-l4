@@ -4,13 +4,14 @@ import { CheckCircle, Clock, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
 type PaymentStatus = "pending" | "success" | "fail" | "verifying" | "error";
 
 export default function Potwierdzenie() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [status, setStatus] = useState<PaymentStatus>("verifying");
   const [caseNumber, setCaseNumber] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -51,10 +52,19 @@ export default function Potwierdzenie() {
         }
 
         setCaseNumber(data.case_number);
-        
+
         // Map payment status
         if (data.payment_status === "success") {
           setStatus("success");
+          pushEvent({
+            event: "purchase",
+            ecommerce: {
+              transaction_id: orderId,
+              value: data.amount,
+              currency: "PLN",
+              items: data.items || [],
+            },
+          });
           clearFormData();
         } else if (data.payment_status === "fail") {
           setStatus("fail");
@@ -111,9 +121,7 @@ export default function Potwierdzenie() {
         <div className="max-w-2xl mx-auto text-center">
           <XCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2">Płatność nieudana</h1>
-          <p className="text-muted-foreground mb-6">
-            Płatność nie została zrealizowana. Możesz spróbować ponownie.
-          </p>
+          <p className="text-muted-foreground mb-6">Płatność nie została zrealizowana. Możesz spróbować ponownie.</p>
           {caseNumber && (
             <p className="text-sm text-muted-foreground mb-4">
               Numer sprawy: <span className="font-mono font-bold">{caseNumber}</span>
@@ -141,9 +149,7 @@ export default function Potwierdzenie() {
           <div className="flex justify-center mb-4">
             <StatusIcon className={`h-16 w-16 ${statusColor}`} />
           </div>
-          <h1 className="text-3xl font-bold mb-2">
-            {isPending ? "Zgłoszenie przyjęte" : "Płatność potwierdzona"}
-          </h1>
+          <h1 className="text-3xl font-bold mb-2">{isPending ? "Zgłoszenie przyjęte" : "Płatność potwierdzona"}</h1>
           <p className="text-muted-foreground">
             {isPending
               ? "Twoje zgłoszenie zostało zarejestrowane. Oczekujemy na potwierdzenie płatności."
@@ -180,7 +186,8 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Weryfikacja danych</h3>
                   <p className="text-sm text-muted-foreground">
-                    Lekarz sprawdzi przesłane przez Ciebie dane i może skontaktować się telefonicznie w celu weryfikacji.
+                    Lekarz sprawdzi przesłane przez Ciebie dane i może skontaktować się telefonicznie w celu
+                    weryfikacji.
                   </p>
                 </div>
               </div>
@@ -192,7 +199,8 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Decyzja lekarza</h3>
                   <p className="text-sm text-muted-foreground">
-                    Na podstawie wywiadu medycznego lekarz podejmie decyzję o wystawieniu e-zwolnienia. Pamiętaj, że e-konsultacja nie gwarantuje wystawienia zwolnienia.
+                    Na podstawie wywiadu medycznego lekarz podejmie decyzję o wystawieniu e-zwolnienia. Pamiętaj, że
+                    e-konsultacja nie gwarantuje wystawienia zwolnienia.
                   </p>
                 </div>
               </div>
@@ -204,7 +212,8 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Wysyłka e-zwolnienia</h3>
                   <p className="text-sm text-muted-foreground">
-                    Jeśli lekarz podejmie pozytywną decyzję, e-zwolnienie zostanie automatycznie wysłane do systemu ZUS i do Twojego pracodawcy.
+                    Jeśli lekarz podejmie pozytywną decyzję, e-zwolnienie zostanie automatycznie wysłane do systemu ZUS
+                    i do Twojego pracodawcy.
                   </p>
                 </div>
               </div>
@@ -228,7 +237,8 @@ export default function Potwierdzenie() {
               <p className="text-sm">
                 <strong>Informacja dla studentów/uczniów:</strong>
                 <br />
-                Po pozytywnej decyzji lekarza otrzymasz dokument PDF na adres e-mail, który możesz pobrać i wykorzystać według potrzeb.
+                Po pozytywnej decyzji lekarza otrzymasz dokument PDF na adres e-mail, który możesz pobrać i wykorzystać
+                według potrzeb.
               </p>
             </CardContent>
           </Card>

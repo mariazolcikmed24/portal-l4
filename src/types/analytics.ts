@@ -89,5 +89,5 @@ export type AnalyticsEvent =
     }
   | {
       event: 'add_payment_info';
-      ecommerce: Ecommerce{}; // tu wstawiasz strukturę ecommerce
+      ecommerce: Ecommerce;
     };

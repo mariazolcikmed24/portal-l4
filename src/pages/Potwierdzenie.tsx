@@ -15,6 +15,7 @@ export default function Potwierdzenie() {
   const [status, setStatus] = useState<PaymentStatus>("verifying");
   const [caseNumber, setCaseNumber] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { pushEvent } = useDataLayer();
 
   useEffect(() => {
     const verifyReturn = async () => {

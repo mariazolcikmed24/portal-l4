@@ -13,6 +13,7 @@ import { useDataLayer } from "@/hooks/useDataLayer";
 export default function Podsumowanie() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { pushEvent } = useDataLayer();
   const [profileData, setProfileData] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
 

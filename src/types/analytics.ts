@@ -8,6 +8,15 @@ export interface EcommerceItem {
   quantity?: number;
 }
 
+export interface Ecommerce {
+  transaction_id?: string;
+  value: number;
+  currency: string;
+  tax?: number;
+  shipping?: number;
+  items: EcommerceItem[];
+}
+
 export type AnalyticsEvent =
   | {
       event: "view_item";
@@ -61,4 +70,24 @@ export type AnalyticsEvent =
       event: "payment_failed";
       error_type: string;
       order_id: string;
+    }
+  | {
+      event: 'form_step_submit';
+      step_name: string;
+      step_number: number;
+      form_name: 'e_zwolnienie';
+      // Parametry biznesowe (opcjonalne, zależne od kroku)
+      leave_type?: string;
+      symptom_category?: string;
+      symptom_duration?: string;
+      has_chronic?: boolean;
+      has_attachments?: boolean;
+    }
+  | {
+      event: 'sign_up';
+      method: string;
+    }
+  | {
+      event: 'add_payment_info';
+      ecommerce: Ecommerce{}; // tu wstawiasz strukturę ecommerce
     };

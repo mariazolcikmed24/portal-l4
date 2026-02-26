@@ -56,4 +56,9 @@ export type AnalyticsEvent =
       event: "custom_interaction";
       label: string;
       category: string;
+    }
+  | {
+      event: "payment_failed";
+      error_type: string;
+      order_id: string;
     };

@@ -12,6 +12,7 @@ export default function Potwierdzenie() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  const { pushEvent } = useDataLayer();
   const [status, setStatus] = useState<PaymentStatus>("verifying");
   const [caseNumber, setCaseNumber] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

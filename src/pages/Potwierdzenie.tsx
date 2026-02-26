@@ -12,7 +12,6 @@ export default function Potwierdzenie() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const { pushEvent } = useDataLayer();
   const [status, setStatus] = useState<PaymentStatus>("verifying");
   const [caseNumber, setCaseNumber] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -60,10 +59,20 @@ export default function Potwierdzenie() {
           pushEvent({
             event: "purchase",
             ecommerce: {
-              transaction_id: orderId,
-              value: data.amount,
+              transaction_id: data.case_number || orderId,
+              value: Number(data.amount),
+              tax: Number(data.tax || 0),
+              shipping: Number(data.shipping || 0),
               currency: "PLN",
-              items: data.items || [],
+              items: data.products.map((prod: any) => ({
+                item_id: prod.id,
+                item_name: prod.name,
+                affiliation: "Autopay Payment",
+                price: Number(prod.price),
+                item_brand: prod.brand || "",
+                item_category: prod.category || "",
+                quantity: prod.quantity || 1,
+              })),
             },
           });
           clearFormData();

@@ -15,7 +15,6 @@ export default function Potwierdzenie() {
   const [status, setStatus] = useState<PaymentStatus>("verifying");
   const [caseNumber, setCaseNumber] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { pushEvent } = useDataLayer();
 
   useEffect(() => {
     const verifyReturn = async () => {
@@ -69,6 +68,11 @@ export default function Potwierdzenie() {
           clearFormData();
         } else if (data.payment_status === "fail") {
           setStatus("fail");
+          pushEvent({
+            event: "payment_failed",
+            error_type: "autopay_fail",
+            order_id: orderId,
+          });
         } else {
           // pending - payment is being processed
           setStatus("pending");

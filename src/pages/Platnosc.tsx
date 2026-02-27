@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
 const paymentSchema = z.object({
   confirm_data: z.literal(true, { errorMap: () => ({ message: "Potwierdzenie jest wymagane" }) }),
@@ -22,7 +23,8 @@ export default function Platnosc() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
-  
+  const { pushEvent } = useDataLayer();
+
   const form = useForm<PaymentFormData>({
     resolver: zodResolver(paymentSchema),
   });
@@ -30,69 +32,73 @@ export default function Platnosc() {
   const onSubmit = async (data: PaymentFormData) => {
     setIsProcessing(true);
     console.log("Płatność:", data);
-    
+
     try {
       // Pobierz dane z localStorage
-      const datyChoroby = JSON.parse(localStorage.getItem('formData_datyChoroby') || '{}');
-      const rodzajZwolnienia = JSON.parse(localStorage.getItem('formData_rodzajZwolnienia') || '{}');
-      const wywiadOgolny = JSON.parse(localStorage.getItem('formData_wywiadOgolny') || '{}');
-      const wywiadObjawy = JSON.parse(localStorage.getItem('formData_wywiadObjawy') || '{}');
-      
+      const datyChoroby = JSON.parse(localStorage.getItem("formData_datyChoroby") || "{}");
+      const rodzajZwolnienia = JSON.parse(localStorage.getItem("formData_rodzajZwolnienia") || "{}");
+      const wywiadOgolny = JSON.parse(localStorage.getItem("formData_wywiadOgolny") || "{}");
+      const wywiadObjawy = JSON.parse(localStorage.getItem("formData_wywiadObjawy") || "{}");
+
       // Pobierz przesłane pliki z localStorage
-      const uploadedAttachments = JSON.parse(localStorage.getItem('uploadedFiles_attachments') || '[]');
+      const uploadedAttachments = JSON.parse(localStorage.getItem("uploadedFiles_attachments") || "[]");
       const attachmentPaths = uploadedAttachments.map((f: { path: string }) => f.path);
-      
+
       // Znajdź profil użytkownika
       let profileId;
       if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .single();
+        const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", user.id).single();
         profileId = profile?.id;
       } else {
         // Dla gościa, pobierz ID z localStorage
-        profileId = localStorage.getItem('guestProfileId');
+        profileId = localStorage.getItem("guestProfileId");
       }
 
       if (!profileId) {
-        throw new Error('Nie znaleziono profilu użytkownika');
+        throw new Error("Nie znaleziono profilu użytkownika");
       }
 
       // Utwórz sprawę po stronie backendu (działa również dla gościa)
-      const recipient_type = rodzajZwolnienia.leave_type === 'pl_employer' ? 'pl_employer' : 
-                            rodzajZwolnienia.leave_type === 'foreign_employer' ? 'foreign_employer' :
-                            rodzajZwolnienia.leave_type === 'uniformed' ? 'uniformed' :
-                            rodzajZwolnienia.leave_type === 'care' ? 'care' :
-                            rodzajZwolnienia.leave_type === 'care_family' ? 'care' :
-                            rodzajZwolnienia.leave_type === 'krus' ? 'krus' : 'student';
+      const recipient_type =
+        rodzajZwolnienia.leave_type === "pl_employer"
+          ? "pl_employer"
+          : rodzajZwolnienia.leave_type === "foreign_employer"
+            ? "foreign_employer"
+            : rodzajZwolnienia.leave_type === "uniformed"
+              ? "uniformed"
+              : rodzajZwolnienia.leave_type === "care"
+                ? "care"
+                : rodzajZwolnienia.leave_type === "care_family"
+                  ? "care"
+                  : rodzajZwolnienia.leave_type === "krus"
+                    ? "krus"
+                    : "student";
 
       // Build employers array from NIPs
       const employers: { nip: string }[] = [];
-      if (rodzajZwolnienia.leave_type === 'pl_employer' && Array.isArray(rodzajZwolnienia.nips)) {
+      if (rodzajZwolnienia.leave_type === "pl_employer" && Array.isArray(rodzajZwolnienia.nips)) {
         rodzajZwolnienia.nips.forEach((nip: string) => employers.push({ nip }));
-      } else if (rodzajZwolnienia.leave_type === 'care' && Array.isArray(rodzajZwolnienia.care_nips)) {
+      } else if (rodzajZwolnienia.leave_type === "care" && Array.isArray(rodzajZwolnienia.care_nips)) {
         rodzajZwolnienia.care_nips.forEach((nip: string) => employers.push({ nip }));
-      } else if (rodzajZwolnienia.leave_type === 'care_family' && Array.isArray(rodzajZwolnienia.care_family_nips)) {
+      } else if (rodzajZwolnienia.leave_type === "care_family" && Array.isArray(rodzajZwolnienia.care_family_nips)) {
         rodzajZwolnienia.care_family_nips.forEach((nip: string) => employers.push({ nip }));
       }
 
-      const { data: createCaseRes, error: createCaseErr } = await supabase.functions.invoke('create-case-for-payment', {
+      const { data: createCaseRes, error: createCaseErr } = await supabase.functions.invoke("create-case-for-payment", {
         body: {
           profile_id: profileId,
           illness_start: datyChoroby.illness_start,
           illness_end: datyChoroby.illness_end,
           recipient_type,
-          pregnant: wywiadOgolny.q_pregnant === 'yes',
-          pregnancy_leave: wywiadOgolny.q_preg_leave === 'yes',
-          has_allergy: wywiadOgolny.q_allergy === 'yes',
+          pregnant: wywiadOgolny.q_pregnant === "yes",
+          pregnancy_leave: wywiadOgolny.q_preg_leave === "yes",
+          has_allergy: wywiadOgolny.q_allergy === "yes",
           allergy_text: wywiadOgolny.allergy_text,
-          has_meds: wywiadOgolny.q_meds === 'yes',
+          has_meds: wywiadOgolny.q_meds === "yes",
           meds_list: wywiadOgolny.meds_list,
           chronic_conditions: wywiadOgolny.chronic_list || [],
           chronic_other: wywiadOgolny.chronic_other_text,
-          long_leave: wywiadOgolny.q_long_leave === 'yes',
+          long_leave: wywiadOgolny.q_long_leave === "yes",
           main_category: wywiadObjawy.main_category,
           symptom_duration: wywiadObjawy.symptom_duration,
           symptoms: wywiadObjawy.symptoms || [],
@@ -105,46 +111,46 @@ export default function Platnosc() {
           care_first_name: rodzajZwolnienia.care_first_name || rodzajZwolnienia.care_family_first_name || null,
           care_last_name: rodzajZwolnienia.care_last_name || rodzajZwolnienia.care_family_last_name || null,
           care_pesel: rodzajZwolnienia.care_pesel || rodzajZwolnienia.care_family_pesel || null,
-        }
+        },
       });
 
       if (createCaseErr) {
-        console.error('Case creation error:', createCaseErr);
-        throw new Error((createCaseErr as any)?.message || 'Nie udało się utworzyć sprawy');
+        console.error("Case creation error:", createCaseErr);
+        throw new Error((createCaseErr as any)?.message || "Nie udało się utworzyć sprawy");
       }
 
       const caseData = (createCaseRes as any)?.case;
       if (!caseData?.id) {
-        throw new Error('Nie udało się utworzyć sprawy (brak ID)');
+        throw new Error("Nie udało się utworzyć sprawy (brak ID)");
       }
 
-      console.log('Case created:', caseData);
+      console.log("Case created:", caseData);
 
       // Wywołaj edge function do inicjowania płatności Autopay
-      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('autopay-initiate-payment', {
-        body: { 
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke("autopay-initiate-payment", {
+        body: {
           case_id: caseData.id,
           amount: 7900, // 79 PLN w groszach
-        }
+        },
       });
 
       if (paymentError) {
-        console.error('Payment initiation error:', paymentError);
-        throw new Error('Nie udało się zainicjować płatności');
+        console.error("Payment initiation error:", paymentError);
+        throw new Error("Nie udało się zainicjować płatności");
       }
 
-      console.log('Payment URL:', paymentData.payment_url);
+      console.log("Payment URL:", paymentData.payment_url);
 
       // Redirect to Autopay gateway.
       // Autopay initiation is specified as a POST (form submission).
       if (paymentData?.payment_base_url && paymentData?.payment_params) {
-        const formEl = document.createElement('form');
-        formEl.method = 'POST';
+        const formEl = document.createElement("form");
+        formEl.method = "POST";
         formEl.action = paymentData.payment_base_url;
 
         Object.entries(paymentData.payment_params as Record<string, string>).forEach(([key, value]) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
+          const input = document.createElement("input");
+          input.type = "hidden";
           input.name = key;
           input.value = value;
           formEl.appendChild(input);
@@ -157,9 +163,8 @@ export default function Platnosc() {
 
       // Fallback: GET redirect
       window.location.href = paymentData.payment_url;
-
     } catch (error: any) {
-      console.error('Błąd podczas zapisywania sprawy:', error);
+      console.error("Błąd podczas zapisywania sprawy:", error);
       toast.error(error?.message || "Wystąpił błąd podczas przetwarzania płatności");
       setIsProcessing(false);
     }
@@ -169,7 +174,7 @@ export default function Platnosc() {
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <ProgressSteps currentStep={6} />
-        
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Płatność</h1>
           <p className="text-muted-foreground">Wybierz metodę płatności i dokończ proces</p>
@@ -191,7 +196,6 @@ export default function Platnosc() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
             <FormField
               control={form.control}
               name="confirm_data"
@@ -199,10 +203,7 @@ export default function Platnosc() {
                 <FormItem className="space-y-3">
                   <div className="flex items-start space-x-2">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="font-normal">
@@ -226,7 +227,13 @@ export default function Platnosc() {
             </div>
 
             <div className="flex gap-4 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigate("/podsumowanie")} className="flex-1" disabled={isProcessing}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate("/podsumowanie")}
+                className="flex-1"
+                disabled={isProcessing}
+              >
                 Wstecz
               </Button>
               <Button type="submit" className="flex-1" disabled={isProcessing}>

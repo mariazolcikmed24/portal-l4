@@ -92,6 +92,7 @@ export default function Podsumowanie() {
         wywiadOgolny: wywiadOgolny ? JSON.parse(wywiadOgolny) : {},
         wywiadObjawy: wywiadObjawy ? JSON.parse(wywiadObjawy) : {},
       });
+    }
 
     loadData();
   }, [user]);

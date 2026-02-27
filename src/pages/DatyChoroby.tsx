@@ -104,11 +104,13 @@ export default function DatyChoroby() {
     console.log("Daty choroby:", data);
     pushEvent({
       event: "form_step_submit",
-      form_name: "e_zwolnienie",
-      step_number: 1,
-      step_name: "daty_choroby",
-      // TODO: obliczyć licbę dni zwolnienia
-      // leave_length_days: 3
+      eventModel: {
+        form_name: "e_zwolnienie",
+        step_number: 1,
+        step_name: "daty_choroby",
+        // TODO: obliczyć licbę dni zwolnienia
+        // leave_length_days: 3
+      },
     });
     toast.success("Dane zapisane");
     navigate("/rodzaj-zwolnienia");

@@ -490,6 +490,10 @@ const Rejestracja = () => {
           title: "Konto utworzone",
           description: "Sprawdź e-mail, aby potwierdzić rejestrację.",
         });
+        pushEvent({
+          event: "sign_up",
+          method: "form_ezwolnienie",
+        });
         navigate("/daty-choroby");
       }
     } catch (error: any) {

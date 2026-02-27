@@ -125,6 +125,14 @@ export default function Podsumowanie() {
 
   const handleGoToPayment = () => {
     pushEvent({
+      event: "form_step_submit",
+      eventModel: {
+        form_name: "e_zwolnienie",
+        step_number: 5,
+        step_name: "podsumowanie",
+      },
+    });
+    pushEvent({
       event: "begin_checkout",
       ecommerce: {
         currency: "PLN",

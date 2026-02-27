@@ -11,9 +11,8 @@ import { Baby, User } from "lucide-react";
 import { useDataLayer } from "@/hooks/useDataLayer";
 
 export default function Podsumowanie() {
-
   const servicePrice = 79.99;
-  
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const { pushEvent } = useDataLayer();
@@ -53,9 +52,9 @@ export default function Podsumowanie() {
 
   const formatPriceUI = (price: number): string => {
     if (Number.isInteger(price)) {
-      return price.toString(); 
+      return price.toString();
     }
-    return price.toFixed(2).replace('.', ',');
+    return price.toFixed(2).replace(".", ",");
   };
 
   useEffect(() => {
@@ -100,20 +99,24 @@ export default function Podsumowanie() {
   useEffect(() => {
     if (formData.rodzajZwolnienia?.leave_type && !hasTrackedViewRef.current) {
       pushEvent({
-        event: 'view_item',
+        event: "view_item",
         ecommerce: {
-          currency: 'PLN',
+          currency: "PLN",
           value: servicePrice,
-          items: [{
-            item_id: 'e-konsultacja-zwolnienie',
-            item_name: 'E-konsultacja + e-zwolnienie',
-            // DYNAMICZNE PARAMETRY
-            item_category: getLeaveTypeLabel(formData.rodzajZwolnienia.leave_type),
-            item_category2: formData.wywiadObjawy?.main_category ? getMainCategoryLabel(formData.wywiadObjawy.main_category) : undefined,
-            price: servicePrice,
-            quantity: 1
-          }]
-        }
+          items: [
+            {
+              item_id: "e-konsultacja-zwolnienie",
+              item_name: "E-konsultacja + e-zwolnienie",
+              // DYNAMICZNE PARAMETRY
+              item_category: getLeaveTypeLabel(formData.rodzajZwolnienia.leave_type),
+              item_category2: formData.wywiadObjawy?.main_category
+                ? getMainCategoryLabel(formData.wywiadObjawy.main_category)
+                : undefined,
+              price: servicePrice,
+              quantity: 1,
+            },
+          ],
+        },
       });
       // Blokujemy ponowne wysłanie
       hasTrackedViewRef.current = true;
@@ -122,21 +125,26 @@ export default function Podsumowanie() {
 
   const handleGoToPayment = () => {
     pushEvent({
-      event: 'begin_checkout',
+      event: "begin_checkout",
       ecommerce: {
-        currency: 'PLN',
+        currency: "PLN",
         value: servicePrice,
-        items: [{
-          item_id: 'e-konsultacja-zwolnienie',
-          item_name: 'E-konsultacja + e-zwolnienie',
-          // DYNAMICZNE PARAMETRY
-          item_category: getLeaveTypeLabel(formData.rodzajZwolnienia?.leave_type),
-          item_category2: formData.wywiadObjawy?.main_category ? getMainCategoryLabel(formData.wywiadObjawy.main_category) : undefined,
-          price: servicePrice,
-          quantity: 1
-        }]
-      }
+        items: [
+          {
+            item_id: "e-konsultacja-zwolnienie",
+            item_name: "E-konsultacja + e-zwolnienie",
+            // DYNAMICZNE PARAMETRY
+            item_category: getLeaveTypeLabel(formData.rodzajZwolnienia?.leave_type),
+            item_category2: formData.wywiadObjawy?.main_category
+              ? getMainCategoryLabel(formData.wywiadObjawy.main_category)
+              : undefined,
+            price: servicePrice,
+            quantity: 1,
+          },
+        ],
+      },
     });
+  };
 
   const getLeaveTypeLabel = (type: string) => {
     const labels: Record<string, string> = {

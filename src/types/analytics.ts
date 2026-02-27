@@ -5,6 +5,10 @@ export interface EcommerceItem {
   price: number;
   item_brand?: string;
   item_category?: string;
+  item_category2?: string;
+  item_category3?: string;
+  item_category4?: string;
+  item_category5?: string;
   quantity?: number;
 }
 
@@ -72,10 +76,10 @@ export type AnalyticsEvent =
       order_id: string;
     }
   | {
-      event: 'form_step_submit';
+      event: "form_step_submit";
       step_name: string;
       step_number: number;
-      form_name: 'e_zwolnienie';
+      form_name: "e_zwolnienie";
       // Parametry biznesowe (opcjonalne, zależne od kroku)
       leave_type?: string;
       symptom_category?: string;
@@ -84,10 +88,10 @@ export type AnalyticsEvent =
       has_attachments?: boolean;
     }
   | {
-      event: 'sign_up';
+      event: "sign_up";
       method: string;
     }
   | {
-      event: 'add_payment_info';
+      event: "add_payment_info";
       ecommerce: Ecommerce;
     };

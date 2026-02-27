@@ -86,6 +86,7 @@ export type AnalyticsEvent =
       symptom_duration?: string;
       has_chronic?: boolean;
       has_attachments?: boolean;
+      takes_meds?: boolean;
     }
   | {
       event: "sign_up";

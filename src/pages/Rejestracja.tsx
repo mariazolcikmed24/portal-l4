@@ -20,7 +20,10 @@ import { cn } from "@/lib/utils";
 const validatePesel = (pesel: string): boolean => {
   if (!/^\d{11}$/.test(pesel)) return false;
   const weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
-  const sum = pesel.split('').slice(0, 10).reduce((acc, digit, i) => acc + parseInt(digit) * weights[i], 0);
+  const sum = pesel
+    .split("")
+    .slice(0, 10)
+    .reduce((acc, digit, i) => acc + parseInt(digit) * weights[i], 0);
   const checksum = (10 - (sum % 10)) % 10;
   return checksum === parseInt(pesel[10]);
 };
@@ -30,11 +33,11 @@ const extractDateOfBirthFromPesel = (pesel: string): string => {
   const year = parseInt(pesel.substring(0, 2));
   const month = parseInt(pesel.substring(2, 4));
   const day = parseInt(pesel.substring(4, 6));
-  
+
   // Determine century based on month code
   let fullYear: number;
   let realMonth: number;
-  
+
   if (month >= 1 && month <= 12) {
     // 1900-1999
     fullYear = 1900 + year;
@@ -60,9 +63,9 @@ const extractDateOfBirthFromPesel = (pesel: string): string => {
     fullYear = 1900 + year;
     realMonth = month;
   }
-  
+
   // Format as YYYY-MM-DD
-  return `${fullYear}-${String(realMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  return `${fullYear}-${String(realMonth).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 };
 
 const registrationSchema = z.object({
@@ -78,12 +81,12 @@ const registrationSchema = z.object({
   postcode: z.string().regex(/^\d{2}-\d{3}$/, "Nieprawidłowy kod pocztowy (format: XX-XXX)"),
   city: z.string().trim().min(1, "Miasto jest wymagane").max(85, "Miasto jest za długie"),
   country: z.string().min(1, "Państwo jest wymagane"),
-  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków").or(z.literal('')).optional(),
-  consentTerms: z.boolean().refine(val => val === true, "Musisz zaakceptować regulamin"),
-  consentEmployment: z.boolean().refine(val => val === true, "Potwierdzenie zatrudnienia jest wymagane"),
-  consentCall: z.boolean().refine(val => val === true, "Zgoda na kontakt telefoniczny jest wymagana"),
-  consentNoGuarantee: z.boolean().refine(val => val === true, "Musisz potwierdzić warunki e-konsultacji"),
-  consentTruth: z.boolean().refine(val => val === true, "Musisz potwierdzić prawdziwość danych"),
+  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków").or(z.literal("")).optional(),
+  consentTerms: z.boolean().refine((val) => val === true, "Musisz zaakceptować regulamin"),
+  consentEmployment: z.boolean().refine((val) => val === true, "Potwierdzenie zatrudnienia jest wymagane"),
+  consentCall: z.boolean().refine((val) => val === true, "Zgoda na kontakt telefoniczny jest wymagana"),
+  consentNoGuarantee: z.boolean().refine((val) => val === true, "Musisz potwierdzić warunki e-konsultacji"),
+  consentTruth: z.boolean().refine((val) => val === true, "Musisz potwierdzić prawdziwość danych"),
   consentMarketingEmail: z.boolean().optional(),
   consentMarketingTel: z.boolean().optional(),
 });
@@ -334,10 +337,18 @@ const Rejestracja = () => {
   const [openCountry, setOpenCountry] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isGuestMode = searchParams.get('guest') === 'true';
+  const isGuestMode = searchParams.get("guest") === "true";
   const { user } = useAuth();
-  
-  const { register, handleSubmit, control, formState: { errors }, setValue, watch } = useForm<RegistrationFormData>({
+  const { pushEvent } = useDataLayer();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       country: "PL",
@@ -349,35 +360,35 @@ const Rejestracja = () => {
       consentTruth: false,
       consentMarketingEmail: false,
       consentMarketingTel: false,
-    }
+    },
   });
 
   const allConsents = watch([
-    'consentTerms',
-    'consentEmployment', 
-    'consentCall',
-    'consentNoGuarantee',
-    'consentTruth',
-    'consentMarketingEmail',
-    'consentMarketingTel'
+    "consentTerms",
+    "consentEmployment",
+    "consentCall",
+    "consentNoGuarantee",
+    "consentTruth",
+    "consentMarketingEmail",
+    "consentMarketingTel",
   ]);
 
-  const allChecked = allConsents.every(consent => consent === true);
+  const allChecked = allConsents.every((consent) => consent === true);
 
   const handleSelectAll = (checked: boolean) => {
-    setValue('consentTerms', checked);
-    setValue('consentEmployment', checked);
-    setValue('consentCall', checked);
-    setValue('consentNoGuarantee', checked);
-    setValue('consentTruth', checked);
-    setValue('consentMarketingEmail', checked);
-    setValue('consentMarketingTel', checked);
+    setValue("consentTerms", checked);
+    setValue("consentEmployment", checked);
+    setValue("consentCall", checked);
+    setValue("consentNoGuarantee", checked);
+    setValue("consentTruth", checked);
+    setValue("consentMarketingEmail", checked);
+    setValue("consentMarketingTel", checked);
   };
 
   // Redirect if already logged in
   useEffect(() => {
     if (user && !isGuestMode) {
-      navigate('/daty-choroby');
+      navigate("/daty-choroby");
     }
   }, [user, isGuestMode, navigate]);
 
@@ -385,10 +396,10 @@ const Rejestracja = () => {
     setIsSubmitting(true);
     try {
       const fullPhone = data.phonePrefix + data.phoneNumber;
-      
+
       if (isGuestMode) {
         // Guest mode: Save profile via edge function (bypasses RLS)
-        const { data: response, error } = await supabase.functions.invoke('create-guest-profile', {
+        const { data: response, error } = await supabase.functions.invoke("create-guest-profile", {
           body: {
             first_name: data.firstName,
             last_name: data.lastName,
@@ -409,21 +420,24 @@ const Rejestracja = () => {
             consent_truth: data.consentTruth,
             consent_marketing_email: data.consentMarketingEmail || false,
             consent_marketing_tel: data.consentMarketingTel || false,
-          }
+          },
         });
 
         if (error || !response?.profile) {
-          throw new Error(response?.error || 'Nie udało się utworzyć profilu');
+          throw new Error(response?.error || "Nie udało się utworzyć profilu");
         }
 
         // Zapisz dane gościa do localStorage dla stron Podsumowanie i Platnosc
-        localStorage.setItem('guestProfileId', response.profile.id);
-        localStorage.setItem('guestProfileData', JSON.stringify({
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          pesel: data.pesel,
-        }));
+        localStorage.setItem("guestProfileId", response.profile.id);
+        localStorage.setItem(
+          "guestProfileData",
+          JSON.stringify({
+            first_name: data.firstName,
+            last_name: data.lastName,
+            email: data.email,
+            pesel: data.pesel,
+          }),
+        );
 
         toast({
           title: "Dane zapisane",
@@ -466,8 +480,8 @@ const Rejestracja = () => {
               consent_truth: data.consentTruth,
               consent_marketing_email: data.consentMarketingEmail || false,
               consent_marketing_tel: data.consentMarketingTel || false,
-            }
-          }
+            },
+          },
         });
 
         if (error) throw error;
@@ -502,17 +516,16 @@ const Rejestracja = () => {
             {isGuestMode ? "Dane do e-zwolnienia" : "Rejestracja"}
           </h1>
           <p className="text-muted-foreground mb-8">
-            {isGuestMode 
-              ? "Wypełnij formularz, aby przejść do procesu uzyskania zwolnienia lekarskiego online" 
-              : "Utwórz konto, aby rozpocząć proces uzyskania zwolnienia lekarskiego online"
-            }
+            {isGuestMode
+              ? "Wypełnij formularz, aby przejść do procesu uzyskania zwolnienia lekarskiego online"
+              : "Utwórz konto, aby rozpocząć proces uzyskania zwolnienia lekarskiego online"}
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Dane osobowe */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-foreground">Dane osobowe</h2>
-              
+
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="reg_first_name">Imię *</Label>
@@ -521,9 +534,7 @@ const Rejestracja = () => {
                     {...register("firstName")}
                     className={errors.firstName ? "border-destructive" : ""}
                   />
-                  {errors.firstName && (
-                    <p className="text-sm text-destructive">{errors.firstName.message}</p>
-                  )}
+                  {errors.firstName && <p className="text-sm text-destructive">{errors.firstName.message}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -533,9 +544,7 @@ const Rejestracja = () => {
                     {...register("lastName")}
                     className={errors.lastName ? "border-destructive" : ""}
                   />
-                  {errors.lastName && (
-                    <p className="text-sm text-destructive">{errors.lastName.message}</p>
-                  )}
+                  {errors.lastName && <p className="text-sm text-destructive">{errors.lastName.message}</p>}
                 </div>
               </div>
 
@@ -547,9 +556,7 @@ const Rejestracja = () => {
                   {...register("email")}
                   className={errors.email ? "border-destructive" : ""}
                 />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email.message}</p>
-                )}
+                {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
               </div>
 
               {!isGuestMode && (
@@ -562,9 +569,7 @@ const Rejestracja = () => {
                     placeholder="Minimum 8 znaków"
                     className={errors.password ? "border-destructive" : ""}
                   />
-                  {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password.message}</p>
-                  )}
+                  {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
                   <p className="text-xs text-muted-foreground">
                     Hasło pozwoli Ci zalogować się w przyszłości i zarządzać swoimi zwolnieniami
                   </p>
@@ -580,9 +585,7 @@ const Rejestracja = () => {
                   placeholder="12345678901"
                   className={errors.pesel ? "border-destructive" : ""}
                 />
-                {errors.pesel && (
-                  <p className="text-sm text-destructive">{errors.pesel.message}</p>
-                )}
+                {errors.pesel && <p className="text-sm text-destructive">{errors.pesel.message}</p>}
               </div>
 
               <div className="grid md:grid-cols-1 gap-4">
@@ -599,10 +602,7 @@ const Rejestracja = () => {
                               variant="outline"
                               role="combobox"
                               aria-expanded={openPhonePrefix}
-                              className={cn(
-                                "w-[160px] justify-between",
-                                errors.phonePrefix && "border-destructive"
-                              )}
+                              className={cn("w-[160px] justify-between", errors.phonePrefix && "border-destructive")}
                             >
                               {field.value
                                 ? phonePrefixes.find((prefix) => prefix.code === field.value)?.flag + " " + field.value
@@ -628,7 +628,7 @@ const Rejestracja = () => {
                                       <Check
                                         className={cn(
                                           "mr-2 h-4 w-4",
-                                          field.value === prefix.code ? "opacity-100" : "opacity-0"
+                                          field.value === prefix.code ? "opacity-100" : "opacity-0",
                                         )}
                                       />
                                       <span className="mr-2">{prefix.flag}</span>
@@ -662,17 +662,11 @@ const Rejestracja = () => {
             {/* Adres */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-foreground">Adres zamieszkania</h2>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="reg_street">Ulica *</Label>
-                <Input
-                  id="reg_street"
-                  {...register("street")}
-                  className={errors.street ? "border-destructive" : ""}
-                />
-                {errors.street && (
-                  <p className="text-sm text-destructive">{errors.street.message}</p>
-                )}
+                <Input id="reg_street" {...register("street")} className={errors.street ? "border-destructive" : ""} />
+                {errors.street && <p className="text-sm text-destructive">{errors.street.message}</p>}
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
@@ -683,9 +677,7 @@ const Rejestracja = () => {
                     {...register("houseNo")}
                     className={errors.houseNo ? "border-destructive" : ""}
                   />
-                  {errors.houseNo && (
-                    <p className="text-sm text-destructive">{errors.houseNo.message}</p>
-                  )}
+                  {errors.houseNo && <p className="text-sm text-destructive">{errors.houseNo.message}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -695,9 +687,7 @@ const Rejestracja = () => {
                     {...register("flatNo")}
                     className={errors.flatNo ? "border-destructive" : ""}
                   />
-                  {errors.flatNo && (
-                    <p className="text-sm text-destructive">{errors.flatNo.message}</p>
-                  )}
+                  {errors.flatNo && <p className="text-sm text-destructive">{errors.flatNo.message}</p>}
                 </div>
               </div>
 
@@ -711,21 +701,13 @@ const Rejestracja = () => {
                     maxLength={6}
                     className={errors.postcode ? "border-destructive" : ""}
                   />
-                  {errors.postcode && (
-                    <p className="text-sm text-destructive">{errors.postcode.message}</p>
-                  )}
+                  {errors.postcode && <p className="text-sm text-destructive">{errors.postcode.message}</p>}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="reg_city">Miasto *</Label>
-                  <Input
-                    id="reg_city"
-                    {...register("city")}
-                    className={errors.city ? "border-destructive" : ""}
-                  />
-                  {errors.city && (
-                    <p className="text-sm text-destructive">{errors.city.message}</p>
-                  )}
+                  <Input id="reg_city" {...register("city")} className={errors.city ? "border-destructive" : ""} />
+                  {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
                 </div>
               </div>
 
@@ -741,13 +723,12 @@ const Rejestracja = () => {
                           variant="outline"
                           role="combobox"
                           aria-expanded={openCountry}
-                          className={cn(
-                            "w-full justify-between",
-                            errors.country && "border-destructive"
-                          )}
+                          className={cn("w-full justify-between", errors.country && "border-destructive")}
                         >
                           {field.value
-                            ? countries.find((country) => country.code === field.value)?.flag + " " + countries.find((country) => country.code === field.value)?.name
+                            ? countries.find((country) => country.code === field.value)?.flag +
+                              " " +
+                              countries.find((country) => country.code === field.value)?.name
                             : "Wybierz państwo"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -770,7 +751,7 @@ const Rejestracja = () => {
                                   <Check
                                     className={cn(
                                       "mr-2 h-4 w-4",
-                                      field.value === country.code ? "opacity-100" : "opacity-0"
+                                      field.value === country.code ? "opacity-100" : "opacity-0",
                                     )}
                                   />
                                   <span className="mr-2">{country.flag}</span>
@@ -784,23 +765,17 @@ const Rejestracja = () => {
                     </Popover>
                   )}
                 />
-                {errors.country && (
-                  <p className="text-sm text-destructive">{errors.country.message}</p>
-                )}
+                {errors.country && <p className="text-sm text-destructive">{errors.country.message}</p>}
               </div>
             </div>
 
             {/* Zgody */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-foreground">Zgody i potwierdzenia</h2>
-              
+
               <div className="space-y-4">
                 <div className="flex items-start space-x-3 pb-3 border-b">
-                  <Checkbox
-                    id="select_all"
-                    checked={allChecked}
-                    onCheckedChange={handleSelectAll}
-                  />
+                  <Checkbox id="select_all" checked={allChecked} onCheckedChange={handleSelectAll} />
                   <Label htmlFor="select_all" className="text-sm font-medium cursor-pointer">
                     Zaznacz wszystkie zgody
                   </Label>
@@ -821,11 +796,17 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_terms" className="text-sm font-normal cursor-pointer">
-                      Akceptuję <Link to="#" className="text-primary hover:underline">Regulamin</Link> i <Link to="#" className="text-primary hover:underline">Politykę prywatności</Link> *
+                      Akceptuję{" "}
+                      <Link to="#" className="text-primary hover:underline">
+                        Regulamin
+                      </Link>{" "}
+                      i{" "}
+                      <Link to="#" className="text-primary hover:underline">
+                        Politykę prywatności
+                      </Link>{" "}
+                      *
                     </Label>
-                    {errors.consentTerms && (
-                      <p className="text-sm text-destructive">{errors.consentTerms.message}</p>
-                    )}
+                    {errors.consentTerms && <p className="text-sm text-destructive">{errors.consentTerms.message}</p>}
                   </div>
                 </div>
 
@@ -844,7 +825,8 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_employment" className="text-sm font-normal cursor-pointer">
-                      Oświadczam, że jestem aktualnie zatrudniony/a u Pracodawcy wskazanego w ankiecie oraz przysługuje mi prawo do zasiłku chorobowego. *
+                      Oświadczam, że jestem aktualnie zatrudniony/a u Pracodawcy wskazanego w ankiecie oraz przysługuje
+                      mi prawo do zasiłku chorobowego. *
                     </Label>
                     {errors.consentEmployment && (
                       <p className="text-sm text-destructive">{errors.consentEmployment.message}</p>
@@ -867,11 +849,10 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_call" className="text-sm font-normal cursor-pointer">
-                      Oświadczam, że przyjmuję do wiadomości, iż lekarz może skontaktować się ze mną telefonicznie w celu pogłębienia wywiadu medycznego. *
+                      Oświadczam, że przyjmuję do wiadomości, iż lekarz może skontaktować się ze mną telefonicznie w
+                      celu pogłębienia wywiadu medycznego. *
                     </Label>
-                    {errors.consentCall && (
-                      <p className="text-sm text-destructive">{errors.consentCall.message}</p>
-                    )}
+                    {errors.consentCall && <p className="text-sm text-destructive">{errors.consentCall.message}</p>}
                   </div>
                 </div>
 
@@ -890,7 +871,10 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_no_guarantee" className="text-sm font-normal cursor-pointer">
-                      Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego e-zwolnienia. Diagnoza oraz decyzja o zasadności i długości e-zwolnienia należą wyłącznie do lekarza, który podejmuje je na podstawie przekazanych przeze mnie informacji i objawów. Data początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy. *
+                      Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego
+                      e-zwolnienia. Diagnoza oraz decyzja o zasadności i długości e-zwolnienia należą wyłącznie do
+                      lekarza, który podejmuje je na podstawie przekazanych przeze mnie informacji i objawów. Data
+                      początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy. *
                     </Label>
                     {errors.consentNoGuarantee && (
                       <p className="text-sm text-destructive">{errors.consentNoGuarantee.message}</p>
@@ -915,9 +899,7 @@ const Rejestracja = () => {
                     <Label htmlFor="consent_truth" className="text-sm font-normal cursor-pointer">
                       Oświadczam, że nie zatajam żadnych istotnych informacji dotyczących mojego stanu zdrowia *
                     </Label>
-                    {errors.consentTruth && (
-                      <p className="text-sm text-destructive">{errors.consentTruth.message}</p>
-                    )}
+                    {errors.consentTruth && <p className="text-sm text-destructive">{errors.consentTruth.message}</p>}
                   </div>
                 </div>
 
@@ -926,11 +908,7 @@ const Rejestracja = () => {
                     name="consentMarketingEmail"
                     control={control}
                     render={({ field }) => (
-                      <Checkbox
-                        id="consent_marketing_email"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox id="consent_marketing_email" checked={field.value} onCheckedChange={field.onChange} />
                     )}
                   />
                   <Label htmlFor="consent_marketing_email" className="text-sm font-normal cursor-pointer">
@@ -943,11 +921,7 @@ const Rejestracja = () => {
                     name="consentMarketingTel"
                     control={control}
                     render={({ field }) => (
-                      <Checkbox
-                        id="consent_marketing_tel"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox id="consent_marketing_tel" checked={field.value} onCheckedChange={field.onChange} />
                     )}
                   />
                   <Label htmlFor="consent_marketing_tel" className="text-sm font-normal cursor-pointer">
@@ -964,10 +938,13 @@ const Rejestracja = () => {
                 </Button>
               </Link>
               <Button type="submit" size="lg" className="w-full sm:flex-1" disabled={isSubmitting}>
-                {isSubmitting 
-                  ? (isGuestMode ? "Zapisywanie..." : "Rejestracja...") 
-                  : (isGuestMode ? "Zapisz i przejdź dalej" : "Zarejestruj się i przejdź dalej")
-                }
+                {isSubmitting
+                  ? isGuestMode
+                    ? "Zapisywanie..."
+                    : "Rejestracja..."
+                  : isGuestMode
+                    ? "Zapisz i przejdź dalej"
+                    : "Zarejestruj się i przejdź dalej"}
               </Button>
             </div>
           </form>

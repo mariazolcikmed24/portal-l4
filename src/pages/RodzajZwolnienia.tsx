@@ -10,21 +10,35 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
 const validateNIP = (nip: string): boolean => {
   if (!/^\d{10}$/.test(nip)) return false;
   const weights = [6, 5, 7, 2, 3, 4, 5, 6, 7];
-  const sum = nip.split('').slice(0, 9).reduce((acc, digit, i) => acc + parseInt(digit) * weights[i], 0);
+  const sum = nip
+    .split("")
+    .slice(0, 9)
+    .reduce((acc, digit, i) => acc + parseInt(digit) * weights[i], 0);
   return sum % 11 === parseInt(nip[9]);
 };
 
 const validatePESEL = (pesel: string): boolean => {
   if (!/^\d{11}$/.test(pesel)) return false;
   const weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
-  const sum = pesel.split('').slice(0, 10).reduce((acc, digit, i) => acc + parseInt(digit) * weights[i], 0);
+  const sum = pesel
+    .split("")
+    .slice(0, 10)
+    .reduce((acc, digit, i) => acc + parseInt(digit) * weights[i], 0);
   return (10 - (sum % 10)) % 10 === parseInt(pesel[10]);
 };
 
@@ -58,7 +72,9 @@ const leaveTypeSchema = z.discriminatedUnion("leave_type", [
   }),
   z.object({
     leave_type: z.literal("care_family"),
-    care_family_nips: z.array(z.string().refine(validateNIP, "Nieprawidłowy NIP")).min(1, "Wymagany co najmniej jeden NIP"),
+    care_family_nips: z
+      .array(z.string().refine(validateNIP, "Nieprawidłowy NIP"))
+      .min(1, "Wymagany co najmniej jeden NIP"),
     care_family_first_name: z.string().min(1, "Imię jest wymagane").max(50),
     care_family_last_name: z.string().min(1, "Nazwisko jest wymagane").max(50),
     care_family_pesel: z.string().refine(validatePESEL, "Nieprawidłowy PESEL"),
@@ -73,7 +89,8 @@ export default function RodzajZwolnienia() {
   const [careNips, setCareNips] = useState<string[]>([""]);
   const [careFamilyNips, setCareFamilyNips] = useState<string[]>([""]);
   const [showStudentDialog, setShowStudentDialog] = useState(false);
-  
+  const { pushEvent } = useDataLayer();
+
   const form = useForm<LeaveTypeFormData>({
     resolver: zodResolver(leaveTypeSchema),
     defaultValues: {
@@ -86,25 +103,29 @@ export default function RodzajZwolnienia() {
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem('formData_rodzajZwolnienia');
+    const savedData = localStorage.getItem("formData_rodzajZwolnienia");
     if (savedData) {
       const parsed = JSON.parse(savedData);
-      
+
       // Migrate old care_family_nip (string) to care_family_nips (array)
       if (parsed.leave_type === "care_family" && parsed.care_family_nip && !parsed.care_family_nips) {
         parsed.care_family_nips = [parsed.care_family_nip];
         delete parsed.care_family_nip;
       }
-      
+
       form.reset(parsed);
-      
+
       if (parsed.leave_type === "pl_employer" && Array.isArray(parsed.nips) && parsed.nips.length > 0) {
         setEmployerNips(parsed.nips);
       }
       if (parsed.leave_type === "care" && Array.isArray(parsed.care_nips) && parsed.care_nips.length > 0) {
         setCareNips(parsed.care_nips);
       }
-      if (parsed.leave_type === "care_family" && Array.isArray(parsed.care_family_nips) && parsed.care_family_nips.length > 0) {
+      if (
+        parsed.leave_type === "care_family" &&
+        Array.isArray(parsed.care_family_nips) &&
+        parsed.care_family_nips.length > 0
+      ) {
         setCareFamilyNips(parsed.care_family_nips);
       }
     }
@@ -113,13 +134,20 @@ export default function RodzajZwolnienia() {
   // Save data to localStorage on change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      localStorage.setItem('formData_rodzajZwolnienia', JSON.stringify(value));
+      localStorage.setItem("formData_rodzajZwolnienia", JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
 
   const onSubmit = async (data: LeaveTypeFormData) => {
     console.log("Rodzaj zwolnienia:", data);
+    pushEvent({
+      event: "form_step_submit",
+      form_name: "e_zwolnienie",
+      step_number: 2,
+      step_name: "rodzaj_zwolnienia",
+      leave_type: formData.leave_type, // np. 'pl_employer', 'student', 'care'
+    });
     toast.success("Dane zapisane");
     navigate("/wywiad-ogolny");
   };
@@ -130,15 +158,23 @@ export default function RodzajZwolnienia() {
 
   const removeEmployerNip = (index: number) => {
     const newNips = employerNips.filter((_, i) => i !== index);
-  setEmployerNips(newNips);
-  form.setValue("nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
+    setEmployerNips(newNips);
+    form.setValue(
+      "nips",
+      newNips.filter((n) => n),
+      { shouldValidate: true, shouldDirty: true },
+    );
   };
 
   const updateEmployerNip = (index: number, value: string) => {
     const newNips = [...employerNips];
     newNips[index] = value;
-  setEmployerNips(newNips);
-  form.setValue("nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
+    setEmployerNips(newNips);
+    form.setValue(
+      "nips",
+      newNips.filter((n) => n),
+      { shouldValidate: true, shouldDirty: true },
+    );
   };
 
   const addCareNip = () => {
@@ -147,15 +183,23 @@ export default function RodzajZwolnienia() {
 
   const removeCareNip = (index: number) => {
     const newNips = careNips.filter((_, i) => i !== index);
-  setCareNips(newNips);
-  form.setValue("care_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
+    setCareNips(newNips);
+    form.setValue(
+      "care_nips",
+      newNips.filter((n) => n),
+      { shouldValidate: true, shouldDirty: true },
+    );
   };
 
   const updateCareNip = (index: number, value: string) => {
     const newNips = [...careNips];
     newNips[index] = value;
-  setCareNips(newNips);
-  form.setValue("care_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
+    setCareNips(newNips);
+    form.setValue(
+      "care_nips",
+      newNips.filter((n) => n),
+      { shouldValidate: true, shouldDirty: true },
+    );
   };
 
   const addCareFamilyNip = () => {
@@ -165,21 +209,29 @@ export default function RodzajZwolnienia() {
   const removeCareFamilyNip = (index: number) => {
     const newNips = careFamilyNips.filter((_, i) => i !== index);
     setCareFamilyNips(newNips);
-    form.setValue("care_family_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
+    form.setValue(
+      "care_family_nips",
+      newNips.filter((n) => n),
+      { shouldValidate: true, shouldDirty: true },
+    );
   };
 
   const updateCareFamilyNip = (index: number, value: string) => {
     const newNips = [...careFamilyNips];
     newNips[index] = value;
     setCareFamilyNips(newNips);
-    form.setValue("care_family_nips", newNips.filter(n => n), { shouldValidate: true, shouldDirty: true });
+    form.setValue(
+      "care_family_nips",
+      newNips.filter((n) => n),
+      { shouldValidate: true, shouldDirty: true },
+    );
   };
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <ProgressSteps currentStep={2} />
-        
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Rodzaj zwolnienia</h1>
           <p className="text-muted-foreground">Wybierz typ zwolnienia, którego potrzebujesz</p>
@@ -240,7 +292,9 @@ export default function RodzajZwolnienia() {
                         <HelpCircle className="h-4 w-4" />
                       </TooltipTrigger>
                       <TooltipContent className="max-w-xs">
-                        <p>Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.</p>
+                        <p>
+                          Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -251,7 +305,7 @@ export default function RodzajZwolnienia() {
                       placeholder="0000000000"
                       maxLength={10}
                       value={nip}
-                      onChange={(e) => updateEmployerNip(index, e.target.value.replace(/\D/g, ''))}
+                      onChange={(e) => updateEmployerNip(index, e.target.value.replace(/\D/g, ""))}
                     />
                     {employerNips.length > 1 && (
                       <Button type="button" variant="outline" size="icon" onClick={() => removeEmployerNip(index)}>
@@ -294,7 +348,12 @@ export default function RodzajZwolnienia() {
                     <FormItem>
                       <FormLabel>NIP *</FormLabel>
                       <FormControl>
-                        <Input placeholder="0000000000" maxLength={10} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
+                        <Input
+                          placeholder="0000000000"
+                          maxLength={10}
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ""))}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -306,7 +365,8 @@ export default function RodzajZwolnienia() {
             {leaveType === "student" && (
               <div className="p-4 border rounded-lg bg-muted/50">
                 <p className="text-sm mb-4">
-                  Zwolnienie nie zostanie wysłane do pracodawcy. Po akceptacji lekarza otrzymasz dokument PDF do pobrania.
+                  Zwolnienie nie zostanie wysłane do pracodawcy. Po akceptacji lekarza otrzymasz dokument PDF do
+                  pobrania.
                 </p>
                 <FormField
                   control={form.control}
@@ -340,7 +400,9 @@ export default function RodzajZwolnienia() {
                           <HelpCircle className="h-4 w-4" />
                         </TooltipTrigger>
                         <TooltipContent className="max-w-xs">
-                          <p>Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.</p>
+                          <p>
+                            Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -351,7 +413,7 @@ export default function RodzajZwolnienia() {
                         placeholder="0000000000"
                         maxLength={10}
                         value={nip}
-                        onChange={(e) => updateCareNip(index, e.target.value.replace(/\D/g, ''))}
+                        onChange={(e) => updateCareNip(index, e.target.value.replace(/\D/g, ""))}
                       />
                       {careNips.length > 1 && (
                         <Button type="button" variant="outline" size="icon" onClick={() => removeCareNip(index)}>
@@ -406,7 +468,12 @@ export default function RodzajZwolnienia() {
                       <FormItem>
                         <FormLabel>PESEL *</FormLabel>
                         <FormControl>
-                          <Input placeholder="00000000000" maxLength={11} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
+                          <Input
+                            placeholder="00000000000"
+                            maxLength={11}
+                            {...field}
+                            onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ""))}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -447,7 +514,10 @@ export default function RodzajZwolnienia() {
                               <HelpCircle className="h-4 w-4" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-xs">
-                              <p>Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej działalności.</p>
+                              <p>
+                                Osoby prowadzące własną działalność gospodarczą powinny podać numer NIP swojej
+                                działalności.
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -459,7 +529,7 @@ export default function RodzajZwolnienia() {
                               placeholder="0000000000"
                               maxLength={10}
                               value={nip}
-                              onChange={(e) => updateCareFamilyNip(index, e.target.value.replace(/\D/g, ''))}
+                              onChange={(e) => updateCareFamilyNip(index, e.target.value.replace(/\D/g, ""))}
                             />
                             {careFamilyNips.length > 1 && (
                               <Button
@@ -474,12 +544,7 @@ export default function RodzajZwolnienia() {
                           </div>
                         ))}
                       </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addCareFamilyNip}
-                        className="w-full"
-                      >
+                      <Button type="button" variant="outline" onClick={addCareFamilyNip} className="w-full">
                         <Plus className="h-4 w-4 mr-2" />
                         Dodaj pracodawcę
                       </Button>
@@ -489,45 +554,50 @@ export default function RodzajZwolnienia() {
                 />
                 <div className="pt-4 border-t">
                   <h3 className="font-semibold mb-4">Dane osoby chorej</h3>
-                <FormField
-                  control={form.control}
-                  name="care_family_first_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Imię *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Jan" maxLength={50} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="care_family_last_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nazwisko *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Kowalski" maxLength={50} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="care_family_pesel"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>PESEL *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="00000000000" maxLength={11} {...field} onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="care_family_first_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Imię *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Jan" maxLength={50} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="care_family_last_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nazwisko *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Kowalski" maxLength={50} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="care_family_pesel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>PESEL *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="00000000000"
+                            maxLength={11}
+                            {...field}
+                            onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ""))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
             )}
@@ -549,7 +619,8 @@ export default function RodzajZwolnienia() {
           <AlertDialogHeader>
             <AlertDialogTitle>Informacja dla studentów/uczniów</AlertDialogTitle>
             <AlertDialogDescription>
-              Zwolnienie nie zostanie wysłane do pracodawcy. Po akceptacji lekarza otrzymasz dokument PDF, który możesz pobrać i wykorzystać według potrzeb.
+              Zwolnienie nie zostanie wysłane do pracodawcy. Po akceptacji lekarza otrzymasz dokument PDF, który możesz
+              pobrać i wykorzystać według potrzeb.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -146,7 +146,7 @@ export default function RodzajZwolnienia() {
       form_name: "e_zwolnienie",
       step_number: 2,
       step_name: "rodzaj_zwolnienia",
-      leave_type: formData.leave_type, // np. 'pl_employer', 'student', 'care'
+      leave_type: data.leave_type, // np. 'pl_employer', 'student', 'care'
     });
     toast.success("Dane zapisane");
     navigate("/wywiad-ogolny");

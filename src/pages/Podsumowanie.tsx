@@ -11,11 +11,16 @@ import { Baby, User } from "lucide-react";
 import { useDataLayer } from "@/hooks/useDataLayer";
 
 export default function Podsumowanie() {
+
+  const servicePrice = 79.99;
+  
   const navigate = useNavigate();
   const { user } = useAuth();
   const { pushEvent } = useDataLayer();
   const [profileData, setProfileData] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
+
+  const hasTrackedViewRef = useRef(false);
 
   // Check if this is child care leave or family care leave
   const isChildCare = formData.rodzajZwolnienia?.leave_type === "care";
@@ -44,6 +49,13 @@ export default function Podsumowanie() {
     if (isChildCare) return "dziecka";
     if (isFamilyCare) return "osoby chorej";
     return "";
+  };
+
+  const formatPriceUI = (price: number): string => {
+    if (Number.isInteger(price)) {
+      return price.toString(); 
+    }
+    return price.toFixed(2).replace('.', ',');
   };
 
   useEffect(() => {
@@ -80,10 +92,50 @@ export default function Podsumowanie() {
         wywiadOgolny: wywiadOgolny ? JSON.parse(wywiadOgolny) : {},
         wywiadObjawy: wywiadObjawy ? JSON.parse(wywiadObjawy) : {},
       });
-    };
 
     loadData();
   }, [user]);
+
+  useEffect(() => {
+    if (formData.rodzajZwolnienia?.leave_type && !hasTrackedViewRef.current) {
+      pushEvent({
+        event: 'view_item',
+        ecommerce: {
+          currency: 'PLN',
+          value: servicePrice,
+          items: [{
+            item_id: 'e-konsultacja-zwolnienie',
+            item_name: 'E-konsultacja + e-zwolnienie',
+            // DYNAMICZNE PARAMETRY
+            item_category: getLeaveTypeLabel(formData.rodzajZwolnienia.leave_type),
+            item_category2: formData.wywiadObjawy?.main_category ? getMainCategoryLabel(formData.wywiadObjawy.main_category) : undefined,
+            price: servicePrice,
+            quantity: 1
+          }]
+        }
+      });
+      // Blokujemy ponowne wysłanie
+      hasTrackedViewRef.current = true;
+    }
+  }, [formData, pushEvent]);
+
+  const handleGoToPayment = () => {
+    pushEvent({
+      event: 'begin_checkout',
+      ecommerce: {
+        currency: 'PLN',
+        value: servicePrice,
+        items: [{
+          item_id: 'e-konsultacja-zwolnienie',
+          item_name: 'E-konsultacja + e-zwolnienie',
+          // DYNAMICZNE PARAMETRY
+          item_category: getLeaveTypeLabel(formData.rodzajZwolnienia?.leave_type),
+          item_category2: formData.wywiadObjawy?.main_category ? getMainCategoryLabel(formData.wywiadObjawy.main_category) : undefined,
+          price: servicePrice,
+          quantity: 1
+        }]
+      }
+    });
 
   const getLeaveTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
@@ -599,7 +651,7 @@ export default function Podsumowanie() {
             <CardContent>
               <div className="flex justify-between items-center">
                 <span className="text-lg">E-konsultacja + e-zwolnienie:</span>
-                <span className="text-2xl font-bold text-primary">79 PLN</span>
+                <span className="text-2xl font-bold text-primary">{formatPriceUI(servicePrice)} PLN</span>
               </div>
             </CardContent>
           </Card>
@@ -616,7 +668,7 @@ export default function Podsumowanie() {
             <Button variant="outline" onClick={() => navigate("/daty-choroby")} className="flex-1">
               Edytuj dane
             </Button>
-            <Button onClick={() => navigate("/platnosc")} className="flex-1">
+            <Button onClick={handleGoToPayment} className="flex-1">
               Przejdź do płatności
             </Button>
           </div>

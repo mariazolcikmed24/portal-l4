@@ -215,11 +215,13 @@ export default function WywiadOgolny() {
     console.log("Wywiad ogólny:", data);
     pushEvent({
       event: "form_step_submit",
-      form_name: "e_zwolnienie",
-      step_number: 3,
-      step_name: "wywiad_ogolny",
-      has_chronic: data.q_chronic === "yes",
-      takes_meds: data.q_meds === "yes",
+      eventModel: {
+        form_name: "e_zwolnienie",
+        step_number: 3,
+        step_name: "wywiad_ogolny",
+        has_chronic: data.q_chronic === "yes",
+        takes_meds: data.q_meds === "yes",
+      },
     });
     toast.success("Dane zapisane");
     navigate("/wywiad-objawy");

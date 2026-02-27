@@ -77,16 +77,18 @@ export type AnalyticsEvent =
     }
   | {
       event: "form_step_submit";
-      step_name: string;
-      step_number: number;
-      form_name: "e_zwolnienie";
-      // Parametry biznesowe (opcjonalne, zależne od kroku)
-      leave_type?: string;
-      symptom_category?: string;
-      symptom_duration?: string;
-      has_chronic?: boolean;
-      has_attachments?: boolean;
-      takes_meds?: boolean;
+      eventModel: {
+        step_name: string;
+        step_number: number;
+        form_name: "e_zwolnienie";
+        // Parametry biznesowe (opcjonalne, zależne od kroku)
+        leave_type?: string;
+        symptom_category?: string;
+        symptom_duration?: string;
+        has_chronic?: boolean;
+        has_attachments?: boolean;
+        takes_meds?: boolean;
+      };
     }
   | {
       event: "sign_up";

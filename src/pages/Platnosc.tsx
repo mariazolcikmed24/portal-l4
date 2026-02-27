@@ -12,6 +12,7 @@ import { ProgressSteps } from "@/components/layout/ProgressSteps";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDataLayer } from "@/hooks/useDataLayer";
+import { formatPriceUI } from "@/lib/formatters";
 
 const paymentSchema = z.object({
   confirm_data: z.literal(true, { errorMap: () => ({ message: "Potwierdzenie jest wymagane" }) }),

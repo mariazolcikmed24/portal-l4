@@ -413,8 +413,8 @@ export default function WywiadObjawy() {
       form_name: "e_zwolnienie",
       step_number: 4,
       step_name: "wywiad_objawy",
-      symptom_category: formData.main_category, // np. 'gastro'
-      symptom_duration: formData.symptom_duration, // np. 'yesterday'
+      symptom_category: data.main_category, // np. 'gastro'
+      symptom_duration: data.symptom_duration, // np. 'yesterday'
       has_attachments: files.length > 0, // true/false
     });
     toast.success("Dane zapisane");

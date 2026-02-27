@@ -21,10 +21,9 @@ const paymentSchema = z.object({
 type PaymentFormData = z.infer<typeof paymentSchema>;
 
 export default function Platnosc() {
-
-  const servicePrice = 79.00;
+  const servicePrice = 79.0;
   const servicePriceGrosze = servicePrice * 100;
-  
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -188,7 +187,9 @@ export default function Platnosc() {
               item_id: "e-konsultacja-zwolnienie",
               item_name: "E-konsultacja + e-zwolnienie",
               item_category: getLeaveTypeLabel(rodzajZwolnienia?.leave_type),
-              item_category2: wywiadObjawy?.main_category ? getMainCategoryLabel(wywiadObjawy.main_category) : undefined,
+              item_category2: wywiadObjawy?.main_category
+                ? getMainCategoryLabel(wywiadObjawy.main_category)
+                : undefined,
               price: servicePrice,
               quantity: 1,
             },
@@ -292,7 +293,7 @@ export default function Platnosc() {
                 Wstecz
               </Button>
               <Button type="submit" className="flex-1" disabled={isProcessing}>
-                {isProcessing ? `Przekierowywanie do płatności..." : "Zapłać ${formatPriceUI(servicePrice)} PLN`}
+                {isProcessing ? "Przekierowywanie do płatności..." : `Zapłać ${formatPriceUI(servicePrice)} PLN`}
               </Button>
             </div>
           </form>

@@ -415,7 +415,7 @@ export default function WywiadObjawy() {
       step_name: "wywiad_objawy",
       symptom_category: data.main_category, // np. 'gastro'
       symptom_duration: data.symptom_duration, // np. 'yesterday'
-      has_attachments: files.length > 0, // true/false
+      has_attachments: uploadedFiles.length > 0, // true/false
     });
     toast.success("Dane zapisane");
     navigate("/podsumowanie");

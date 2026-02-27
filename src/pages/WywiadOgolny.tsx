@@ -14,73 +14,103 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
 import { Upload, Baby, Users } from "lucide-react";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
-const medicalSchema = z.object({
-  q_pregnant: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  q_preg_leave: z.enum(["yes", "no"]).optional(),
-  upload_preg_card: z.instanceof(FileList).optional(),
-  
-  q_chronic: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  chronic_list: z.array(z.string()).optional(),
-  chronic_other_text: z.string().max(200).optional(),
-  
-  q_allergy: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  allergy_text: z.string().max(500).optional(),
-  
-  q_meds: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  meds_list: z.string().max(500).optional(),
-  
-  q_long_leave: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
-  upload_prev_docs: z.instanceof(FileList).optional(),
-}).refine((data) => {
-  if (data.q_pregnant === "yes" && data.q_preg_leave === "yes" && (!data.upload_preg_card || data.upload_preg_card.length === 0)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Karta ciąży jest wymagana dla zwolnienia ciążowego",
-  path: ["upload_preg_card"],
-}).refine((data) => {
-  if (data.q_chronic === "yes" && (!data.chronic_list || data.chronic_list.length === 0)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Wybierz co najmniej jedną chorobę",
-  path: ["chronic_list"],
-}).refine((data) => {
-  if (data.q_chronic === "yes" && data.chronic_list?.includes("other") && !data.chronic_other_text) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Opisz inne choroby",
-  path: ["chronic_other_text"],
-}).refine((data) => {
-  if (data.q_allergy === "yes" && !data.allergy_text) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Podaj alergie",
-  path: ["allergy_text"],
-}).refine((data) => {
-  if (data.q_meds === "yes" && !data.meds_list) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Podaj listę leków",
-  path: ["meds_list"],
-}).refine((data) => {
-  if (data.q_long_leave === "yes" && (!data.upload_prev_docs || data.upload_prev_docs.length === 0)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Dokumentacja poprzednich zwolnień jest wymagana",
-  path: ["upload_prev_docs"],
-});
+const medicalSchema = z
+  .object({
+    q_pregnant: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
+    q_preg_leave: z.enum(["yes", "no"]).optional(),
+    upload_preg_card: z.instanceof(FileList).optional(),
+
+    q_chronic: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
+    chronic_list: z.array(z.string()).optional(),
+    chronic_other_text: z.string().max(200).optional(),
+
+    q_allergy: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
+    allergy_text: z.string().max(500).optional(),
+
+    q_meds: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
+    meds_list: z.string().max(500).optional(),
+
+    q_long_leave: z.enum(["yes", "no"], { required_error: "Odpowiedź jest wymagana" }),
+    upload_prev_docs: z.instanceof(FileList).optional(),
+  })
+  .refine(
+    (data) => {
+      if (
+        data.q_pregnant === "yes" &&
+        data.q_preg_leave === "yes" &&
+        (!data.upload_preg_card || data.upload_preg_card.length === 0)
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Karta ciąży jest wymagana dla zwolnienia ciążowego",
+      path: ["upload_preg_card"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.q_chronic === "yes" && (!data.chronic_list || data.chronic_list.length === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Wybierz co najmniej jedną chorobę",
+      path: ["chronic_list"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.q_chronic === "yes" && data.chronic_list?.includes("other") && !data.chronic_other_text) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Opisz inne choroby",
+      path: ["chronic_other_text"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.q_allergy === "yes" && !data.allergy_text) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Podaj alergie",
+      path: ["allergy_text"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.q_meds === "yes" && !data.meds_list) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Podaj listę leków",
+      path: ["meds_list"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.q_long_leave === "yes" && (!data.upload_prev_docs || data.upload_prev_docs.length === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Dokumentacja poprzednich zwolnień jest wymagana",
+      path: ["upload_prev_docs"],
+    },
+  );
 
 type MedicalFormData = z.infer<typeof medicalSchema>;
 
@@ -101,35 +131,36 @@ export default function WywiadOgolny() {
   const navigate = useNavigate();
   const pregCardInputRef = useRef<HTMLInputElement>(null);
   const prevDocsInputRef = useRef<HTMLInputElement>(null);
-  
+  const { pushEvent } = useDataLayer();
+
   // Check if this is a care leave (child or family member)
   const [isCareLeave, setIsCareLeave] = useState(false);
   const [isChildCare, setIsChildCare] = useState(false);
   const [patientName, setPatientName] = useState("");
-  
+
   useEffect(() => {
-    const savedLeaveData = localStorage.getItem('formData_rodzajZwolnienia');
+    const savedLeaveData = localStorage.getItem("formData_rodzajZwolnienia");
     if (savedLeaveData) {
       const parsed = JSON.parse(savedLeaveData);
-      if (parsed.leave_type === 'care') {
+      if (parsed.leave_type === "care") {
         setIsCareLeave(true);
         setIsChildCare(true);
         setPatientName(parsed.care_first_name || "dziecka");
-      } else if (parsed.leave_type === 'care_family') {
+      } else if (parsed.leave_type === "care_family") {
         setIsCareLeave(true);
         setIsChildCare(false);
         setPatientName(parsed.care_family_first_name || "podopiecznego");
       }
     }
   }, []);
-  
+
   // Get label for the patient based on leave type
   const getPatientLabel = () => {
     if (isChildCare) return "dziecka";
     if (isCareLeave) return "osoby chorej";
     return "";
   };
-  
+
   const form = useForm<MedicalFormData>({
     resolver: zodResolver(medicalSchema),
   });
@@ -146,7 +177,7 @@ export default function WywiadOgolny() {
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem('formData_wywiadOgolny');
+    const savedData = localStorage.getItem("formData_wywiadOgolny");
     if (savedData) {
       const parsed = JSON.parse(savedData);
       // Don't restore file uploads
@@ -175,13 +206,21 @@ export default function WywiadOgolny() {
       const dataToSave = { ...value };
       delete dataToSave.upload_preg_card;
       delete dataToSave.upload_prev_docs;
-      localStorage.setItem('formData_wywiadOgolny', JSON.stringify(dataToSave));
+      localStorage.setItem("formData_wywiadOgolny", JSON.stringify(dataToSave));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
 
   const onSubmit = async (data: MedicalFormData) => {
     console.log("Wywiad ogólny:", data);
+    pushEvent({
+      event: "form_step_submit",
+      form_name: "e_zwolnienie",
+      step_number: 3,
+      step_name: "wywiad_ogolny",
+      has_chronic: formData.q_chronic === "yes",
+      takes_meds: formData.q_meds === "yes",
+    });
     toast.success("Dane zapisane");
     navigate("/wywiad-objawy");
   };
@@ -197,28 +236,20 @@ export default function WywiadOgolny() {
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <ProgressSteps currentStep={3} />
-        
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
-            {isCareLeave 
-              ? `Wywiad medyczny - stan zdrowia ${getPatientLabel()}`
-              : "Wywiad medyczny - pytania ogólne"
-            }
+            {isCareLeave ? `Wywiad medyczny - stan zdrowia ${getPatientLabel()}` : "Wywiad medyczny - pytania ogólne"}
           </h1>
           <p className="text-muted-foreground">
-            {isCareLeave 
+            {isCareLeave
               ? `Odpowiedz na poniższe pytania dotyczące stanu zdrowia ${patientName}`
-              : "Odpowiedz na poniższe pytania dotyczące Twojego stanu zdrowia"
-            }
+              : "Odpowiedz na poniższe pytania dotyczące Twojego stanu zdrowia"}
           </p>
-          
+
           {isCareLeave && (
             <div className="mt-4 flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20">
-              {isChildCare ? (
-                <Baby className="h-5 w-5 text-primary" />
-              ) : (
-                <Users className="h-5 w-5 text-primary" />
-              )}
+              {isChildCare ? <Baby className="h-5 w-5 text-primary" /> : <Users className="h-5 w-5 text-primary" />}
               <span className="text-sm font-medium">
                 Formularz dotyczy stanu zdrowia {getPatientLabel()}: <strong>{patientName}</strong>
               </span>
@@ -342,7 +373,7 @@ export default function WywiadOgolny() {
                         {getSubjectText(
                           `Czy ${patientName} cierpi na choroby przewlekłe? *`,
                           `Czy ${patientName} cierpi na choroby przewlekłe? *`,
-                          "Czy cierpisz na choroby przewlekłe? *"
+                          "Czy cierpisz na choroby przewlekłe? *",
                         )}
                       </FormLabel>
                       <FormControl>
@@ -437,7 +468,7 @@ export default function WywiadOgolny() {
                         {getSubjectText(
                           `Czy ${patientName} ma jakieś alergie? *`,
                           `Czy ${patientName} ma jakieś alergie? *`,
-                          "Czy masz jakieś alergie? *"
+                          "Czy masz jakieś alergie? *",
                         )}
                       </FormLabel>
                       <FormControl>
@@ -464,7 +495,11 @@ export default function WywiadOgolny() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          {getSubjectText("Wymień alergie dziecka *", `Wymień alergie ${patientName} *`, "Wymień alergie *")}
+                          {getSubjectText(
+                            "Wymień alergie dziecka *",
+                            `Wymień alergie ${patientName} *`,
+                            "Wymień alergie *",
+                          )}
                         </FormLabel>
                         <FormControl>
                           <Textarea placeholder="Np. pyłki, orzechy, penicylina..." maxLength={500} {...field} />
@@ -493,7 +528,7 @@ export default function WywiadOgolny() {
                         {getSubjectText(
                           `Czy ${patientName} bierze jakieś leki na stałe? *`,
                           `Czy ${patientName} bierze jakieś leki na stałe? *`,
-                          "Czy bierzesz jakieś leki na stałe? *"
+                          "Czy bierzesz jakieś leki na stałe? *",
                         )}
                       </FormLabel>
                       <FormControl>
@@ -520,10 +555,18 @@ export default function WywiadOgolny() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          {getSubjectText("Podaj leki przyjmowane przez dziecko *", `Podaj leki przyjmowane przez ${patientName} *`, "Podaj listę leków *")}
+                          {getSubjectText(
+                            "Podaj leki przyjmowane przez dziecko *",
+                            `Podaj leki przyjmowane przez ${patientName} *`,
+                            "Podaj listę leków *",
+                          )}
                         </FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Nazwa leku, dawka, częstotliwość przyjmowania..." maxLength={500} {...field} />
+                          <Textarea
+                            placeholder="Nazwa leku, dawka, częstotliwość przyjmowania..."
+                            maxLength={500}
+                            {...field}
+                          />
                         </FormControl>
                         <p className="text-sm text-muted-foreground">{field.value?.length || 0}/500</p>
                         <FormMessage />
@@ -595,7 +638,10 @@ export default function WywiadOgolny() {
                               </Button>
                               {uploadPrevDocs && uploadPrevDocs.length > 0 && (
                                 <div className="text-sm text-muted-foreground">
-                                  Wybrano: {Array.from(uploadPrevDocs).map(f => f.name).join(", ")}
+                                  Wybrano:{" "}
+                                  {Array.from(uploadPrevDocs)
+                                    .map((f) => f.name)
+                                    .join(", ")}
                                 </div>
                               )}
                             </div>

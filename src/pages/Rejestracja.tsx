@@ -486,14 +486,16 @@ const Rejestracja = () => {
 
         if (error) throw error;
 
-        toast({
-          title: "Konto utworzone",
-          description: "Sprawdź e-mail, aby potwierdzić rejestrację.",
-        });
         pushEvent({
           event: "sign_up",
           method: "form_ezwolnienie",
         });
+
+        toast({
+          title: "Konto utworzone",
+          description: "Sprawdź e-mail, aby potwierdzić rejestrację.",
+        });
+
         navigate("/daty-choroby");
       }
     } catch (error: any) {

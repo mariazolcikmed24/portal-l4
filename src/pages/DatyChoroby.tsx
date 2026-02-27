@@ -13,42 +13,54 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
-const datesSchema = z.object({
-  illness_start: z.date({
-    required_error: "Data zachorowania jest wymagana",
-  }).refine((date) => {
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    return date >= threeDaysAgo;
-  }, "Data nie może być starsza niż 3 dni wstecz"),
-  
-  illness_end: z.date({
-    required_error: "Data zakończenia jest wymagana",
-  }),
-  
-  late_justification: z.string().max(500, "Uzasadnienie nie może przekraczać 500 znaków").optional(),
-}).refine((data) => {
-  const maxEndDate = new Date(data.illness_start);
-  maxEndDate.setDate(maxEndDate.getDate() + 6);
-  return data.illness_end <= maxEndDate;
-}, {
-  message: "Data zakończenia nie może być późniejsza niż 7 dni od daty zachorowania",
-  path: ["illness_end"],
-}).refine((data) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const startDate = new Date(data.illness_start);
-  startDate.setHours(0, 0, 0, 0);
-  
-  if (startDate < today && !data.late_justification) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Uzasadnienie opóźnienia jest wymagane dla daty w przeszłości",
-  path: ["late_justification"],
-});
+const datesSchema = z
+  .object({
+    illness_start: z
+      .date({
+        required_error: "Data zachorowania jest wymagana",
+      })
+      .refine((date) => {
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        return date >= threeDaysAgo;
+      }, "Data nie może być starsza niż 3 dni wstecz"),
+
+    illness_end: z.date({
+      required_error: "Data zakończenia jest wymagana",
+    }),
+
+    late_justification: z.string().max(500, "Uzasadnienie nie może przekraczać 500 znaków").optional(),
+  })
+  .refine(
+    (data) => {
+      const maxEndDate = new Date(data.illness_start);
+      maxEndDate.setDate(maxEndDate.getDate() + 6);
+      return data.illness_end <= maxEndDate;
+    },
+    {
+      message: "Data zakończenia nie może być późniejsza niż 7 dni od daty zachorowania",
+      path: ["illness_end"],
+    },
+  )
+  .refine(
+    (data) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startDate = new Date(data.illness_start);
+      startDate.setHours(0, 0, 0, 0);
+
+      if (startDate < today && !data.late_justification) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Uzasadnienie opóźnienia jest wymagane dla daty w przeszłości",
+      path: ["late_justification"],
+    },
+  );
 
 type DatesFormData = z.infer<typeof datesSchema>;
 
@@ -56,17 +68,18 @@ export default function DatyChoroby() {
   const navigate = useNavigate();
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
-  
+  const { pushEvent } = useDataLayer();
+
   const form = useForm<DatesFormData>({
     resolver: zodResolver(datesSchema),
   });
 
   const watchStart = form.watch("illness_start");
-  const needsJustification = watchStart && new Date(watchStart).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
+  const needsJustification = watchStart && new Date(watchStart).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem('formData_datyChoroby');
+    const savedData = localStorage.getItem("formData_datyChoroby");
     if (savedData) {
       const parsed = JSON.parse(savedData);
       if (parsed.illness_start) {
@@ -82,7 +95,7 @@ export default function DatyChoroby() {
   // Save data to localStorage on change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      localStorage.setItem('formData_datyChoroby', JSON.stringify(value));
+      localStorage.setItem("formData_datyChoroby", JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
@@ -97,7 +110,7 @@ export default function DatyChoroby() {
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <ProgressSteps currentStep={1} />
-        
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Daty choroby</h1>
           <p className="text-muted-foreground">Podaj daty okresu, na który potrzebujesz zwolnienia lekarskiego</p>
@@ -116,16 +129,9 @@ export default function DatyChoroby() {
                       <FormControl>
                         <Button
                           variant="outline"
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
+                          className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                         >
-                          {field.value ? (
-                            format(field.value, "dd.MM.yyyy")
-                          ) : (
-                            <span>Wybierz datę</span>
-                          )}
+                          {field.value ? format(field.value, "dd.MM.yyyy") : <span>Wybierz datę</span>}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
@@ -165,16 +171,9 @@ export default function DatyChoroby() {
                       <FormControl>
                         <Button
                           variant="outline"
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
+                          className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                         >
-                          {field.value ? (
-                            format(field.value, "dd.MM.yyyy")
-                          ) : (
-                            <span>Wybierz datę</span>
-                          )}
+                          {field.value ? format(field.value, "dd.MM.yyyy") : <span>Wybierz datę</span>}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
@@ -218,9 +217,7 @@ export default function DatyChoroby() {
                         {...field}
                       />
                     </FormControl>
-                    <p className="text-sm text-muted-foreground">
-                      {field.value?.length || 0}/500 znaków
-                    </p>
+                    <p className="text-sm text-muted-foreground">{field.value?.length || 0}/500 znaków</p>
                     <FormMessage />
                   </FormItem>
                 )}

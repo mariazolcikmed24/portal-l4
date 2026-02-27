@@ -143,10 +143,12 @@ export default function RodzajZwolnienia() {
     console.log("Rodzaj zwolnienia:", data);
     pushEvent({
       event: "form_step_submit",
-      form_name: "e_zwolnienie",
-      step_number: 2,
-      step_name: "rodzaj_zwolnienia",
-      leave_type: data.leave_type, // np. 'pl_employer', 'student', 'care'
+      eventModel: {
+        form_name: "e_zwolnienie",
+        step_number: 2,
+        step_name: "rodzaj_zwolnienia",
+        leave_type: data.leave_type, // np. 'pl_employer', 'student', 'care'
+      },
     });
     toast.success("Dane zapisane");
     navigate("/wywiad-ogolny");

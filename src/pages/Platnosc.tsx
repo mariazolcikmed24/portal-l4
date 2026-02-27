@@ -21,6 +21,10 @@ const paymentSchema = z.object({
 type PaymentFormData = z.infer<typeof paymentSchema>;
 
 export default function Platnosc() {
+
+  const servicePrice = 79.00;
+  const servicePriceGrosze = servicePrice * 100;
+  
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -29,6 +33,36 @@ export default function Platnosc() {
   const form = useForm<PaymentFormData>({
     resolver: zodResolver(paymentSchema),
   });
+
+  // DODANO: Helpery do mapowania parametrów analitycznych
+  const getLeaveTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      pl_employer: "Zwolnienie dla ubezpieczonych w ZUS",
+      care: "Zwolnienie na dziecko",
+      student: "Student/Uczeń",
+      care_family: "Opieka nad członkiem rodziny",
+      krus: "Ubezpieczeni w KRUS",
+      uniformed: "Służby mundurowe/Studenci służb mundurowych",
+      foreign_employer: "Pracodawca zagraniczny",
+    };
+    return labels[type] || type;
+  };
+
+  const getMainCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      cold_pain: "Przeziębienie lub bóle",
+      gastro: "Zatrucie i problemy żołądkowe",
+      bladder: "Problemy z pęcherzem",
+      injury: "Urazy",
+      menstruation: "Menstruacja / miesiączka",
+      back_pain: "Bóle pleców",
+      eye: "Problemy z oczami",
+      migraine: "Migrena",
+      acute_stress: "Ostre reakcje na stres",
+      psych: "Problemy psychologiczne",
+    };
+    return labels[category] || category;
+  };
 
   const onSubmit = async (data: PaymentFormData) => {
     setIsProcessing(true);
@@ -131,7 +165,7 @@ export default function Platnosc() {
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke("autopay-initiate-payment", {
         body: {
           case_id: caseData.id,
-          amount: 7900, // 79 PLN w groszach
+          amount: servicePriceGrosze, // 79 PLN w groszach
         },
       });
 
@@ -141,6 +175,26 @@ export default function Platnosc() {
       }
 
       console.log("Payment URL:", paymentData.payment_url);
+
+      // ANALYTICS EVENT
+      pushEvent({
+        event: "add_payment_info",
+        ecommerce: {
+          currency: "PLN",
+          value: servicePrice,
+          payment_type: "autopay",
+          items: [
+            {
+              item_id: "e-konsultacja-zwolnienie",
+              item_name: "E-konsultacja + e-zwolnienie",
+              item_category: getLeaveTypeLabel(rodzajZwolnienia?.leave_type),
+              item_category2: wywiadObjawy?.main_category ? getMainCategoryLabel(wywiadObjawy.main_category) : undefined,
+              price: servicePrice,
+              quantity: 1,
+            },
+          ],
+        },
+      });
 
       // Redirect to Autopay gateway.
       // Autopay initiation is specified as a POST (form submission).
@@ -189,7 +243,7 @@ export default function Platnosc() {
             <CardContent>
               <div className="flex justify-between items-center">
                 <span className="text-lg">E-konsultacja + e-zwolnienie:</span>
-                <span className="text-3xl font-bold text-primary">79 PLN</span>
+                <span className="text-3xl font-bold text-primary">{formatPriceUI(servicePrice)} PLN</span>
               </div>
             </CardContent>
           </Card>
@@ -238,7 +292,7 @@ export default function Platnosc() {
                 Wstecz
               </Button>
               <Button type="submit" className="flex-1" disabled={isProcessing}>
-                {isProcessing ? "Przekierowywanie do płatności..." : "Zapłać 79 PLN"}
+                {isProcessing ? `Przekierowywanie do płatności..." : "Zapłać ${formatPriceUI(servicePrice)} PLN`}
               </Button>
             </div>
           </form>

@@ -90,6 +90,7 @@ export default function Podsumowanie() {
     loadData();
   }, [user]);
 
+  // ANALYTICS EVENT
   useEffect(() => {
     if (formData.rodzajZwolnienia?.leave_type && !hasTrackedViewRef.current) {
       pushEvent({
@@ -118,6 +119,7 @@ export default function Podsumowanie() {
   }, [formData, pushEvent]);
 
   const handleGoToPayment = () => {
+    // ANALYTICS EVENT
     pushEvent({
       event: "form_step_submit",
       eventModel: {
@@ -126,6 +128,7 @@ export default function Podsumowanie() {
         step_name: "podsumowanie",
       },
     });
+    // ANALYTICS EVENT
     pushEvent({
       event: "begin_checkout",
       ecommerce: {

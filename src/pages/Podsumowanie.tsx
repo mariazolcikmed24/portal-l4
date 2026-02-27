@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Baby, User } from "lucide-react";
 import { useDataLayer } from "@/hooks/useDataLayer";
+import { formatPriceUI } from "@/lib/formatters";
 
 export default function Podsumowanie() {
   const servicePrice = 79.99;
@@ -48,13 +49,6 @@ export default function Podsumowanie() {
     if (isChildCare) return "dziecka";
     if (isFamilyCare) return "osoby chorej";
     return "";
-  };
-
-  const formatPriceUI = (price: number): string => {
-    if (Number.isInteger(price)) {
-      return price.toString();
-    }
-    return price.toFixed(2).replace(".", ",");
   };
 
   useEffect(() => {

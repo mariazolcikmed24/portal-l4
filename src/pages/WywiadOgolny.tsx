@@ -218,8 +218,8 @@ export default function WywiadOgolny() {
       form_name: "e_zwolnienie",
       step_number: 3,
       step_name: "wywiad_ogolny",
-      has_chronic: formData.q_chronic === "yes",
-      takes_meds: formData.q_meds === "yes",
+      has_chronic: data.q_chronic === "yes",
+      takes_meds: data.q_meds === "yes",
     });
     toast.success("Dane zapisane");
     navigate("/wywiad-objawy");

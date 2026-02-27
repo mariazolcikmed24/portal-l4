@@ -55,6 +55,10 @@ export type AnalyticsEvent =
       };
     }
   | {
+      event: "add_payment_info";
+      ecommerce: any;
+    }
+  | {
       event: "purchase";
       ecommerce: {
         transaction_id: string;
@@ -93,8 +97,4 @@ export type AnalyticsEvent =
   | {
       event: "sign_up";
       method: string;
-    }
-  | {
-      event: "add_payment_info";
-      ecommerce: Ecommerce;
     };

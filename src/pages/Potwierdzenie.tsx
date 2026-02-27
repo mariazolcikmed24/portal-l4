@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CheckCircle, Clock, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +16,8 @@ export default function Potwierdzenie() {
   const [status, setStatus] = useState<PaymentStatus>("verifying");
   const [caseNumber, setCaseNumber] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const hasTrackedPurchaseRef = useRef(false);
 
   useEffect(() => {
     const verifyReturn = async () => {
@@ -55,8 +57,7 @@ export default function Potwierdzenie() {
         setCaseNumber(data.case_number);
 
         // Map payment status
-        if (data.payment_status === "success") {
-          setStatus("success");
+        if (data.payment_status === "success" && !hasTrackedPurchaseRef.current) {
           pushEvent({
             event: "purchase",
             ecommerce: {
@@ -76,6 +77,8 @@ export default function Potwierdzenie() {
               })),
             },
           });
+          hasTrackedPurchaseRef.current = true; // Flaga chroniąca przed podwójnym wysłaniem
+          setStatus("success");
           clearFormData();
         } else if (data.payment_status === "fail") {
           setStatus("fail");

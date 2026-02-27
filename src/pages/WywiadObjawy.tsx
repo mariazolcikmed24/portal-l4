@@ -14,28 +14,32 @@ import { toast } from "sonner";
 import { ProgressSteps } from "@/components/layout/ProgressSteps";
 import { Upload, X, Loader2, Baby, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
 const symptomsSchema = z.object({
-  main_category: z.enum([
-    "cold_pain",
-    "gastro",
-    "bladder",
-    "injury",
-    "menstruation",
-    "back_pain",
-    "eye",
-    "migraine",
-    "acute_stress",
-    "psych",
-  ], { required_error: "Kategoria jest wymagana" }),
-  
-  symptom_duration: z.enum(["today", "yesterday", "2_3", "4_5", "gt_5"], { required_error: "Czas trwania jest wymagany" }),
-  
+  main_category: z.enum(
+    [
+      "cold_pain",
+      "gastro",
+      "bladder",
+      "injury",
+      "menstruation",
+      "back_pain",
+      "eye",
+      "migraine",
+      "acute_stress",
+      "psych",
+    ],
+    { required_error: "Kategoria jest wymagana" },
+  ),
+
+  symptom_duration: z.enum(["today", "yesterday", "2_3", "4_5", "gt_5"], {
+    required_error: "Czas trwania jest wymagany",
+  }),
+
   symptoms: z.array(z.string()).optional(),
-  
-  free_text_reason: z.string()
-    .min(1, "Opis jest wymagany")
-    .max(1500, "Opis nie może przekraczać 1500 znaków"),
+
+  free_text_reason: z.string().min(1, "Opis jest wymagany").max(1500, "Opis nie może przekraczać 1500 znaków"),
 });
 
 type SymptomsFormData = z.infer<typeof symptomsSchema>;
@@ -75,7 +79,7 @@ const symptomsByCategory: Record<string, { id: string; label: string }[]> = {
     { id: "fever", label: "Gorączka >38°C" },
     { id: "subfebrile", label: "Stan podgorączkowy" },
     { id: "fatigue", label: "Zmęczenie/brak sił" },
-    { id: "malaise", label: "Uczucie \"rozbicia\"" },
+    { id: "malaise", label: 'Uczucie "rozbicia"' },
     { id: "weakness", label: "Osłabienie" },
     { id: "chills", label: "Dreszcze" },
     { id: "muscle_pain", label: "Bóle mięśni" },
@@ -285,28 +289,29 @@ export default function WywiadObjawy() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  
+
   // Check if this is a care leave (child or family member)
   const [isCareLeave, setIsCareLeave] = useState(false);
   const [isChildCare, setIsChildCare] = useState(false);
   const [patientName, setPatientName] = useState("");
-  
+  const { pushEvent } = useDataLayer();
+
   useEffect(() => {
-    const savedLeaveData = localStorage.getItem('formData_rodzajZwolnienia');
+    const savedLeaveData = localStorage.getItem("formData_rodzajZwolnienia");
     if (savedLeaveData) {
       const parsed = JSON.parse(savedLeaveData);
-      if (parsed.leave_type === 'care') {
+      if (parsed.leave_type === "care") {
         setIsCareLeave(true);
         setIsChildCare(true);
         setPatientName(parsed.care_first_name || "dziecka");
-      } else if (parsed.leave_type === 'care_family') {
+      } else if (parsed.leave_type === "care_family") {
         setIsCareLeave(true);
         setIsChildCare(false);
         setPatientName(parsed.care_family_first_name || "podopiecznego");
       }
     }
   }, []);
-  
+
   const form = useForm<SymptomsFormData>({
     resolver: zodResolver(symptomsSchema),
   });
@@ -315,14 +320,14 @@ export default function WywiadObjawy() {
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem('formData_wywiadObjawy');
+    const savedData = localStorage.getItem("formData_wywiadObjawy");
     if (savedData) {
       const parsed = JSON.parse(savedData);
       form.reset(parsed);
     }
-    
+
     // Load uploaded files from localStorage
-    const savedFiles = localStorage.getItem('uploadedFiles_attachments');
+    const savedFiles = localStorage.getItem("uploadedFiles_attachments");
     if (savedFiles) {
       setUploadedFiles(JSON.parse(savedFiles));
     }
@@ -331,92 +336,97 @@ export default function WywiadObjawy() {
   // Save data to localStorage on change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      localStorage.setItem('formData_wywiadObjawy', JSON.stringify(value));
+      localStorage.setItem("formData_wywiadObjawy", JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
 
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    
+
     if (uploadedFiles.length + files.length > 3) {
       toast.error("Maksymalnie możesz załączyć 3 pliki");
       return;
     }
-    
+
     setIsUploading(true);
     const newUploadedFiles: UploadedFile[] = [];
-    
+
     for (const file of Array.from(files)) {
       if (file.size > 10 * 1024 * 1024) {
         toast.error(`Plik ${file.name} jest za duży (max 10MB)`);
         continue;
       }
-      
+
       try {
         // Generate unique path
         const timestamp = Date.now();
         const randomId = Math.random().toString(36).substring(7);
         const filePath = `attachments/${timestamp}-${randomId}-${file.name}`;
-        
+
         console.log(`Uploading file: ${file.name} to ${filePath}`);
-        
-        const { error: uploadError } = await supabase.storage
-          .from('case-attachments')
-          .upload(filePath, file);
-        
+
+        const { error: uploadError } = await supabase.storage.from("case-attachments").upload(filePath, file);
+
         if (uploadError) {
-          console.error('Upload error:', uploadError);
+          console.error("Upload error:", uploadError);
           toast.error(`Błąd przesyłania pliku ${file.name}`);
           continue;
         }
-        
+
         newUploadedFiles.push({ path: filePath, name: file.name });
         console.log(`Successfully uploaded: ${file.name}`);
       } catch (error) {
-        console.error('Error uploading file:', error);
+        console.error("Error uploading file:", error);
         toast.error(`Błąd przesyłania pliku ${file.name}`);
       }
     }
-    
+
     if (newUploadedFiles.length > 0) {
       const allFiles = [...uploadedFiles, ...newUploadedFiles];
       setUploadedFiles(allFiles);
-      localStorage.setItem('uploadedFiles_attachments', JSON.stringify(allFiles));
+      localStorage.setItem("uploadedFiles_attachments", JSON.stringify(allFiles));
       toast.success(`Przesłano ${newUploadedFiles.length} plik(ów)`);
     }
-    
+
     setIsUploading(false);
   };
 
   const handleRemoveFile = async (filePath: string) => {
     try {
-      await supabase.storage
-        .from('case-attachments')
-        .remove([filePath]);
-      
-      const updatedFiles = uploadedFiles.filter(f => f.path !== filePath);
+      await supabase.storage.from("case-attachments").remove([filePath]);
+
+      const updatedFiles = uploadedFiles.filter((f) => f.path !== filePath);
       setUploadedFiles(updatedFiles);
-      localStorage.setItem('uploadedFiles_attachments', JSON.stringify(updatedFiles));
+      localStorage.setItem("uploadedFiles_attachments", JSON.stringify(updatedFiles));
       toast.success("Plik usunięty");
     } catch (error) {
-      console.error('Error removing file:', error);
+      console.error("Error removing file:", error);
       toast.error("Błąd usuwania pliku");
     }
   };
 
   const onSubmit = async (data: SymptomsFormData) => {
     console.log("Wywiad objawy:", data);
+    pushEvent({
+      event: "form_step_submit",
+      form_name: "e_zwolnienie",
+      step_number: 4,
+      step_name: "wywiad_objawy",
+      symptom_category: formData.main_category, // np. 'gastro'
+      symptom_duration: formData.symptom_duration, // np. 'yesterday'
+      has_attachments: files.length > 0, // true/false
+    });
     toast.success("Dane zapisane");
     navigate("/podsumowanie");
   };
 
   // Get categories based on leave type
   const availableCategories = isChildCare ? childCategories : categories;
-  
+
   // Get symptoms based on category and leave type
   const getSymptoms = (category: string) => {
-    if (isChildCare && category === 'acute_stress') {
+    if (isChildCare && category === "acute_stress") {
       return childStressSymptoms;
     }
     return symptomsByCategory[category] || [];
@@ -433,28 +443,20 @@ export default function WywiadObjawy() {
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <ProgressSteps currentStep={4} />
-        
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
-            {isCareLeave 
-              ? `Wywiad medyczny - objawy ${getPatientLabel()}`
-              : "Wywiad medyczny - objawy"
-            }
+            {isCareLeave ? `Wywiad medyczny - objawy ${getPatientLabel()}` : "Wywiad medyczny - objawy"}
           </h1>
           <p className="text-muted-foreground">
-            {isCareLeave 
+            {isCareLeave
               ? `Opisz główną dolegliwość i objawy ${patientName}`
-              : "Opisz swoją główną dolegliwość i objawy"
-            }
+              : "Opisz swoją główną dolegliwość i objawy"}
           </p>
-          
+
           {isCareLeave && (
             <div className="mt-4 flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20">
-              {isChildCare ? (
-                <Baby className="h-5 w-5 text-primary" />
-              ) : (
-                <Users className="h-5 w-5 text-primary" />
-              )}
+              {isChildCare ? <Baby className="h-5 w-5 text-primary" /> : <Users className="h-5 w-5 text-primary" />}
               <span className="text-sm font-medium">
                 Formularz dotyczy stanu zdrowia {getPatientLabel()}: <strong>{patientName}</strong>
               </span>
@@ -470,10 +472,9 @@ export default function WywiadObjawy() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {isCareLeave 
+                    {isCareLeave
                       ? `Kategoria głównej dolegliwości ${getPatientLabel()} *`
-                      : "Kategoria głównej dolegliwości *"
-                    }
+                      : "Kategoria głównej dolegliwości *"}
                   </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
@@ -500,10 +501,7 @@ export default function WywiadObjawy() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {isCareLeave 
-                      ? `Od kiedy ${patientName} ma te objawy? *`
-                      : "Czas trwania objawów *"
-                    }
+                    {isCareLeave ? `Od kiedy ${patientName} ma te objawy? *` : "Czas trwania objawów *"}
                   </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
@@ -531,10 +529,9 @@ export default function WywiadObjawy() {
                 render={() => (
                   <FormItem>
                     <FormLabel>
-                      {isCareLeave 
+                      {isCareLeave
                         ? `Wybierz objawy ${getPatientLabel()} (opcjonalnie)`
-                        : "Wybierz objawy (opcjonalnie)"
-                      }
+                        : "Wybierz objawy (opcjonalnie)"}
                     </FormLabel>
                     <div className="space-y-2 max-h-64 overflow-y-auto border rounded-md p-4">
                       {getSymptoms(mainCategory).map((symptom) => (
@@ -574,25 +571,23 @@ export default function WywiadObjawy() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {isCareLeave 
+                    {isCareLeave
                       ? `Opisz objawy zdrowotne ${getPatientLabel()} oraz okoliczności, które wymagają Twojej opieki *`
-                      : "Opisz objawy zdrowotne oraz okoliczności, które uniemożliwiają Ci wykonywanie pracy *"
-                    }
+                      : "Opisz objawy zdrowotne oraz okoliczności, które uniemożliwiają Ci wykonywanie pracy *"}
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={isCareLeave 
-                        ? `Opisz szczegółowo objawy ${getPatientLabel()}, okoliczności ich wystąpienia oraz dlaczego wymaga Twojej osobistej opieki...`
-                        : "Opisz szczegółowo swoje objawy, okoliczności ich wystąpienia oraz wpływ na Twoją zdolność do pracy..."
+                      placeholder={
+                        isCareLeave
+                          ? `Opisz szczegółowo objawy ${getPatientLabel()}, okoliczności ich wystąpienia oraz dlaczego wymaga Twojej osobistej opieki...`
+                          : "Opisz szczegółowo swoje objawy, okoliczności ich wystąpienia oraz wpływ na Twoją zdolność do pracy..."
                       }
                       className="min-h-[200px]"
                       maxLength={1500}
                       {...field}
                     />
                   </FormControl>
-                  <p className="text-sm text-muted-foreground">
-                    {field.value?.length || 0}/1500 znaków
-                  </p>
+                  <p className="text-sm text-muted-foreground">{field.value?.length || 0}/1500 znaków</p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -600,10 +595,9 @@ export default function WywiadObjawy() {
 
             <FormItem>
               <FormLabel>
-                {isCareLeave 
+                {isCareLeave
                   ? `Załącz dokumentację medyczną ${getPatientLabel()} (opcjonalnie)`
-                  : "Załącz dokumentację medyczną (opcjonalnie)"
-                }
+                  : "Załącz dokumentację medyczną (opcjonalnie)"}
               </FormLabel>
               <div className="space-y-2">
                 <Input
@@ -635,19 +629,14 @@ export default function WywiadObjawy() {
                     </>
                   )}
                 </Button>
-                
+
                 {uploadedFiles.length > 0 && (
                   <div className="space-y-2 mt-2">
                     <p className="text-sm text-muted-foreground">Przesłane pliki ({uploadedFiles.length}/3):</p>
                     {uploadedFiles.map((file) => (
                       <div key={file.path} className="flex items-center justify-between bg-muted/50 p-2 rounded">
                         <span className="text-sm truncate flex-1">{file.name}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveFile(file.path)}
-                        >
+                        <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(file.path)}>
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
@@ -655,9 +644,7 @@ export default function WywiadObjawy() {
                   </div>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground">
-                Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)
-              </p>
+              <p className="text-sm text-muted-foreground">Format: PDF, JPG, PNG (max 10MB każdy, max 3 pliki)</p>
             </FormItem>
 
             <div className="flex gap-4 pt-4">

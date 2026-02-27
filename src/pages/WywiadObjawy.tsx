@@ -410,12 +410,14 @@ export default function WywiadObjawy() {
     console.log("Wywiad objawy:", data);
     pushEvent({
       event: "form_step_submit",
-      form_name: "e_zwolnienie",
-      step_number: 4,
-      step_name: "wywiad_objawy",
-      symptom_category: data.main_category, // np. 'gastro'
-      symptom_duration: data.symptom_duration, // np. 'yesterday'
-      has_attachments: uploadedFiles.length > 0, // true/false
+      eventModel: {
+        form_name: "e_zwolnienie",
+        step_number: 4,
+        step_name: "wywiad_objawy",
+        symptom_category: data.main_category, // np. 'gastro'
+        symptom_duration: data.symptom_duration, // np. 'yesterday'
+        has_attachments: uploadedFiles.length > 0, // true/false
+      },
     });
     toast.success("Dane zapisane");
     navigate("/podsumowanie");

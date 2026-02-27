@@ -177,6 +177,16 @@ export default function Platnosc() {
 
       // ANALYTICS EVENT
       pushEvent({
+        event: "form_step_submit",
+        eventModel: {
+          form_name: "e_zwolnienie",
+          step_number: 6,
+          step_name: "platnosc",
+        },
+      });
+
+      // ANALYTICS EVENT
+      pushEvent({
         event: "add_payment_info",
         ecommerce: {
           currency: "PLN",

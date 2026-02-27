@@ -15,6 +15,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
 // Walidacja sumy kontrolnej PESEL
 const validatePesel = (pesel: string): boolean => {

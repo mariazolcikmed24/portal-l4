@@ -682,7 +682,7 @@ export default function Podsumowanie() {
             <Button variant="outline" onClick={() => navigate("/daty-choroby")} className="flex-1">
               Edytuj dane
             </Button>
-            <Button onClick={handleGoToPayment} className="flex-1">
+            <Button onClick={() => handleGoToPayment} className="flex-1">
               Przejdź do płatności
             </Button>
           </div>

@@ -149,6 +149,7 @@ export default function Podsumowanie() {
         ],
       },
     });
+    navigate("/platnosc");
   };
 
   const getLeaveTypeLabel = (type: string) => {

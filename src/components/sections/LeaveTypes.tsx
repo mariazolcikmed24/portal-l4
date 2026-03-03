@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ChevronRight, FileText, Baby, GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
 const leaveTypes = [
   {
@@ -33,6 +34,8 @@ const leaveTypes = [
 ];
 
 const LeaveTypes = () => {
+  const { pushEvent, handleButtonClickActions } = useDataLayer();
+
   return (
     <section className="pt-8 pb-8 md:pt-12 md:pb-12 bg-gradient-to-b from-muted/20 to-muted/40">
       <div className="container mx-auto px-4">
@@ -44,6 +47,9 @@ const LeaveTypes = () => {
                 key={index}
                 to={type.link}
                 className="group relative bg-card rounded-2xl p-6 shadow-soft hover:shadow-strong transition-all duration-300 flex flex-col border border-border/50 hover:border-primary/30 hover:-translate-y-1"
+                onClick={handleButtonClickActions("form_start", type.title, "Karta Zwolnienia", {
+                  form_name: "e_zwolnienie",
+                })}
               >
                 {/* Popular badge */}
                 {type.popular && (
@@ -69,9 +75,7 @@ const LeaveTypes = () => {
                   <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
                     {type.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {type.subtitle}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{type.subtitle}</p>
                 </div>
 
                 {/* Features list */}
@@ -85,14 +89,17 @@ const LeaveTypes = () => {
                 </div>
 
                 {/* CTA Button */}
-                <Button 
-                  variant="hero" 
-                  size="lg" 
+                <Button
+                  variant="hero"
+                  size="lg"
                   className="w-full justify-center gap-2 group-hover:gap-3 transition-all"
                   tabIndex={-1}
                 >
                   Wypełnij formularz
-                  <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  <ChevronRight
+                    className="w-5 h-5 transition-transform group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
                 </Button>
               </Link>
             );

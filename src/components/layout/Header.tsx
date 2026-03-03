@@ -3,10 +3,13 @@ import { Shield, Phone, Menu, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+
+  const { pushEvent, handleButtonClickActions } = useDataLayer();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -22,7 +25,9 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center transition-smooth hover:opacity-80">
-            <span className="text-xl font-bold text-foreground">e-<span className="text-primary">zwolnienie</span>.com.pl</span>
+            <span className="text-xl font-bold text-foreground">
+              e-<span className="text-primary">zwolnienie</span>.com.pl
+            </span>
           </Link>
 
           {/* Desktop Menu */}
@@ -45,10 +50,7 @@ const Header = () => {
             >
               FAQ
             </button>
-            <Link
-              to="/status"
-              className="text-foreground hover:text-primary transition-smooth font-medium"
-            >
+            <Link to="/status" className="text-foreground hover:text-primary transition-smooth font-medium">
               Sprawdź status sprawy
             </Link>
             <button
@@ -75,7 +77,12 @@ const Header = () => {
               </Link>
             )}
             */}
-            <Link to="/rejestracja?guest=true">
+            <Link
+              to="/rejestracja?guest=true"
+              onClick={handleButtonClickActions("form_start", "Uzyskaj zwolnienie", "Header", {
+                form_name: "e_zwolnienie",
+              })}
+            >
               <Button variant="hero" size="lg">
                 Uzyskaj zwolnienie
               </Button>

@@ -149,7 +149,13 @@ const Header = () => {
                 </Link>
               )}
               */}
-              <Link to="/rejestracja?guest=true" className="w-full">
+              <Link
+                to="/rejestracja?guest=true"
+                className="w-full"
+                onClick={handleButtonClickActions("form_start", "Uzyskaj zwolnienie", "Header", {
+                  form_name: "e_zwolnienie",
+                })}
+              >
                 <Button variant="hero" size="lg" className="w-full">
                   Uzyskaj zwolnienie
                 </Button>

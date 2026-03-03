@@ -445,6 +445,15 @@ const Rejestracja = () => {
           method: "form_ezwolnienie",
         });
 
+        pushEvent({
+          event: "form_step_submit",
+          eventModel: {
+            form_name: "e_zwolnienie",
+            step_number: 0,
+            step_name: "rejestracja",
+          },
+        });
+
         toast({
           title: "Dane zapisane",
           description: "Przejdź do formularza medycznego.",

@@ -9,7 +9,7 @@ const Hero = () => {
   const [doctorsOnline, setDoctorsOnline] = useState(10);
   const [activeBadge, setActiveBadge] = useState(0);
 
-  const { pushEvent } = useDataLayer();
+  const { pushEvent, handleButtonClickActions } = useDataLayer();
 
   useEffect(() => {
     // Set random number on mount
@@ -114,7 +114,12 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Link to="/rejestracja?guest=true">
+              <Link
+                to="/rejestracja?guest=true"
+                onClick={handleButtonClickActions("form_start", "Uzyskaj zwolnienie online", "Hero", {
+                  form_name: "e_zwolnienie",
+                })}
+              >
                 <Button variant="hero" size="lg" className="w-full sm:w-auto shadow-strong hover:shadow-glow">
                   Uzyskaj zwolnienie online
                 </Button>

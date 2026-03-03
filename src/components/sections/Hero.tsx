@@ -3,44 +3,58 @@ import { CheckCircle, Shield, Clock, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-doctor.jpg";
+import { useDataLayer } from "@/hooks/useDataLayer";
 
 const Hero = () => {
   const [doctorsOnline, setDoctorsOnline] = useState(10);
   const [activeBadge, setActiveBadge] = useState(0);
 
+  const { pushEvent } = useDataLayer();
+
   useEffect(() => {
     // Set random number on mount
     setDoctorsOnline(Math.floor(Math.random() * 7) + 7); // 7-13
-    
+
     // Update doctors count every 5 minutes
     const doctorsInterval = setInterval(() => {
       setDoctorsOnline(Math.floor(Math.random() * 7) + 7);
     }, 300000);
-    
+
     // Auto-rotate badges on mobile every 3 seconds
     const badgeInterval = setInterval(() => {
-      setActiveBadge(prev => (prev === 0 ? 1 : 0));
+      setActiveBadge((prev) => (prev === 0 ? 1 : 0));
     }, 3000);
-    
+
     return () => {
       clearInterval(doctorsInterval);
       clearInterval(badgeInterval);
     };
   }, []);
 
-  return <section className="relative pt-20 pb-8 md:pt-28 md:pb-12 lg:pt-24 overflow-hidden gradient-subtle">
+  const handleButtonClickEvent = (buttonName: string) => {
+    return () => {
+      pushEvent({
+        event: "button_click",
+        button_name: buttonName,
+        section: sectionName,
+      });
+    };
+  };
+
+  return (
+    <section className="relative pt-20 pb-8 md:pt-28 md:pb-12 lg:pt-24 overflow-hidden gradient-subtle">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-      
+
       <div className="container mx-auto px-4 relative">
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
           {/* Left column - Content */}
           <div className="space-y-4 md:space-y-5">
             {/* Mobile & Tablet: Rotating badges */}
             <div className="lg:hidden relative h-12 overflow-visible">
-              <div 
+              <div
                 className={`absolute inset-0 flex items-center transition-all duration-500 ease-in-out ${
-                  activeBadge === 0 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+                  activeBadge === 0 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
                 }`}
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-secondary text-secondary-foreground rounded-full text-sm font-semibold shadow-soft">
@@ -51,14 +65,16 @@ const Hero = () => {
                   <span>{doctorsOnline} lekarzy online</span>
                 </div>
               </div>
-              <div 
+              <div
                 className={`absolute inset-0 flex items-center transition-all duration-500 ease-in-out ${
-                  activeBadge === 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
+                  activeBadge === 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full"
                 }`}
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft">
                   <Users className="w-4 h-4" aria-hidden="true" />
-                  <span><strong>250 000+</strong> zadowolonych pacjentów</span>
+                  <span>
+                    <strong>250 000+</strong> zadowolonych pacjentów
+                  </span>
                 </div>
               </div>
             </div>
@@ -74,7 +90,9 @@ const Hero = () => {
               </div>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft">
                 <Users className="w-4 h-4" aria-hidden="true" />
-                <span><strong>250 000+</strong> zadowolonych pacjentów</span>
+                <span>
+                  <strong>250 000+</strong> zadowolonych pacjentów
+                </span>
               </div>
             </div>
 
@@ -84,7 +102,8 @@ const Hero = () => {
             </h1>
 
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Skonsultuj się z lekarzem online i otrzymaj e-zwolnienie w kilka minut. Profesjonalnie, bezpiecznie i zgodnie z RODO.
+              Skonsultuj się z lekarzem online i otrzymaj e-zwolnienie w kilka minut. Profesjonalnie, bezpiecznie i
+              zgodnie z RODO.
             </p>
 
             {/* Trust indicators */}
@@ -116,15 +135,14 @@ const Hero = () => {
                 </Button>
               </a>
             </div>
-
           </div>
 
           {/* Right column - Image */}
           <div className="relative hidden md:block">
             <div className="relative rounded-2xl overflow-hidden shadow-strong">
-              <img 
-                src={heroImage} 
-                alt="Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-zwolnienie" 
+              <img
+                src={heroImage}
+                alt="Profesjonalny lekarz podczas konsultacji online - bezpieczne i legalne zwolnienia lekarskie e-zwolnienie"
                 className="w-full h-auto object-cover aspect-[4/3]"
                 width={600}
                 height={450}
@@ -134,7 +152,7 @@ const Hero = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
             </div>
-            
+
             {/* Floating card */}
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-strong max-w-xs">
               <div className="flex items-center gap-4">
@@ -150,6 +168,7 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
 export default Hero;

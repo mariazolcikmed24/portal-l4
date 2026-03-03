@@ -19,5 +19,24 @@ export const useDataLayer = () => {
     window.dataLayer.push(payload);
   };
 
-  return { pushEvent };
+  const handleButtonClickActions = (
+    eventName: string,
+    action: string,
+    section: string,
+    custom: Record<string, any> = {},
+  ) => {
+    return () => {
+      const eventModel = {
+        page_action: action,
+        page_section: section,
+        ...custom,
+      };
+      pushEvent({
+        event: eventName,
+        eventModel,
+      } as any);
+    };
+  };
+
+  return { pushEvent, handleButtonClickActions };
 };

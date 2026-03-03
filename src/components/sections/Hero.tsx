@@ -31,19 +31,6 @@ const Hero = () => {
     };
   }, []);
 
-  const handleButtonClickEvent = (section: string, action: string) => {
-    return () => {
-      pushEvent({
-        event: "form_start",
-        eventModel: {
-          form_name: "e_zwolnienie",
-          page_action: action,
-          page_section: section,
-        },
-      });
-    };
-  };
-
   return (
     <section className="relative pt-20 pb-8 md:pt-28 md:pb-12 lg:pt-24 overflow-hidden gradient-subtle">
       {/* Background decoration */}

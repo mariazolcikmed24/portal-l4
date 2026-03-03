@@ -31,12 +31,15 @@ const Hero = () => {
     };
   }, []);
 
-  const handleButtonClickEvent = () => {
+  const handleButtonClickEvent = (section: string, action: string) => {
     return () => {
       pushEvent({
-        event: "",
-        page_action: "",
-        page_section: "",
+        event: "form_start",
+        eventModel: {
+          form_name: "e_zwolnienie",
+          page_action: action,
+          page_section: section,
+        },
       });
     };
   };

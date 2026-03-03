@@ -31,12 +31,12 @@ const Hero = () => {
     };
   }, []);
 
-  const handleButtonClickEvent = (buttonName: string) => {
+  const handleButtonClickEvent = () => {
     return () => {
       pushEvent({
-        event: "button_click",
-        button_name: buttonName,
-        section: sectionName,
+        event: "",
+        page_action: "",
+        page_section: "",
       });
     };
   };

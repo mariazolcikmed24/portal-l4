@@ -440,6 +440,11 @@ const Rejestracja = () => {
           }),
         );
 
+        pushEvent({
+          event: "sign_up",
+          method: "form_ezwolnienie",
+        });
+
         toast({
           title: "Dane zapisane",
           description: "Przejdź do formularza medycznego.",

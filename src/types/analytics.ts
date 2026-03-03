@@ -97,4 +97,12 @@ export type AnalyticsEvent =
   | {
       event: "sign_up";
       method: string;
+    }
+  | {
+      event: "form_start";
+      eventModel: {
+        form_name: string;
+        page_action: string;
+        page_section: string;
+      };
     };

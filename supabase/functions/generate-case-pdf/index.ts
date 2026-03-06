@@ -213,10 +213,19 @@ serve(async (req) => {
     }
 
     // General medical history
-    drawSection('WYWIAD OGOLNY');
-    drawText(`Ciaza: ${caseData.pregnant ? 'Tak' : 'Nie'}`);
-    if (caseData.pregnant && caseData.pregnancy_leave) {
-      drawText(`Zwolnienie zwiazane z ciaza: Tak`);
+    const carePatientLabel = isCareVisit ? 'dziecka' : (isCareFamily ? 'osoby chorej' : '');
+    if (isCareLeave) {
+      drawSection(`WYWIAD OGOLNY (dot. ${carePatientLabel})`);
+    } else {
+      drawSection('WYWIAD OGOLNY');
+    }
+
+    // Pregnancy - only for non-care visits
+    if (!isCareLeave) {
+      drawText(`Ciaza: ${caseData.pregnant ? 'Tak' : 'Nie'}`);
+      if (caseData.pregnant && caseData.pregnancy_leave) {
+        drawText(`Zwolnienie zwiazane z ciaza: Tak`);
+      }
     }
     
     drawText(`Choroby przewlekle: ${caseData.chronic_conditions?.length > 0 ? 'Tak' : 'Nie'}`);
@@ -255,8 +264,10 @@ serve(async (req) => {
       drawText(`  - ${caseData.meds_list}`);
     }
 
-    drawText(`Dlugotrwale zwolnienie (>33 dni/rok): ${caseData.long_leave ? 'Tak' : 'Nie'}`);
-
+    // Long leave - only for non-care visits
+    if (!isCareLeave) {
+      drawText(`Dlugotrwale zwolnienie (>33 dni/rok): ${caseData.long_leave ? 'Tak' : 'Nie'}`);
+    }
     // Symptoms
     drawSection('OBJAWY I DOLEGLIWOSCI');
     drawText(`Kategoria: ${getCategoryLabel(caseData.main_category)}`);

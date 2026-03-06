@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useDataLayer } from "@/hooks/useDataLayer";
 
+const SERVICE_PRICE = 79.0;
+
 type PaymentStatus = "pending" | "success" | "fail" | "verifying" | "error";
 
 export default function Potwierdzenie() {
@@ -62,22 +64,21 @@ export default function Potwierdzenie() {
             event: "purchase",
             ecommerce: {
               transaction_id: data.case_number || orderId,
-              value: Number(data.amount),
-              tax: Number(data.tax || 0),
-              shipping: Number(data.shipping || 0),
+              value: SERVICE_PRICE,
+              tax: 0,
+              shipping: 0,
               currency: "PLN",
-              items: data.products.map((prod: any) => ({
-                item_id: prod.id,
-                item_name: prod.name,
-                affiliation: "Autopay Payment",
-                price: Number(prod.price),
-                item_brand: prod.brand || "",
-                item_category: prod.category || "",
-                quantity: prod.quantity || 1,
-              })),
+              items: [
+                {
+                  item_id: "e-konsultacja-zwolnienie",
+                  item_name: "E-konsultacja + e-zwolnienie",
+                  price: SERVICE_PRICE,
+                  quantity: 1,
+                },
+              ],
             },
           });
-          hasTrackedPurchaseRef.current = true; // Flaga chroniąca przed podwójnym wysłaniem
+          hasTrackedPurchaseRef.current = true;
           setStatus("success");
           clearFormData();
         } else if (data.payment_status === "fail") {

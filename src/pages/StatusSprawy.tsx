@@ -247,14 +247,6 @@ export default function StatusSprawy() {
                 {/* Visit Details */}
                 <div className="grid md:grid-cols-2 gap-4 pt-4">
                   <div>
-                    <p className="text-sm text-muted-foreground">Data rozpoczęcia zwolnienia</p>
-                    <p className="font-medium">{format(new Date(caseData.illness_start), 'dd.MM.yyyy', { locale: pl })}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Data zakończenia zwolnienia</p>
-                    <p className="font-medium">{format(new Date(caseData.illness_end), 'dd.MM.yyyy', { locale: pl })}</p>
-                  </div>
-                  <div>
                     <p className="text-sm text-muted-foreground">Data zgłoszenia</p>
                     <p className="font-medium">{format(new Date(caseData.created_at), 'dd.MM.yyyy HH:mm', { locale: pl })}</p>
                   </div>

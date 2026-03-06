@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Plus, X, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -85,23 +85,37 @@ type LeaveTypeFormData = z.infer<typeof leaveTypeSchema>;
 
 export default function RodzajZwolnienia() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [employerNips, setEmployerNips] = useState<string[]>([""]);
   const [careNips, setCareNips] = useState<string[]>([""]);
   const [careFamilyNips, setCareFamilyNips] = useState<string[]>([""]);
   const [showStudentDialog, setShowStudentDialog] = useState(false);
   const { pushEvent } = useDataLayer();
 
+  // Map URL or sessionStorage type param to leave_type value
+  const getLeaveTypeFromParam = (typeParam: string | null): LeaveTypeFormData["leave_type"] => {
+    switch (typeParam) {
+      case "zus": return "pl_employer";
+      case "child": return "care";
+      case "student": return "student";
+      default: return "pl_employer";
+    }
+  };
+
+  // Check URL param first, then sessionStorage preselection
+  const preselectedType = searchParams.get("type") || sessionStorage.getItem("preselected_leave_type");
+
   const form = useForm<LeaveTypeFormData>({
     resolver: zodResolver(leaveTypeSchema),
     defaultValues: {
-      leave_type: "pl_employer",
+      leave_type: getLeaveTypeFromParam(preselectedType),
       nips: [],
     },
   });
 
   const leaveType = form.watch("leave_type");
 
-  // Load saved data from localStorage
+  // Load saved data from localStorage (but URL param takes priority if no saved data)
   useEffect(() => {
     const savedData = sessionStorage.getItem("formData_rodzajZwolnienia");
     if (savedData) {

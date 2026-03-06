@@ -58,8 +58,8 @@ export default function Podsumowanie() {
         const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
         setProfileData(data);
       } else {
-        // Tryb gościa - pobierz dane z localStorage
-        const guestProfile = localStorage.getItem("guestProfileData");
+        // Tryb gościa - pobierz dane z sessionStorage
+        const guestProfile = sessionStorage.getItem("guestProfileData");
         if (guestProfile) {
           setProfileData(JSON.parse(guestProfile));
         } else {
@@ -73,11 +73,11 @@ export default function Podsumowanie() {
         }
       }
 
-      // Pobierz dane z localStorage
-      const datyChoroby = localStorage.getItem("formData_datyChoroby");
-      const rodzajZwolnienia = localStorage.getItem("formData_rodzajZwolnienia");
-      const wywiadOgolny = localStorage.getItem("formData_wywiadOgolny");
-      const wywiadObjawy = localStorage.getItem("formData_wywiadObjawy");
+      // Pobierz dane z sessionStorage
+      const datyChoroby = sessionStorage.getItem("formData_datyChoroby");
+      const rodzajZwolnienia = sessionStorage.getItem("formData_rodzajZwolnienia");
+      const wywiadOgolny = sessionStorage.getItem("formData_wywiadOgolny");
+      const wywiadObjawy = sessionStorage.getItem("formData_wywiadObjawy");
 
       setFormData({
         datyChoroby: datyChoroby ? JSON.parse(datyChoroby) : {},

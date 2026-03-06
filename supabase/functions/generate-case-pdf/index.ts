@@ -134,6 +134,7 @@ serve(async (req) => {
         'care': 'Zwolnienie na dziecko',
         'student': 'Student/Uczen',
         'care_family': 'Opieka nad czlonkiem rodziny',
+        'care_family': 'Opieka nad czlonkiem rodziny',
         'krus': 'Ubezpieczeni w KRUS',
         'uniformed': 'Sluzby mundurowe/Studenci sluzb mundurowych',
         'foreign_employer': 'Pracodawca zagraniczny',
@@ -456,7 +457,11 @@ serve(async (req) => {
     }
 
     // Free text description
-    drawSection('OPIS DOLEGLIWOSCI');
+    if (isCareLeave) {
+      drawSection(`OPIS DOLEGLIWOSCI (dot. ${carePatientLabel})`);
+    } else {
+      drawSection('OPIS DOLEGLIWOSCI');
+    }
     // Split long text into multiple lines
     const freeText = caseData.free_text_reason || '';
     const maxCharsPerLine = 80;

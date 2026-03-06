@@ -139,7 +139,7 @@ export default function WywiadOgolny() {
   const [patientName, setPatientName] = useState("");
 
   useEffect(() => {
-    const savedLeaveData = localStorage.getItem("formData_rodzajZwolnienia");
+    const savedLeaveData = sessionStorage.getItem("formData_rodzajZwolnienia");
     if (savedLeaveData) {
       const parsed = JSON.parse(savedLeaveData);
       if (parsed.leave_type === "care") {
@@ -177,7 +177,7 @@ export default function WywiadOgolny() {
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem("formData_wywiadOgolny");
+    const savedData = sessionStorage.getItem("formData_wywiadOgolny");
     if (savedData) {
       const parsed = JSON.parse(savedData);
       // Don't restore file uploads
@@ -206,7 +206,7 @@ export default function WywiadOgolny() {
       const dataToSave = { ...value };
       delete dataToSave.upload_preg_card;
       delete dataToSave.upload_prev_docs;
-      localStorage.setItem("formData_wywiadOgolny", JSON.stringify(dataToSave));
+      sessionStorage.setItem("formData_wywiadOgolny", JSON.stringify(dataToSave));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);

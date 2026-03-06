@@ -68,7 +68,7 @@ export default function DatyChoroby() {
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem("formData_datyChoroby");
+    const savedData = sessionStorage.getItem("formData_datyChoroby");
     if (savedData) {
       const parsed = JSON.parse(savedData);
       if (parsed.illness_start) {
@@ -84,7 +84,7 @@ export default function DatyChoroby() {
   // Save data to localStorage on change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      localStorage.setItem("formData_datyChoroby", JSON.stringify(value));
+      sessionStorage.setItem("formData_datyChoroby", JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);

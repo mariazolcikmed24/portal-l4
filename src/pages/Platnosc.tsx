@@ -68,14 +68,14 @@ export default function Platnosc() {
     console.log("Płatność:", data);
 
     try {
-      // Pobierz dane z localStorage
-      const datyChoroby = JSON.parse(localStorage.getItem("formData_datyChoroby") || "{}");
-      const rodzajZwolnienia = JSON.parse(localStorage.getItem("formData_rodzajZwolnienia") || "{}");
-      const wywiadOgolny = JSON.parse(localStorage.getItem("formData_wywiadOgolny") || "{}");
-      const wywiadObjawy = JSON.parse(localStorage.getItem("formData_wywiadObjawy") || "{}");
+      // Pobierz dane z sessionStorage
+      const datyChoroby = JSON.parse(sessionStorage.getItem("formData_datyChoroby") || "{}");
+      const rodzajZwolnienia = JSON.parse(sessionStorage.getItem("formData_rodzajZwolnienia") || "{}");
+      const wywiadOgolny = JSON.parse(sessionStorage.getItem("formData_wywiadOgolny") || "{}");
+      const wywiadObjawy = JSON.parse(sessionStorage.getItem("formData_wywiadObjawy") || "{}");
 
-      // Pobierz przesłane pliki z localStorage
-      const uploadedAttachments = JSON.parse(localStorage.getItem("uploadedFiles_attachments") || "[]");
+      // Pobierz przesłane pliki z sessionStorage
+      const uploadedAttachments = JSON.parse(sessionStorage.getItem("uploadedFiles_attachments") || "[]");
       const attachmentPaths = uploadedAttachments.map((f: { path: string }) => f.path);
 
       // Znajdź profil użytkownika
@@ -84,8 +84,8 @@ export default function Platnosc() {
         const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", user.id).single();
         profileId = profile?.id;
       } else {
-        // Dla gościa, pobierz ID z localStorage
-        profileId = localStorage.getItem("guestProfileId");
+        // Dla gościa, pobierz ID z sessionStorage
+        profileId = sessionStorage.getItem("guestProfileId");
       }
 
       if (!profileId) {

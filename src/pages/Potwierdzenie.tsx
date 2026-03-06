@@ -103,11 +103,11 @@ export default function Potwierdzenie() {
   }, [searchParams]);
 
   const clearFormData = () => {
-    localStorage.removeItem("formData_datyChoroby");
-    localStorage.removeItem("formData_rodzajZwolnienia");
-    localStorage.removeItem("formData_wywiadOgolny");
-    localStorage.removeItem("formData_wywiadObjawy");
-    localStorage.removeItem("uploadedFiles_attachments");
+    sessionStorage.removeItem("formData_datyChoroby");
+    sessionStorage.removeItem("formData_rodzajZwolnienia");
+    sessionStorage.removeItem("formData_wywiadOgolny");
+    sessionStorage.removeItem("formData_wywiadObjawy");
+    sessionStorage.removeItem("uploadedFiles_attachments");
   };
 
   if (status === "verifying") {

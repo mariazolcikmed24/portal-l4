@@ -12,7 +12,7 @@ import { useDataLayer } from "@/hooks/useDataLayer";
 import { formatPriceUI } from "@/lib/formatters";
 
 export default function Podsumowanie() {
-  const servicePrice = 79.99;
+  const servicePrice = 79.0;
 
   const navigate = useNavigate();
   const { user } = useAuth();

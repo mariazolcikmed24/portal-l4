@@ -483,9 +483,16 @@ async function createMed24Visit(supabase: any, caseId: string) {
 
     const profile = caseWithProfile.profile;
 
+    // Resolve service ID based on recipient_type
+    const resolvedServiceId = caseWithProfile.recipient_type === 'care'
+      ? (med24ChildCareServiceId || med24DefaultServiceId || null)
+      : (med24DefaultServiceId || null);
+
+    console.log(`Resolved service ID for recipient_type "${caseWithProfile.recipient_type}": ${resolvedServiceId}`);
+
     const visitPayload = {
       channel_kind: "phone_call",
-      service_id: med24ServiceId || null,
+      service_id: resolvedServiceId,
       patient: {
         first_name: profile.first_name,
         last_name: profile.last_name,

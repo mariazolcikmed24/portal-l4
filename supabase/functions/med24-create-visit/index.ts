@@ -124,10 +124,23 @@ serve(async (req) => {
       { kind: "marketing_l4_portal_phone", is_given: profile.consent_marketing_tel ?? false },
     ];
 
+    // Resolve Med24 service ID based on recipient_type
+    const resolveServiceId = (recipientType: string): string | null => {
+      switch (recipientType) {
+        case 'care':
+          return med24ChildCareServiceId || med24DefaultServiceId || null;
+        default:
+          return med24DefaultServiceId || null;
+      }
+    };
+
+    const resolvedServiceId = resolveServiceId(caseData.recipient_type);
+    console.log(`Resolved service ID for recipient_type "${caseData.recipient_type}": ${resolvedServiceId}`);
+
     // Create Med24 visit payload
     const visitPayload: Med24BookVisitUrgentSchema = {
       channel_kind,
-      service_id: med24ServiceId || null,
+      service_id: resolvedServiceId,
       patient,
       booking_intent,
       queue: "urgent",

@@ -269,7 +269,11 @@ serve(async (req) => {
       drawText(`Dlugotrwale zwolnienie (>33 dni/rok): ${caseData.long_leave ? 'Tak' : 'Nie'}`);
     }
     // Symptoms
-    drawSection('OBJAWY I DOLEGLIWOSCI');
+    if (isCareLeave) {
+      drawSection(`OBJAWY I DOLEGLIWOSCI (dot. ${carePatientLabel})`);
+    } else {
+      drawSection('OBJAWY I DOLEGLIWOSCI');
+    }
     drawText(`Kategoria: ${getCategoryLabel(caseData.main_category)}`);
     drawText(`Czas trwania objawow: ${getDurationLabel(caseData.symptom_duration)}`);
     

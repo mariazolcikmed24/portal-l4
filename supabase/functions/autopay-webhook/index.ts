@@ -490,10 +490,42 @@ async function createMed24Visit(supabase: any, caseId: string) {
 
     console.log(`Resolved service ID for recipient_type "${caseWithProfile.recipient_type}": ${resolvedServiceId}`);
 
-    const visitPayload = {
-      channel_kind: "phone_call",
-      service_id: resolvedServiceId,
-      patient: {
+    // Determine if this is a care visit (child or family member)
+    const isCareVisit = caseWithProfile.recipient_type === 'care';
+    
+    let patientData: any;
+
+    if (isCareVisit && caseWithProfile.care_first_name && caseWithProfile.care_last_name) {
+      // For care visits: child/family member is the patient, parent/guardian is nested
+      console.log('Care visit detected - sending care recipient as patient, profile as parent');
+      patientData = {
+        first_name: caseWithProfile.care_first_name,
+        last_name: caseWithProfile.care_last_name,
+        pesel: caseWithProfile.care_pesel || null,
+        date_of_birth: null,
+        email: profile.email || null,
+        phone_number: profile.phone || null,
+        address: profile.street || null,
+        house_number: profile.house_no || null,
+        flat_number: profile.flat_no || null,
+        postal_code: profile.postcode || null,
+        city: profile.city || null,
+        parent: {
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          pesel: profile.pesel || null,
+          email: profile.email || null,
+          phone_number: profile.phone || null,
+          address: profile.street || null,
+          house_number: profile.house_no || null,
+          flat_number: profile.flat_no || null,
+          postal_code: profile.postcode || null,
+          city: profile.city || null,
+        },
+      };
+    } else {
+      // Standard visit: profile is the patient
+      patientData = {
         first_name: profile.first_name,
         last_name: profile.last_name,
         pesel: profile.pesel || null,
@@ -505,7 +537,13 @@ async function createMed24Visit(supabase: any, caseId: string) {
         flat_number: profile.flat_no || null,
         postal_code: profile.postcode || null,
         city: profile.city || null,
-      },
+      };
+    }
+
+    const visitPayload = {
+      channel_kind: "phone_call",
+      service_id: resolvedServiceId,
+      patient: patientData,
       booking_intent: "finalize",
       queue: "urgent",
       consents: [

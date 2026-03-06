@@ -6,6 +6,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface Med24ParentSchema {
+  first_name: string;
+  last_name: string;
+  pesel?: string | null;
+  email?: string | null;
+  phone_number?: string | null;
+  address?: string | null;
+  house_number?: string | null;
+  flat_number?: string | null;
+  postal_code?: string | null;
+  city?: string | null;
+}
+
 interface Med24BookVisitPatientSchema {
   first_name: string;
   last_name: string;
@@ -18,6 +31,7 @@ interface Med24BookVisitPatientSchema {
   flat_number?: string | null;
   postal_code?: string | null;
   city?: string | null;
+  parent?: Med24ParentSchema | null;
 }
 
 interface Med24ConsentSchema {
@@ -103,20 +117,55 @@ serve(async (req) => {
       );
     }
 
-    // Map profile to Med24 patient schema
-    const patient: Med24BookVisitPatientSchema = {
-      first_name: profile.first_name,
-      last_name: profile.last_name,
-      pesel: profile.pesel || null,
-      date_of_birth: profile.date_of_birth || null,
-      email: profile.email || null,
-      phone_number: profile.phone || null,
-      address: profile.street || null,
-      house_number: profile.house_no || null,
-      flat_number: profile.flat_no || null,
-      postal_code: profile.postcode || null,
-      city: profile.city || null,
-    };
+    // Determine if this is a care visit (child or family member)
+    const isCareVisit = caseData.recipient_type === 'care';
+
+    let patient: Med24BookVisitPatientSchema;
+
+    if (isCareVisit && caseData.care_first_name && caseData.care_last_name) {
+      // For care visits: child/family member is the patient, parent/guardian is nested
+      console.log('Care visit detected - sending care recipient as patient, profile as parent');
+      patient = {
+        first_name: caseData.care_first_name,
+        last_name: caseData.care_last_name,
+        pesel: caseData.care_pesel || null,
+        date_of_birth: null, // Could be derived from care_pesel in future
+        email: profile.email || null,
+        phone_number: profile.phone || null,
+        address: profile.street || null,
+        house_number: profile.house_no || null,
+        flat_number: profile.flat_no || null,
+        postal_code: profile.postcode || null,
+        city: profile.city || null,
+        parent: {
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          pesel: profile.pesel || null,
+          email: profile.email || null,
+          phone_number: profile.phone || null,
+          address: profile.street || null,
+          house_number: profile.house_no || null,
+          flat_number: profile.flat_no || null,
+          postal_code: profile.postcode || null,
+          city: profile.city || null,
+        },
+      };
+    } else {
+      // Standard visit: profile is the patient
+      patient = {
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        pesel: profile.pesel || null,
+        date_of_birth: profile.date_of_birth || null,
+        email: profile.email || null,
+        phone_number: profile.phone || null,
+        address: profile.street || null,
+        house_number: profile.house_no || null,
+        flat_number: profile.flat_no || null,
+        postal_code: profile.postcode || null,
+        city: profile.city || null,
+      };
+    }
 
     // Build marketing consents from profile
     const consents: Med24ConsentSchema[] = [

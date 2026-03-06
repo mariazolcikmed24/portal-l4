@@ -428,9 +428,9 @@ const Rejestracja = () => {
           throw new Error(response?.error || "Nie udało się utworzyć profilu");
         }
 
-        // Zapisz dane gościa do localStorage dla stron Podsumowanie i Platnosc
-        localStorage.setItem("guestProfileId", response.profile.id);
-        localStorage.setItem(
+        // Zapisz dane gościa do sessionStorage dla stron Podsumowanie i Platnosc
+        sessionStorage.setItem("guestProfileId", response.profile.id);
+        sessionStorage.setItem(
           "guestProfileData",
           JSON.stringify({
             first_name: data.firstName,

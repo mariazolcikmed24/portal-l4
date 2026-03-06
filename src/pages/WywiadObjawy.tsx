@@ -297,7 +297,7 @@ export default function WywiadObjawy() {
   const { pushEvent } = useDataLayer();
 
   useEffect(() => {
-    const savedLeaveData = localStorage.getItem("formData_rodzajZwolnienia");
+    const savedLeaveData = sessionStorage.getItem("formData_rodzajZwolnienia");
     if (savedLeaveData) {
       const parsed = JSON.parse(savedLeaveData);
       if (parsed.leave_type === "care") {
@@ -320,14 +320,14 @@ export default function WywiadObjawy() {
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem("formData_wywiadObjawy");
+    const savedData = sessionStorage.getItem("formData_wywiadObjawy");
     if (savedData) {
       const parsed = JSON.parse(savedData);
       form.reset(parsed);
     }
 
     // Load uploaded files from localStorage
-    const savedFiles = localStorage.getItem("uploadedFiles_attachments");
+    const savedFiles = sessionStorage.getItem("uploadedFiles_attachments");
     if (savedFiles) {
       setUploadedFiles(JSON.parse(savedFiles));
     }
@@ -336,7 +336,7 @@ export default function WywiadObjawy() {
   // Save data to localStorage on change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      localStorage.setItem("formData_wywiadObjawy", JSON.stringify(value));
+      sessionStorage.setItem("formData_wywiadObjawy", JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
@@ -385,7 +385,7 @@ export default function WywiadObjawy() {
     if (newUploadedFiles.length > 0) {
       const allFiles = [...uploadedFiles, ...newUploadedFiles];
       setUploadedFiles(allFiles);
-      localStorage.setItem("uploadedFiles_attachments", JSON.stringify(allFiles));
+      sessionStorage.setItem("uploadedFiles_attachments", JSON.stringify(allFiles));
       toast.success(`Przesłano ${newUploadedFiles.length} plik(ów)`);
     }
 
@@ -398,7 +398,7 @@ export default function WywiadObjawy() {
 
       const updatedFiles = uploadedFiles.filter((f) => f.path !== filePath);
       setUploadedFiles(updatedFiles);
-      localStorage.setItem("uploadedFiles_attachments", JSON.stringify(updatedFiles));
+      sessionStorage.setItem("uploadedFiles_attachments", JSON.stringify(updatedFiles));
       toast.success("Plik usunięty");
     } catch (error) {
       console.error("Error removing file:", error);

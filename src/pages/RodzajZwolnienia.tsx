@@ -103,7 +103,7 @@ export default function RodzajZwolnienia() {
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem("formData_rodzajZwolnienia");
+    const savedData = sessionStorage.getItem("formData_rodzajZwolnienia");
     if (savedData) {
       const parsed = JSON.parse(savedData);
 
@@ -134,7 +134,7 @@ export default function RodzajZwolnienia() {
   // Save data to localStorage on change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      localStorage.setItem("formData_rodzajZwolnienia", JSON.stringify(value));
+      sessionStorage.setItem("formData_rodzajZwolnienia", JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);

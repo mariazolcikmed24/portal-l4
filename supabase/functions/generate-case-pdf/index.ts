@@ -134,6 +134,7 @@ serve(async (req) => {
         'care': 'Zwolnienie na dziecko',
         'student': 'Student/Uczen',
         'care_family': 'Opieka nad czlonkiem rodziny',
+        'care_family': 'Opieka nad czlonkiem rodziny',
         'krus': 'Ubezpieczeni w KRUS',
         'uniformed': 'Sluzby mundurowe/Studenci sluzb mundurowych',
         'foreign_employer': 'Pracodawca zagraniczny',
@@ -152,8 +153,16 @@ serve(async (req) => {
     drawText(`e-zwolnienie.com.pl | Sprawa: ${caseData.case_number || case_id}`, { size: 9 });
     drawText(`Data wygenerowania: ${formatDate(new Date().toISOString())}`, { size: 9 });
 
-    // Patient data
-    drawSection('DANE PACJENTA');
+    const isCareVisit = caseData.recipient_type === 'care';
+    const isCareFamily = caseData.recipient_type === 'care_family';
+    const isCareLeave = isCareVisit || isCareFamily;
+
+    // Patient / Guardian data
+    if (isCareLeave) {
+      drawSection('DANE RODZICA / OPIEKUNA');
+    } else {
+      drawSection('DANE PACJENTA');
+    }
     if (profile) {
       drawText(`Imie i nazwisko: ${profile.first_name} ${profile.last_name}`);
       drawText(`PESEL: ${profile.pesel}`);
@@ -162,6 +171,16 @@ serve(async (req) => {
       drawText(`Email: ${profile.email}`);
       drawText(`Adres: ${profile.street} ${profile.house_no}${profile.flat_no ? '/' + profile.flat_no : ''}`);
       drawText(`         ${profile.postcode} ${profile.city}`);
+    }
+
+    // Care recipient data (child or family member)
+    if (isCareLeave && (caseData.care_first_name || caseData.care_last_name)) {
+      const careLabel = isCareVisit ? 'DANE DZIECKA' : 'DANE OSOBY CHOREJ';
+      drawSection(careLabel);
+      drawText(`Imie i nazwisko: ${caseData.care_first_name || ''} ${caseData.care_last_name || ''}`);
+      if (caseData.care_pesel) {
+        drawText(`PESEL: ${caseData.care_pesel}`);
+      }
     }
 
     // Leave dates
@@ -195,10 +214,19 @@ serve(async (req) => {
     }
 
     // General medical history
-    drawSection('WYWIAD OGOLNY');
-    drawText(`Ciaza: ${caseData.pregnant ? 'Tak' : 'Nie'}`);
-    if (caseData.pregnant && caseData.pregnancy_leave) {
-      drawText(`Zwolnienie zwiazane z ciaza: Tak`);
+    const carePatientLabel = isCareVisit ? 'dziecka' : (isCareFamily ? 'osoby chorej' : '');
+    if (isCareLeave) {
+      drawSection(`WYWIAD OGOLNY (dot. ${carePatientLabel})`);
+    } else {
+      drawSection('WYWIAD OGOLNY');
+    }
+
+    // Pregnancy - only for non-care visits
+    if (!isCareLeave) {
+      drawText(`Ciaza: ${caseData.pregnant ? 'Tak' : 'Nie'}`);
+      if (caseData.pregnant && caseData.pregnancy_leave) {
+        drawText(`Zwolnienie zwiazane z ciaza: Tak`);
+      }
     }
     
     drawText(`Choroby przewlekle: ${caseData.chronic_conditions?.length > 0 ? 'Tak' : 'Nie'}`);
@@ -237,10 +265,16 @@ serve(async (req) => {
       drawText(`  - ${caseData.meds_list}`);
     }
 
-    drawText(`Dlugotrwale zwolnienie (>33 dni/rok): ${caseData.long_leave ? 'Tak' : 'Nie'}`);
-
+    // Long leave - only for non-care visits
+    if (!isCareLeave) {
+      drawText(`Dlugotrwale zwolnienie (>33 dni/rok): ${caseData.long_leave ? 'Tak' : 'Nie'}`);
+    }
     // Symptoms
-    drawSection('OBJAWY I DOLEGLIWOSCI');
+    if (isCareLeave) {
+      drawSection(`OBJAWY I DOLEGLIWOSCI (dot. ${carePatientLabel})`);
+    } else {
+      drawSection('OBJAWY I DOLEGLIWOSCI');
+    }
     drawText(`Kategoria: ${getCategoryLabel(caseData.main_category)}`);
     drawText(`Czas trwania objawow: ${getDurationLabel(caseData.symptom_duration)}`);
     
@@ -423,7 +457,11 @@ serve(async (req) => {
     }
 
     // Free text description
-    drawSection('OPIS DOLEGLIWOSCI');
+    if (isCareLeave) {
+      drawSection(`OPIS DOLEGLIWOSCI (dot. ${carePatientLabel})`);
+    } else {
+      drawSection('OPIS DOLEGLIWOSCI');
+    }
     // Split long text into multiple lines
     const freeText = caseData.free_text_reason || '';
     const maxCharsPerLine = 80;

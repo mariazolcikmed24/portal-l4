@@ -152,8 +152,16 @@ serve(async (req) => {
     drawText(`e-zwolnienie.com.pl | Sprawa: ${caseData.case_number || case_id}`, { size: 9 });
     drawText(`Data wygenerowania: ${formatDate(new Date().toISOString())}`, { size: 9 });
 
-    // Patient data
-    drawSection('DANE PACJENTA');
+    const isCareVisit = caseData.recipient_type === 'care';
+    const isCareFamily = caseData.recipient_type === 'care_family';
+    const isCareLeave = isCareVisit || isCareFamily;
+
+    // Patient / Guardian data
+    if (isCareLeave) {
+      drawSection('DANE RODZICA / OPIEKUNA');
+    } else {
+      drawSection('DANE PACJENTA');
+    }
     if (profile) {
       drawText(`Imie i nazwisko: ${profile.first_name} ${profile.last_name}`);
       drawText(`PESEL: ${profile.pesel}`);
@@ -162,6 +170,16 @@ serve(async (req) => {
       drawText(`Email: ${profile.email}`);
       drawText(`Adres: ${profile.street} ${profile.house_no}${profile.flat_no ? '/' + profile.flat_no : ''}`);
       drawText(`         ${profile.postcode} ${profile.city}`);
+    }
+
+    // Care recipient data (child or family member)
+    if (isCareLeave && (caseData.care_first_name || caseData.care_last_name)) {
+      const careLabel = isCareVisit ? 'DANE DZIECKA' : 'DANE OSOBY CHOREJ';
+      drawSection(careLabel);
+      drawText(`Imie i nazwisko: ${caseData.care_first_name || ''} ${caseData.care_last_name || ''}`);
+      if (caseData.care_pesel) {
+        drawText(`PESEL: ${caseData.care_pesel}`);
+      }
     }
 
     // Leave dates

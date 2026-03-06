@@ -5,6 +5,19 @@ export type Med24ChannelKind = "video_call" | "text_message" | "phone_call";
 export type Med24BookingIntent = "reserve" | "finalize";
 export type Med24Queue = "urgent" | "scheduled";
 
+export interface Med24ParentSchema {
+  first_name: string;
+  last_name: string;
+  pesel?: string | null;
+  email?: string | null;
+  phone_number?: string | null;
+  address?: string | null;
+  house_number?: string | null;
+  flat_number?: string | null;
+  postal_code?: string | null;
+  city?: string | null;
+}
+
 export interface Med24BookVisitPatientSchema {
   first_name: string;
   last_name: string;
@@ -17,6 +30,7 @@ export interface Med24BookVisitPatientSchema {
   flat_number?: string | null;
   postal_code?: string | null;
   city?: string | null;
+  parent?: Med24ParentSchema | null;
 }
 
 export type Med24ConsentKind = "marketing_l4_portal_email" | "marketing_l4_portal_phone";

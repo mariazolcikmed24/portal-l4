@@ -339,6 +339,14 @@ const Rejestracja = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuestMode = searchParams.get("guest") === "true";
+  const leaveTypeParam = searchParams.get("type");
+
+  // Save leave type param to sessionStorage for pre-selection in the form
+  useEffect(() => {
+    if (leaveTypeParam) {
+      sessionStorage.setItem("preselected_leave_type", leaveTypeParam);
+    }
+  }, [leaveTypeParam]);
   const { user } = useAuth();
   const { pushEvent } = useDataLayer();
 

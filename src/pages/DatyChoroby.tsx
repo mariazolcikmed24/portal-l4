@@ -35,17 +35,6 @@ const datesSchema = z
   })
   .refine(
     (data) => {
-      const maxEndDate = new Date(data.illness_start);
-      maxEndDate.setDate(maxEndDate.getDate() + 6);
-      return data.illness_end <= maxEndDate;
-    },
-    {
-      message: "Data zakończenia nie może być późniejsza niż 7 dni od daty zachorowania",
-      path: ["illness_end"],
-    },
-  )
-  .refine(
-    (data) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const startDate = new Date(data.illness_start);
@@ -196,12 +185,7 @@ export default function DatyChoroby() {
                           field.onChange(date);
                           setEndDateOpen(false);
                         }}
-                        disabled={(date) => {
-                          if (!watchStart) return true;
-                          const maxDate = new Date(watchStart);
-                          maxDate.setDate(maxDate.getDate() + 6);
-                          return date < watchStart || date > maxDate;
-                        }}
+                        disabled={(date) => !watchStart || date < watchStart}
                         initialFocus
                         className="pointer-events-auto"
                       />

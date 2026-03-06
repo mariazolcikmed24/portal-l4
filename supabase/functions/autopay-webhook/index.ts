@@ -461,7 +461,8 @@ async function createMed24Visit(supabase: any, caseId: string) {
     const med24ApiUrl = Deno.env.get("MED24_API_URL");
     const med24Username = Deno.env.get("MED24_API_USERNAME");
     const med24Password = Deno.env.get("MED24_API_PASSWORD");
-    const med24ServiceId = Deno.env.get("MED24_SERVICE_ID");
+    const med24DefaultServiceId = Deno.env.get("MED24_SERVICE_ID");
+    const med24ChildCareServiceId = Deno.env.get("MED24_SERVICE_ID_CHILD_CARE");
 
     if (!med24ApiUrl || !med24Username || !med24Password) {
       console.log("Med24 API not configured, skipping visit creation");
@@ -482,9 +483,16 @@ async function createMed24Visit(supabase: any, caseId: string) {
 
     const profile = caseWithProfile.profile;
 
+    // Resolve service ID based on recipient_type
+    const resolvedServiceId = caseWithProfile.recipient_type === 'care'
+      ? (med24ChildCareServiceId || med24DefaultServiceId || null)
+      : (med24DefaultServiceId || null);
+
+    console.log(`Resolved service ID for recipient_type "${caseWithProfile.recipient_type}": ${resolvedServiceId}`);
+
     const visitPayload = {
       channel_kind: "phone_call",
-      service_id: med24ServiceId || null,
+      service_id: resolvedServiceId,
       patient: {
         first_name: profile.first_name,
         last_name: profile.last_name,

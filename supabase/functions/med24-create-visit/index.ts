@@ -51,7 +51,8 @@ serve(async (req) => {
     const med24ApiUrl = Deno.env.get('MED24_API_URL');
     const med24Username = Deno.env.get('MED24_API_USERNAME');
     const med24Password = Deno.env.get('MED24_API_PASSWORD');
-    const med24ServiceId = Deno.env.get('MED24_SERVICE_ID');
+    const med24DefaultServiceId = Deno.env.get('MED24_SERVICE_ID');
+    const med24ChildCareServiceId = Deno.env.get('MED24_SERVICE_ID_CHILD_CARE');
 
     if (!med24ApiUrl || !med24Username || !med24Password) {
       console.error('Missing Med24 API configuration');
@@ -123,10 +124,23 @@ serve(async (req) => {
       { kind: "marketing_l4_portal_phone", is_given: profile.consent_marketing_tel ?? false },
     ];
 
+    // Resolve Med24 service ID based on recipient_type
+    const resolveServiceId = (recipientType: string): string | null => {
+      switch (recipientType) {
+        case 'care':
+          return med24ChildCareServiceId || med24DefaultServiceId || null;
+        default:
+          return med24DefaultServiceId || null;
+      }
+    };
+
+    const resolvedServiceId = resolveServiceId(caseData.recipient_type);
+    console.log(`Resolved service ID for recipient_type "${caseData.recipient_type}": ${resolvedServiceId}`);
+
     // Create Med24 visit payload
     const visitPayload: Med24BookVisitUrgentSchema = {
       channel_kind,
-      service_id: med24ServiceId || null,
+      service_id: resolvedServiceId,
       patient,
       booking_intent,
       queue: "urgent",

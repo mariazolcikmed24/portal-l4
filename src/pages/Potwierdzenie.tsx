@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useDataLayer } from "@/hooks/useDataLayer";
 
+const SERVICE_PRICE = 79.0;
+
 type PaymentStatus = "pending" | "success" | "fail" | "verifying" | "error";
 
 export default function Potwierdzenie() {

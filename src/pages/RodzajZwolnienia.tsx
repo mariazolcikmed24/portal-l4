@@ -92,7 +92,7 @@ export default function RodzajZwolnienia() {
   const [showStudentDialog, setShowStudentDialog] = useState(false);
   const { pushEvent } = useDataLayer();
 
-  // Map URL type param to leave_type value
+  // Map URL or sessionStorage type param to leave_type value
   const getLeaveTypeFromParam = (typeParam: string | null): LeaveTypeFormData["leave_type"] => {
     switch (typeParam) {
       case "zus": return "pl_employer";
@@ -102,10 +102,13 @@ export default function RodzajZwolnienia() {
     }
   };
 
+  // Check URL param first, then sessionStorage preselection
+  const preselectedType = searchParams.get("type") || sessionStorage.getItem("preselected_leave_type");
+
   const form = useForm<LeaveTypeFormData>({
     resolver: zodResolver(leaveTypeSchema),
     defaultValues: {
-      leave_type: getLeaveTypeFromParam(searchParams.get("type")),
+      leave_type: getLeaveTypeFromParam(preselectedType),
       nips: [],
     },
   });

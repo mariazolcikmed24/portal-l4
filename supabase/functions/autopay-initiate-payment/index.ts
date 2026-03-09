@@ -13,6 +13,9 @@ interface PaymentRequest {
   case_id: string;
   payment_method?: string;
   amount?: number;
+  gateway_id_override?: string;
+  authorization_code?: string;
+  direct_post?: boolean; // If true, POST to Autopay server-side and return response
 }
 
 Deno.serve(async (req) => {
@@ -26,7 +29,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { case_id, payment_method, amount = 7900 }: PaymentRequest = await req.json();
+    const { case_id, payment_method, amount = 7900, gateway_id_override, authorization_code, direct_post }: PaymentRequest = await req.json();
 
     if (!case_id) {
       return new Response(
@@ -92,7 +95,9 @@ Deno.serve(async (req) => {
     // NOTE: In practice, some Autopay environments expect GatewayID to be present even for paywall.
     // For paywall, we send GatewayID="0" and include it in the hash.
     let gatewayId: string = "0";
-    if (payment_method) {
+    if (gateway_id_override) {
+      gatewayId = gateway_id_override;
+    } else if (payment_method) {
       switch (payment_method) {
         case "blik":
           gatewayId = "509"; // BLIK
@@ -247,21 +252,50 @@ Deno.serve(async (req) => {
     // Omit GatewayID when it's the paywall default ("0") to match Autopay hash expectations.
     if (gatewayId !== "0") params.set("GatewayID", String(gatewayId));
 
+    // Add AuthorizationCode for BLIK WhiteLabel if provided
+    if (authorization_code) {
+      params.set("AuthorizationCode", authorization_code);
+    }
+
     console.log("Payment params:", Object.fromEntries(params.entries()));
 
     const paymentUrl = `${baseUrl}?${params.toString()}`;
 
     console.log("Payment URL generated:", paymentUrl);
 
+    // If direct_post is true, POST to Autopay server-side and return their response
+    if (direct_post) {
+      console.log("Direct POST to Autopay:", baseUrl);
+      const autopayResponse = await fetch(baseUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+      });
+      const autopayBody = await autopayResponse.text();
+      console.log("Autopay response status:", autopayResponse.status);
+      console.log("Autopay response body (first 2000 chars):", autopayBody.substring(0, 2000));
+
+      return new Response(
+        JSON.stringify({
+          autopay_status: autopayResponse.status,
+          autopay_headers: Object.fromEntries(autopayResponse.headers.entries()),
+          autopay_body: autopayBody.substring(0, 5000),
+          order_id: orderId,
+          case_id: case_id,
+          payment_params: Object.fromEntries(params.entries()),
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     return new Response(
       JSON.stringify({
-        // Backwards compatibility (GET redirect)
         payment_url: paymentUrl,
-
-        // Preferred: POST redirect to gateway
         payment_base_url: baseUrl,
         payment_params: Object.fromEntries(params.entries()),
-
         order_id: orderId,
         case_id: case_id,
       }),

@@ -95,7 +95,9 @@ Deno.serve(async (req) => {
     // NOTE: In practice, some Autopay environments expect GatewayID to be present even for paywall.
     // For paywall, we send GatewayID="0" and include it in the hash.
     let gatewayId: string = "0";
-    if (payment_method) {
+    if (gateway_id_override) {
+      gatewayId = gateway_id_override;
+    } else if (payment_method) {
       switch (payment_method) {
         case "blik":
           gatewayId = "509"; // BLIK

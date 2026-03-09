@@ -13,6 +13,9 @@ interface PaymentRequest {
   case_id: string;
   payment_method?: string;
   amount?: number;
+  gateway_id_override?: string;
+  authorization_code?: string;
+  direct_post?: boolean; // If true, POST to Autopay server-side and return response
 }
 
 Deno.serve(async (req) => {

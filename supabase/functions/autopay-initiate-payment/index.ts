@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { case_id, payment_method, amount = 7900 }: PaymentRequest = await req.json();
+    const { case_id, payment_method, amount = 7900, gateway_id_override, authorization_code, direct_post }: PaymentRequest = await req.json();
 
     if (!case_id) {
       return new Response(

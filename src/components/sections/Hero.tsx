@@ -98,7 +98,7 @@ const Hero = () => {
             <div className="flex flex-wrap gap-3 text-sm">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">7 dni w tygodniu</span>
+                <span className="text-foreground">Dostępność 24/7</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-secondary" aria-hidden="true" />

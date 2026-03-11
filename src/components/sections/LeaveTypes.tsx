@@ -15,7 +15,7 @@ const leaveTypes = [
   },
   {
     title: "E-zwolnienie na dziecko",
-    subtitle: "Opieka nad chorym dzieckiem",
+    subtitle: "Umów konsultację lekarską online z możliwością otrzymania L4 na dziecko.",
     price: "79 zł",
     icon: Baby,
     features: [],

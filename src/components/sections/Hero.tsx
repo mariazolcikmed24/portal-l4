@@ -91,7 +91,7 @@ const Hero = () => {
             </h1>
 
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Wypełnij krótki formularz — <span className="text-foreground font-medium">lekarz oceni Twoje objawy</span> i wystawi e-zwolnienie nawet w 15 minut.
+              Wypełnij formularz, aby uzyskać konsultację lekarską ze zwolnieniem (L4).
             </p>
 
             {/* Trust indicators */}

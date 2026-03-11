@@ -61,13 +61,14 @@ const LeaveTypes = () => {
                 )}
 
                 {/* Icon and Price header */}
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                     <IconComponent className="w-6 h-6 text-primary" aria-hidden="true" />
                   </div>
-                  <span className="px-4 py-2 bg-primary text-primary-foreground text-lg font-extrabold rounded-xl shadow-md ring-2 ring-primary/20">
-                    {type.price}
-                  </span>
+                  <div className="flex items-baseline gap-1 px-4 py-2 bg-primary/10 rounded-xl">
+                    <span className="text-3xl font-extrabold text-primary tracking-tight">79</span>
+                    <span className="text-base font-semibold text-primary/70">zł</span>
+                  </div>
                 </div>
 
                 {/* Title and subtitle */}

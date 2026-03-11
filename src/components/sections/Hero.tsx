@@ -158,19 +158,6 @@ const Hero = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
             </div>
-
-            {/* Floating card */}
-            <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-strong max-w-xs">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 gradient-hero rounded-full flex items-center justify-center shadow-soft">
-                  <Shield className="w-6 h-6 text-white" aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">Certyfikowani lekarze</p>
-                  <p className="text-sm text-muted-foreground">Zgodne z prawem polskim</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

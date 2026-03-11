@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Clock, Users, ShieldCheck, Lock } from "lucide-react";
+import { Shield, Clock, Users, ShieldCheck, Lock, Stethoscope } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-doctor.jpg";
@@ -110,9 +110,9 @@ const Hero = () => {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
-                  <Lock className="w-4 h-4 text-secondary" aria-hidden="true" />
+                  <Stethoscope className="w-4 h-4 text-secondary" aria-hidden="true" />
                 </div>
-                <span className="text-foreground font-medium">Pełna poufność</span>
+                <span className="text-foreground font-medium">Profesjonalny zespół lekarski</span>
               </div>
             </div>
 

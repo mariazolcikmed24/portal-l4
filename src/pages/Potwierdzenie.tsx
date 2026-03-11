@@ -59,26 +59,28 @@ export default function Potwierdzenie() {
         setCaseNumber(data.case_number);
 
         // Map payment status
-        if (data.payment_status === "success" && !hasTrackedPurchaseRef.current) {
-          pushEvent({
-            event: "purchase",
-            ecommerce: {
-              transaction_id: data.case_number || orderId,
-              value: SERVICE_PRICE,
-              tax: 0,
-              shipping: 0,
-              currency: "PLN",
-              items: [
-                {
-                  item_id: "e-konsultacja-zwolnienie",
-                  item_name: "E-konsultacja + e-zwolnienie",
-                  price: SERVICE_PRICE,
-                  quantity: 1,
-                },
-              ],
-            },
-          });
-          hasTrackedPurchaseRef.current = true;
+        if (data.payment_status === "success") {
+          if (!hasTrackedPurchaseRef.current) {
+            pushEvent({
+              event: "purchase",
+              ecommerce: {
+                transaction_id: data.case_number || orderId,
+                value: SERVICE_PRICE,
+                tax: 0,
+                shipping: 0,
+                currency: "PLN",
+                items: [
+                  {
+                    item_id: "e-konsultacja-zwolnienie",
+                    item_name: "E-konsultacja + e-zwolnienie",
+                    price: SERVICE_PRICE,
+                    quantity: 1,
+                  },
+                ],
+              },
+            });
+            hasTrackedPurchaseRef.current = true;
+          }
           setStatus("success");
           clearFormData();
         } else if (data.payment_status === "fail") {

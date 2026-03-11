@@ -2,7 +2,7 @@ import { FileText, Stethoscope, Download, ArrowRight } from "lucide-react";
 const steps = [{
   icon: FileText,
   title: "Wypełnij formularz",
-  description: "Uzupełnij krótki formularz medyczny online. To zajmie maksymalnie 5 minut.",
+  description: "Uzupełnij krótki formularz medyczny online. To zajmie około 2 min.",
   step: "01"
 }, {
   icon: Stethoscope,

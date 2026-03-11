@@ -19,7 +19,7 @@ const benefits = [{
 }, {
   icon: FileCheck,
   title: "Automatyczne wysłanie",
-  description: "e-zwolnienie trafia bezpośrednio do ZUS i Twojego pracodawcy. Nie musisz nic załatwiać."
+  description: "e-zwolnienie trafia bezpośrednio na Twojego maila, do ZUS i Twojego pracodawcy. Nie musisz nic załatwiać."
 }, {
   icon: CheckCircle,
   title: "Doświadczeni lekarze",

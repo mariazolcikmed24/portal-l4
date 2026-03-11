@@ -65,7 +65,7 @@ const LeaveTypes = () => {
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                     <IconComponent className="w-6 h-6 text-primary" aria-hidden="true" />
                   </div>
-                  <span className="px-3 py-1.5 bg-primary text-primary-foreground text-sm font-bold rounded-lg shadow-sm">
+                  <span className="px-4 py-2 bg-primary text-primary-foreground text-lg font-extrabold rounded-xl shadow-md ring-2 ring-primary/20">
                     {type.price}
                   </span>
                 </div>

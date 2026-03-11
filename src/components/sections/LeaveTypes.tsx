@@ -5,7 +5,7 @@ import { useDataLayer } from "@/hooks/useDataLayer";
 
 const leaveTypes = [
   {
-    title: "E-zwolnienie",
+    title: "E-zwolnienie (L4)",
     subtitle: "Zwolnienie lekarskie L4",
     price: "79 zł",
     icon: FileText,

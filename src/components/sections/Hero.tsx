@@ -91,8 +91,7 @@ const Hero = () => {
             </h1>
 
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Skonsultuj się z lekarzem online i otrzymaj e-zwolnienie w kilka minut. Profesjonalnie, bezpiecznie i
-              zgodnie z RODO.
+              Wypełnij formularz, aby uzyskać konsultację lekarską ze zwolnieniem (L4).
             </p>
 
             {/* Trust indicators */}

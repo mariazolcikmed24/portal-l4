@@ -9,7 +9,7 @@ const leaveTypes = [
     subtitle: "Konsultacja lekarska online z możliwością otrzymania L4.",
     price: "79 zł",
     icon: FileText,
-    features: ["Oficjalne L4 do ZUS", "Szybka realizacja"],
+    features: [],
     link: "/rejestracja?guest=true&type=zus",
     popular: true,
   },

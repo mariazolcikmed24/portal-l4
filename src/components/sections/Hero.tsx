@@ -121,7 +121,7 @@ const Hero = () => {
                 })}
               >
                 <Button variant="hero" size="lg" className="w-full sm:w-auto shadow-strong hover:shadow-glow">
-                  Uzyskaj zwolnienie online
+                  Wypełnij formularz
                 </Button>
               </Link>
               <a href="#jak-to-dziala">

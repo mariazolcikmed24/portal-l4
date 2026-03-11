@@ -106,7 +106,7 @@ const Hero = () => {
               </div>
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">Nawet w 15 minut</span>
+                <span className="text-foreground">Nawet w 30 minut</span>
               </div>
             </div>
 

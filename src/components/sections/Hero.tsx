@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Shield, Clock, Users } from "lucide-react";
+import { Shield, Clock, Users, ShieldCheck, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-doctor.jpg";
@@ -95,18 +95,24 @@ const Hero = () => {
             </p>
 
             {/* Trust indicators */}
-            <div className="flex flex-wrap gap-3 text-sm">
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">Dostępność 24/7</span>
+            <div className="flex flex-wrap gap-5 text-sm">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-secondary" aria-hidden="true" />
+                </div>
+                <span className="text-foreground font-medium">Dostępność 24/7</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle className="w-4 h-4 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">Legalnie i zgodnie z przepisami</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-5 h-5 text-secondary" aria-hidden="true" />
+                </div>
+                <span className="text-foreground font-medium">Legalnie i zgodnie z przepisami</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle className="w-4 h-4 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">Pełna poufność</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
+                  <Lock className="w-5 h-5 text-secondary" aria-hidden="true" />
+                </div>
+                <span className="text-foreground font-medium">Pełna poufność</span>
               </div>
             </div>
 

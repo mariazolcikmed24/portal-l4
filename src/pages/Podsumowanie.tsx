@@ -659,13 +659,14 @@ export default function Podsumowanie() {
             </CardContent>
           </Card>
 
-          <Card className="border-primary">
-            <CardHeader>
-              <CardTitle>Koszt usługi</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-center items-center">
-                <span className="text-2xl font-bold text-primary">{formatPriceUI(servicePrice)} PLN</span>
+          <Card className="border-primary bg-primary/5">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <span className="text-base sm:text-lg font-medium text-foreground">Do zapłaty</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-primary">{formatPriceUI(servicePrice)}</span>
+                  <span className="text-base sm:text-lg font-medium text-muted-foreground">zł</span>
+                </div>
               </div>
             </CardContent>
           </Card>

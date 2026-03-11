@@ -91,7 +91,7 @@ const Hero = () => {
             </h1>
 
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Wypełnij krótki formularz, aby uzyskać konsultację lekarską ze zwolnieniem (L4) od  59 zł, nawet w 30 minut.
+              Wypełnij krótki formularz, aby uzyskać konsultację lekarską ze zwolnieniem (L4) od <strong className="text-foreground">59 zł</strong>, nawet w <strong className="text-foreground">30 minut</strong>.
             </p>
 
             {/* Trust indicators */}

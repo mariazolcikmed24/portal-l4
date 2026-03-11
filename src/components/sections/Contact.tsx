@@ -42,20 +42,6 @@ const Contact = () => {
                     <p className="text-sm text-muted-foreground">Pon-Pt: 9:00 - 17:00</p>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-primary" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">Adres</p>
-                    <p className="text-muted-foreground">
-                      ul. Berezyńska 39
-                    <br />
-                      03-908 Warszawa
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

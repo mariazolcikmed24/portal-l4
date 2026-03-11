@@ -27,18 +27,6 @@ const Contact = () => {
                     <a href="mailto:kontakt@e-zwolnienie.com.pl" className="text-primary hover:underline">
                       kontakt@e-zwolnienie.com.pl
                     </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-primary" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">Telefon</p>
-                    <a href="tel:+48123456789" className="text-primary hover:underline">
-                      +48 123 456 789
-                    </a>
                     <p className="text-sm text-muted-foreground">Pon-Pt: 9:00 - 17:00</p>
                   </div>
                 </div>

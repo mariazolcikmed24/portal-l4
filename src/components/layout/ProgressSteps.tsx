@@ -33,7 +33,9 @@ export const ProgressSteps = ({ currentStep }: ProgressStepsProps) => {
           className="absolute top-5 h-0.5 bg-primary transition-all duration-300"
           style={{ 
             left: '20px',
-            width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - ${currentStep === steps.length ? 0 : 20}px)`
+            width: currentStep >= steps.length
+              ? 'calc(100% - 40px)'
+              : `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - 20px)`
           }}
         />
         

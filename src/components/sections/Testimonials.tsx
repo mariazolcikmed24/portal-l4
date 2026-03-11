@@ -72,7 +72,7 @@ const Testimonials = () => {
             <div className="text-sm text-muted-foreground">Dostępność</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">30min</div>
+            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">30 min.</div>
             <div className="text-sm text-muted-foreground">Średni czas realizacji</div>
           </div>
         </div>

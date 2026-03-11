@@ -88,7 +88,6 @@ const Hero = () => {
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
               Zwolnienie lekarskie online (L4)
-              <span className="block text-primary mt-1">szybko i bez wychodzenia z domu</span>
             </h1>
 
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">

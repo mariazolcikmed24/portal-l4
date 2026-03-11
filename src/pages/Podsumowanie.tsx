@@ -671,13 +671,7 @@ export default function Podsumowanie() {
             </CardContent>
           </Card>
 
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              <strong>Ważne:</strong> Lekarz może skontaktować się z Tobą telefonicznie w celu pogłębienia wywiadu
-              medycznego. E-konsultacja nie gwarantuje wystawienia e-zwolnienia - ostateczną decyzję podejmuje lekarz na
-              podstawie wywiadu medycznego i obowiązujących przepisów.
-            </p>
-          </div>
+
 
           <div className="flex gap-4 pt-4">
             <Button variant="outline" onClick={() => navigate("/daty-choroby")} className="flex-1">

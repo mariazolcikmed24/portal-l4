@@ -117,11 +117,21 @@ const Hero = () => {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="7" r="4" />
-                    <path d="M5.5 21v-2a5.5 5.5 0 0 1 5.5-5.5h2a5.5 5.5 0 0 1 5.5 5.5v2" />
-                    <path d="M16 3c1.5 1 2 3 2 4s-.5 3-2 4" />
-                    <path d="M18 7h2" />
+                  <svg className="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    {/* Head */}
+                    <circle cx="12" cy="6" r="3.5" />
+                    {/* Hair */}
+                    <path d="M8.5 5.5c0-2 1.5-3.5 3.5-3.5s3.5 1.5 3.5 3.5" />
+                    {/* Body/shoulders */}
+                    <path d="M4 21v-1c0-3.3 2.7-6 6-6h4c3.3 0 6 2.7 6 6v1" />
+                    {/* Collar */}
+                    <path d="M10 14l2 3 2-3" />
+                    {/* Stethoscope left */}
+                    <path d="M8 14c-1.5 1-2.5 2.5-2.5 4.5" />
+                    <circle cx="5.5" cy="19" r="0.8" fill="currentColor" />
+                    {/* Stethoscope right */}
+                    <path d="M16 14c1.5 1 2.5 2.5 2.5 4.5" />
+                    <circle cx="18.5" cy="19" r="0.8" fill="currentColor" />
                   </svg>
                 </div>
                 <span className="text-foreground font-medium">Profesjonalny zespół lekarski</span>

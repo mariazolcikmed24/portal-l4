@@ -6,7 +6,7 @@ import { useDataLayer } from "@/hooks/useDataLayer";
 const leaveTypes = [
   {
     title: "E-zwolnienie (L4)",
-    subtitle: "Zwolnienie lekarskie L4",
+    subtitle: "Konsultacja lekarska online z możliwością otrzymania L4.",
     price: "79 zł",
     icon: FileText,
     features: ["Oficjalne L4 do ZUS", "Szybka realizacja"],

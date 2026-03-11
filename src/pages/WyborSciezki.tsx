@@ -11,7 +11,7 @@ const WyborSciezki = () => {
 
         <div className="bg-white p-8 md:p-12 rounded-2xl shadow-strong">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Uzyskaj zwolnienie lekarskie online
+            Uzyskaj konsultację lekarską online
           </h1>
           <p className="text-muted-foreground mb-8">
             Wybierz sposób, w jaki chcesz kontynuować proces uzyskania e-zwolnienia
@@ -20,46 +20,46 @@ const WyborSciezki = () => {
           <div className="space-y-4">
             {/* Login/Register options hidden for initial launch - uncomment when ready
             <Link to="/logowanie" className="block">
-              <div className="group p-6 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-soft cursor-pointer">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                    <LogIn className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      Zaloguj się
-                    </h2>
-                    <p className="text-muted-foreground text-sm">
-                      Masz już konto? Zaloguj się, aby szybko wypełnić formularz z zapisanymi danymi
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <div className="group p-6 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-soft cursor-pointer">
+            <div className="flex items-start gap-4">
+            <div className="p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+            <LogIn className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+            <h2 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+            Zaloguj się
+            </h2>
+            <p className="text-muted-foreground text-sm">
+            Masz już konto? Zaloguj się, aby szybko wypełnić formularz z zapisanymi danymi
+            </p>
+            </div>
+            </div>
+            </div>
             </Link>
-
             <Link to="/rejestracja" className="block">
-              <div className="group p-6 rounded-xl border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-all hover:shadow-soft cursor-pointer">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-primary text-white">
-                    <UserPlus className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h2 className="text-xl font-semibold text-foreground">
-                        Zarejestruj się
-                      </h2>
-                      <span className="px-2 py-1 text-xs font-medium bg-primary text-white rounded-full">
-                        Polecane
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground text-sm">
-                      Utwórz konto, aby mieć dostęp do historii zwolnień i szybszego procesu w przyszłości
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <div className="group p-6 rounded-xl border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-all hover:shadow-soft cursor-pointer">
+            <div className="flex items-start gap-4">
+            <div className="p-3 rounded-lg bg-primary text-white">
+            <UserPlus className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+            <h2 className="text-xl font-semibold text-foreground">
+            Zarejestruj się
+            </h2>
+            <span className="px-2 py-1 text-xs font-medium bg-primary text-white rounded-full">
+            Polecane
+            </span>
+            </div>
+            <p className="text-muted-foreground text-sm">
+            Utwórz konto, aby mieć dostęp do historii zwolnień i szybszego procesu w przyszłości
+            </p>
+            </div>
+            </div>
+            </div>
             </Link>
-            */}
+            */
+          }
 
             {/* Kup jako gość - teraz jedyna opcja */}
             <Link to="/rejestracja?guest=true" className="block">
@@ -71,7 +71,7 @@ const WyborSciezki = () => {
                   <div className="flex-1">
                     <h2 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Rozpocznij wypełnianie formularza</h2>
                     <p className="text-muted-foreground text-sm">
-                      Wypełnij formularz, aby uzyskać konsultację online
+                      Wypełnij formularz, aby uzyskać e-zwolnienie online
                     </p>
                   </div>
                 </div>
@@ -91,7 +91,7 @@ const WyborSciezki = () => {
                   Ważne informacje
                 </p>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Proces zajmuje około 2 min.</li>
+                  <li>• Proces zajmuje około 5 minut</li>
                   <li>• Lekarz zastrzega sobie prawo do wykonania połączenia telefonicznego, w celu pogłębienia wywiadu.
 Wykupienie e-konsultacji nie gwarantuje otrzymania wnioskowanego e-zwolnienia.</li>
                   <li>• Wykupienie e-konsultacji nie gwarantuje otrzymania wnioskowanego e-zwolnienia.</li>

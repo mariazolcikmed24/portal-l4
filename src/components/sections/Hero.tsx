@@ -98,7 +98,14 @@ const Hero = () => {
             <div className="flex flex-wrap gap-5 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
-                  <Timer className="w-4 h-4 text-secondary" aria-hidden="true" />
+                  <svg className="w-4 h-4 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="13" cy="12" r="8" />
+                    <path d="M13 8v4l2.5 2.5" />
+                    <path d="M1 10h4" />
+                    <path d="M2 14h3" />
+                    <path d="M3 18h2" />
+                    <path d="M17 4l2.5 2" />
+                  </svg>
                 </div>
                 <span className="text-foreground font-medium">Dostępność 24/7, szybko i bezpiecznie</span>
               </div>

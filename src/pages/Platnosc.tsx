@@ -281,8 +281,11 @@ export default function Platnosc() {
               )}
             />
 
-            <div className="bg-muted/50 p-4 rounded-lg">
+            <div className="bg-muted/50 p-4 rounded-lg space-y-2">
               <p className="text-base font-medium">Ważne informacje:</p>
+              <p className="text-sm text-muted-foreground">
+                Po dokonaniu płatności wszystkie informacje dotyczące przebiegu wizyty oraz dokumentacja medyczna zostaną przesłane bezpośrednio na Twój adres e-mail.
+              </p>
             </div>
 
             <div className="flex gap-4 pt-4">

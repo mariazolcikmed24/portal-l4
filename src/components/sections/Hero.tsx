@@ -97,16 +97,16 @@ const Hero = () => {
             {/* Trust indicators */}
             <div className="flex flex-wrap gap-3 text-sm">
               <div className="flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-secondary" aria-hidden="true" />
+                <span className="text-foreground">7 dni w tygodniu</span>
+              </div>
+              <div className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-secondary" aria-hidden="true" />
                 <span className="text-foreground">Legalnie i zgodnie z przepisami</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-secondary" aria-hidden="true" />
                 <span className="text-foreground">Pełna poufność</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-secondary" aria-hidden="true" />
-                <span className="text-foreground">Nawet w 30 minut</span>
               </div>
             </div>
 

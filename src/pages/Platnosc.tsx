@@ -284,7 +284,7 @@ export default function Platnosc() {
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
               <p className="text-base font-medium">Ważne informacje:</p>
               <p className="text-sm text-muted-foreground">
-                Po dokonaniu płatności wszystkie informacje dotyczące przebiegu wizyty oraz dokumentacja medyczna, po zakończeniu wizyty zostaną przesłane bezpośrednio na Twój adres e-mail.
+                Po dokonaniu płatności wszystkie informacje dotyczące przebiegu wizyty oraz dokumentacja medyczna zostaną przesłane na Twój adres e-mail po jej zakończeniu - jeśli wiadomość nie pojawi się w skrzynce odbiorczej, prosimy sprawdzić folder SPAM.
               </p>
             </div>
 

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Shield, Clock, Users } from "lucide-react";
+import { Shield, Clock, Users, ShieldCheck, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-doctor.jpg";

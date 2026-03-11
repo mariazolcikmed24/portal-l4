@@ -12,7 +12,7 @@ const steps = [{
 }, {
   icon: Download,
   title: "Otrzymaj e-zwolnienie",
-  description: "Zwolnienie lekarskie zostanie automatycznie wysłane do ZUS i Twojego pracodawcy.",
+  description: "Zwolnienie lekarskie zostanie automatycznie wysłane na Twojego maila, do ZUS i Twojego pracodawcy.",
   step: "03"
 }];
 const HowItWorks = () => {

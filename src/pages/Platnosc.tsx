@@ -281,14 +281,8 @@ export default function Platnosc() {
               )}
             />
 
-            <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+            <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-base font-medium">Ważne informacje:</p>
-              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                <li>Lekarz może skontaktować się z Tobą telefonicznie</li>
-                <li>E-konsultacja nie gwarantuje wystawienia e-zwolnienia</li>
-                <li>Ostateczną decyzję podejmuje lekarz</li>
-                <li>Data początkowa zwolnienia to data przez Ciebie zadeklarowana</li>
-              </ul>
             </div>
 
             <div className="flex gap-4 pt-4">

@@ -117,7 +117,12 @@ const Hero = () => {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
-                  <UserRound className="w-4 h-4 text-secondary" aria-hidden="true" />
+                  <svg className="w-4 h-4 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="7" r="4" />
+                    <path d="M5.5 21v-2a5.5 5.5 0 0 1 5.5-5.5h2a5.5 5.5 0 0 1 5.5 5.5v2" />
+                    <path d="M16 3c1.5 1 2 3 2 4s-.5 3-2 4" />
+                    <path d="M18 7h2" />
+                  </svg>
                 </div>
                 <span className="text-foreground font-medium">Profesjonalny zespół lekarski</span>
               </div>

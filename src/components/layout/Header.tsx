@@ -84,7 +84,7 @@ const Header = () => {
               })}
             >
               <Button variant="hero" size="lg">
-                Uzyskaj zwolnienie
+                Wypełnij formularz
               </Button>
             </Link>
           </div>

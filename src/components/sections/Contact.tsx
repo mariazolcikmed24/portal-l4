@@ -1,4 +1,4 @@
-import { Mail, Phone } from "lucide-react";
+import { Mail } from "lucide-react";
 const Contact = () => {
   return <section id="kontakt" className="pt-8 pb-16 md:pt-12 md:pb-24 gradient-subtle">
       <div className="container mx-auto px-4">

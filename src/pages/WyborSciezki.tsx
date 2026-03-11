@@ -14,7 +14,7 @@ const WyborSciezki = () => {
             Uzyskaj konsultację lekarską online
           </h1>
           <p className="text-muted-foreground mb-8">
-            Wybierz sposób, w jaki chcesz kontynuować proces uzyskania e-zwolnienia
+            Wybierz sposób, w jaki chcesz kontynuować proces uzyskania konsultacji
           </p>
 
           <div className="space-y-4">

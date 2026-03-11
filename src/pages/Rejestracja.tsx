@@ -546,7 +546,7 @@ const Rejestracja = () => {
           </h1>
           <p className="text-muted-foreground mb-8">
             {isGuestMode
-              ? "Wypełnij formularz, aby przejść do procesu uzyskania zwolnienia lekarskiego online"
+              ? "Wypełnij formularz, aby przejść do procesu uzyskania konsultacji lekarskiej online"
               : "Utwórz konto, aby rozpocząć proces uzyskania zwolnienia lekarskiego online"}
           </p>
 

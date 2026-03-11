@@ -252,8 +252,7 @@ export default function Platnosc() {
               <CardTitle>Do zapłaty</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex justify-between items-center">
-                <span className="text-lg">E-konsultacja + e-zwolnienie:</span>
+              <div className="flex justify-end items-center">
                 <span className="text-3xl font-bold text-primary">{formatPriceUI(servicePrice)} PLN</span>
               </div>
             </CardContent>

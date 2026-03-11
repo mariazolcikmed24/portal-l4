@@ -98,6 +98,9 @@ export default function RodzajZwolnienia() {
       case "zus": return "pl_employer";
       case "child": return "care";
       case "student": return "student";
+      case "uniformed": return "uniformed";
+      case "foreign": return "foreign_employer";
+      case "care_family": return "care_family";
       default: return "pl_employer";
     }
   };

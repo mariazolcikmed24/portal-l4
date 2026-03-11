@@ -664,8 +664,7 @@ export default function Podsumowanie() {
               <CardTitle>Koszt usługi</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex justify-between items-center">
-                <span className="text-lg">E-konsultacja + e-zwolnienie:</span>
+              <div className="flex justify-center items-center">
                 <span className="text-2xl font-bold text-primary">{formatPriceUI(servicePrice)} PLN</span>
               </div>
             </CardContent>

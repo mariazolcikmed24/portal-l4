@@ -33,7 +33,7 @@ const Benefits = () => {
             Dlaczego <span className="text-primary">e-zwolnienie online?</span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground">
-            Nowoczesne podejście do zwolnień lekarskich. Bezpiecznie, szybko i zgodnie z prawem.
+            Legalnie, szybko i bezpiecznie. Oszczędzasz czas i pieniądze.
           </p>
         </div>
 

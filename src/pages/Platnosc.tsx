@@ -248,13 +248,9 @@ export default function Platnosc() {
 
         <div className="mb-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Do zapłaty</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-end items-center">
-                <span className="text-3xl font-bold text-primary">{formatPriceUI(servicePrice)} PLN</span>
-              </div>
+            <CardContent className="flex items-center justify-between py-6 px-6">
+              <span className="text-lg font-medium text-muted-foreground">Do zapłaty</span>
+              <span className="text-3xl font-bold text-primary">{formatPriceUI(servicePrice)} PLN</span>
             </CardContent>
           </Card>
         </div>

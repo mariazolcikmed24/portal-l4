@@ -282,7 +282,7 @@ export default function Platnosc() {
             />
 
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-              <p className="text-sm font-medium">Ważne informacje:</p>
+              <p className="text-base font-medium">Ważne informacje:</p>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                 <li>Lekarz może skontaktować się z Tobą telefonicznie</li>
                 <li>E-konsultacja nie gwarantuje wystawienia e-zwolnienia</li>

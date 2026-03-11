@@ -117,21 +117,24 @@ const Hero = () => {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <svg className="w-6 h-6 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     {/* Head */}
-                    <circle cx="12" cy="6" r="3.5" />
+                    <circle cx="12" cy="5.5" r="3" />
                     {/* Hair */}
-                    <path d="M8.5 5.5c0-2 1.5-3.5 3.5-3.5s3.5 1.5 3.5 3.5" />
-                    {/* Body/shoulders */}
-                    <path d="M4 21v-1c0-3.3 2.7-6 6-6h4c3.3 0 6 2.7 6 6v1" />
-                    {/* Collar */}
-                    <path d="M10 14l2 3 2-3" />
-                    {/* Stethoscope left */}
-                    <path d="M8 14c-1.5 1-2.5 2.5-2.5 4.5" />
-                    <circle cx="5.5" cy="19" r="0.8" fill="currentColor" />
-                    {/* Stethoscope right */}
-                    <path d="M16 14c1.5 1 2.5 2.5 2.5 4.5" />
-                    <circle cx="18.5" cy="19" r="0.8" fill="currentColor" />
+                    <path d="M9 4.5c0-1.8 1.3-3 3-3s3 1.2 3 3" />
+                    {/* Body */}
+                    <path d="M5 22v-1.5c0-3 2.5-5.5 5.5-5.5h3c3 0 5.5 2.5 5.5 5.5V22" />
+                    {/* Collar/tie */}
+                    <path d="M10 15l2 2.5 2-2.5" />
+                    <line x1="12" y1="17.5" x2="12" y2="22" />
+                    {/* Stethoscope tube - left side going down */}
+                    <path d="M8.5 15c-2 .5-3.5 2-3.5 4" />
+                    <circle cx="5" cy="19.5" r="1.2" />
+                    <circle cx="5" cy="19.5" r="0.4" fill="currentColor" />
+                    {/* Stethoscope tube - right side */}
+                    <path d="M15.5 15c2 .5 3.5 2 3.5 4" />
+                    <circle cx="19" cy="19.5" r="1.2" />
+                    <circle cx="19" cy="19.5" r="0.4" fill="currentColor" />
                   </svg>
                 </div>
                 <span className="text-foreground font-medium">Profesjonalny zespół lekarski</span>

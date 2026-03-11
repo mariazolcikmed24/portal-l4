@@ -22,7 +22,7 @@ const Hero = () => {
 
     // Auto-rotate badges on mobile every 3 seconds
     const badgeInterval = setInterval(() => {
-      setActiveBadge((prev) => (prev === 0 ? 1 : 0));
+      setActiveBadge((prev) => prev === 0 ? 1 : 0);
     }, 3000);
 
     return () => {
@@ -44,9 +44,9 @@ const Hero = () => {
             <div className="lg:hidden relative h-12 overflow-visible">
               <div
                 className={`absolute inset-0 flex items-center transition-all duration-500 ease-in-out ${
-                  activeBadge === 0 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
-                }`}
-              >
+                activeBadge === 0 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"}`
+                }>
+                
                 <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-secondary text-secondary-foreground rounded-full text-sm font-semibold shadow-soft">
                   <span className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -57,9 +57,9 @@ const Hero = () => {
               </div>
               <div
                 className={`absolute inset-0 flex items-center transition-all duration-500 ease-in-out ${
-                  activeBadge === 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full"
-                }`}
-              >
+                activeBadge === 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full"}`
+                }>
+                
                 <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary/10 text-primary rounded-full text-sm font-semibold border border-primary/20 shadow-soft">
                   <Users className="w-4 h-4" aria-hidden="true" />
                   <span>
@@ -86,8 +86,8 @@ const Hero = () => {
               </div>
             </div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
-              Zwolnienia lekarskie online
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">Zwolnienie lekarskie online
+szybko i bez wychodzenia z domu
               <span className="block text-primary mt-1">szybko i bez wychodzenia z domu</span>
             </h1>
 
@@ -117,9 +117,9 @@ const Hero = () => {
               <Link
                 to="/rejestracja?guest=true"
                 onClick={handleButtonClickActions("form_start", "Uzyskaj zwolnienie online", "Hero", {
-                  form_name: "e_zwolnienie",
-                })}
-              >
+                  form_name: "e_zwolnienie"
+                })}>
+                
                 <Button variant="hero" size="lg" className="w-full sm:w-auto shadow-strong hover:shadow-glow">
                   Wypełnij formularz
                 </Button>
@@ -143,8 +143,8 @@ const Hero = () => {
                 height={450}
                 loading="eager"
                 fetchPriority="high"
-                decoding="async"
-              />
+                decoding="async" />
+              
               <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
             </div>
 
@@ -163,7 +163,7 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>);
+
 };
 export default Hero;

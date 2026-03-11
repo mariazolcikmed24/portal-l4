@@ -97,8 +97,8 @@ const Hero = () => {
             {/* Trust indicators */}
             <div className="flex flex-wrap gap-5 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <div className="w-10 h-10 rounded-full border-2 border-secondary/40 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <circle cx="13" cy="12" r="8" />
                     <path d="M13 8v4l2.5 2.5" />
                     <path d="M1 10h4" />

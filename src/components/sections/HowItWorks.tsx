@@ -7,7 +7,7 @@ const steps = [{
 }, {
   icon: Stethoscope,
   title: "Weryfikacja przez lekarza",
-  description: "Lekarz weryfikuje dane z wypełnionego formularza medycznego i w razie potrzeby kontaktuje się z Tobą.",
+  description: "Lekarz zweryfikuje dane z formularza i w razie potrzeby skontaktuje się z Tobą telefonicznie.",
   step: "02"
 }, {
   icon: Download,

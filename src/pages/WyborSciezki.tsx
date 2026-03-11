@@ -71,7 +71,7 @@ const WyborSciezki = () => {
                   <div className="flex-1">
                     <h2 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Rozpocznij wypełnianie formularza</h2>
                     <p className="text-muted-foreground text-sm">
-                      Wypełnij formularz, aby uzyskać e-zwolnienie online
+                      Wypełnij formularz, aby uzyskać konsultację 
                     </p>
                   </div>
                 </div>

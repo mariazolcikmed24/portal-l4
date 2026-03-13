@@ -2,7 +2,7 @@ import { Star, Quote } from "lucide-react";
 const testimonials = [{
   name: "Anna K.",
   role: "Nauczycielka",
-  content: "Świetna usługa! Zachorowałam w środku tygodnia i nie miałam siły iść do przychodni. Lekarz zadzwonił do mnie w 20 minut, przeprowadził profesjonalną konsultację i e-zwolnienie było już wysłane. Polecam!",
+  content: "Świetna usługa! Zachorowałam w środku tygodnia i nie miałam siły iść do przychodni. Wypełniłam formularz online, a lekarz szybko przeanalizował moje zgłoszenie i e-zwolnienie było już wysłane. Polecam!",
   rating: 5
 }, {
   name: "Piotr M.",

@@ -182,7 +182,7 @@ export default function Potwierdzenie() {
           </p>
         </div>
 
-        {caseNumber &&
+        {caseNumber ? (
         <Card className="mb-6">
             <CardHeader>
               <CardTitle>Numer potwierdzenia</CardTitle>
@@ -196,7 +196,7 @@ export default function Potwierdzenie() {
               </p>
             </CardContent>
           </Card>
-        }
+        ) : null}
 
         <div className="space-y-6">
           <Card>

@@ -56,15 +56,15 @@ export default function Potwierdzenie() {
           return;
         }
 
-        setCaseNumber(data.case_number);
+      setCaseNumber(data.payment_psp_ref || data.case_number);
 
-        // Map payment status
-        if (data.payment_status === "success") {
-          if (!hasTrackedPurchaseRef.current) {
+      // Map payment status
+      if (data.payment_status === "success") {
+        if (!hasTrackedPurchaseRef.current) {
             pushEvent({
               event: "purchase",
               ecommerce: {
-                transaction_id: data.case_number || orderId,
+                transaction_id: data.payment_psp_ref || data.case_number || orderId,
                 value: SERVICE_PRICE,
                 tax: 0,
                 shipping: 0,

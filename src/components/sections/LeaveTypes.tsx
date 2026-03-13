@@ -14,7 +14,7 @@ const leaveTypes = [
     popular: true,
   },
   {
-    title: "E-zwolnienie na dziecko",
+    title: "E-zwolnienie na dziecko (L4)",
     subtitle: "Umów konsultację lekarską online z możliwością otrzymania L4 na dziecko.",
     price: "79 zł",
     icon: Baby,

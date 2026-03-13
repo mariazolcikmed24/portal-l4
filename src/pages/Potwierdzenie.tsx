@@ -185,7 +185,7 @@ export default function Potwierdzenie() {
         {caseNumber &&
         <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Numer sprawy</CardTitle>
+              <CardTitle>Numer potwierdzenia</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center">

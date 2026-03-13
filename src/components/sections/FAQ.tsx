@@ -95,8 +95,8 @@ const FAQ = () => {
                             <Stethoscope className="w-4 h-4 text-primary" />
                           </span>
                           <div>
-                            <span className="font-semibold text-foreground">Lekarz weryfikuje Twoje dane</span>
-                            <span className="text-muted-foreground"> — i w razie potrzeby przeprowadza konsultację telefoniczną.</span>
+                            <span className="font-semibold text-foreground">Lekarz weryfikuje dane z wypełnionego przez Ciebie formularza medycznego</span>
+                            <span className="text-muted-foreground"> — i w razie potrzeby przeprowadza konsultację telefoniczną z Tobą.</span>
                           </div>
                         </li>
                         <li className="flex gap-3 items-start">

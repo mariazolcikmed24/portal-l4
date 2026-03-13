@@ -144,11 +144,11 @@ export default function Potwierdzenie() {
           <XCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2">Płatność nieudana</h1>
           <p className="text-muted-foreground mb-6">Płatność nie została zrealizowana. Możesz spróbować ponownie.</p>
-          {caseNumber &&
+          {caseNumber ? (
           <p className="text-sm text-muted-foreground mb-4">
               Numer potwierdzenia: <span className="font-mono font-bold">{caseNumber}</span>
             </p>
-          }
+          ) : null}
           <div className="flex gap-3 justify-center">
             <Button variant="outline" onClick={() => navigate("/")}>
               Strona główna

@@ -235,8 +235,8 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Wysyłka e-zwolnienia</h3>
                   <p className="text-sm text-muted-foreground">
-                    Jeśli lekarz podejmie pozytywną decyzję, e-zwolnienie zostanie automatycznie wysłane do systemu ZUS
-                    i do Twojego pracodawcy.
+                    Jeśli lekarz zdecyduje o wystawieniu e-zwolnienia, zostanie ono automatycznie wysłane do ZUS
+                    i Twojego pracodawcy. Kopię dokumentu otrzymasz także na e-mail.
                   </p>
                 </div>
               </div>

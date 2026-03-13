@@ -20,7 +20,7 @@ const HowItWorks = () => {
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <p className="mb-4 text-lg md:text-xl font-semibold text-primary bg-primary/10 inline-block px-4 py-2 rounded-lg">
-            📧 Potwierdzenie konsultacji oraz dokumenty po konsultacji wyślemy na adres EMAIL podany w formularzu rejestracyjnym.
+            📧 Potwierdzenie płatności oraz dokumenty po konsultacji wyślemy na adres EMAIL podany w formularzu rejestracyjnym.
           </p>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
             Jak otrzymać <span className="text-primary">zwolnienie lekarskie (L4) online?</span>

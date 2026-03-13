@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
 
     const { data: caseData, error: caseError } = await supabase
       .from("cases")
-      .select("id, case_number, payment_status, status")
+      .select("id, case_number, payment_status, payment_psp_ref, status")
       .eq("id", caseId)
       .maybeSingle();
 

@@ -18,6 +18,10 @@ const faqs: FaqItem[] = [
     answer: "Tak, zwolnienia lekarskie wystawiane online są w pełni legalne i zgodne z polskim prawem. Konsultacje prowadzą licencjonowani lekarze posiadający prawo wykonywania zawodu. e-zwolnienie jest akceptowane przez ZUS i pracodawców na takich samych zasadach jak tradycyjne zwolnienie."
   },
   {
+    question: "Jak otrzymam zwolnienie lekarskie?",
+    answer: "Dokumentację medyczną w tym L4, zalecenia, e-receptę, skierowania na badania, zaświadczenia itp. wyślemy na adres EMAIL podany w formularzu rejestracyjnym."
+  },
+  {
     question: "Jak szybko otrzymam zwolnienie lekarskie?",
     answer: "Zwolnienie możesz otrzymać nawet do 30 minut od złożenia Zamówienia (maksymalny czas realizacji konsultacji to 24 godziny) e-zwolnienie jest automatycznie wysyłane do ZUS i Twojego pracodawcy, więc nie musisz niczego dodatkowo załatwiać. Otrzymasz go również na maila podanego w formularzu."
   },
@@ -45,10 +49,6 @@ const faqs: FaqItem[] = [
   {
     question: "Co jeśli jestem studentem lub uczniem?",
     answer: "Studenci i uczniowie również mogą skorzystać z naszej usługi. W takim przypadku lekarz wystawi  zaświadczenie  na uczelnię (nie zwolnienie L4). Otrzymasz na maila dokument w formie PDF, który możesz przedstawić w szkole lub na uczelni. "
-  },
-  {
-    question: "Jak otrzymam zwolnienie lekarskie?",
-    answer: "Dokumentację medyczną w tym L4, zalecenia, e-receptę, skierowania na badania, zaświadczenia itp. wyślemy na adres EMAIL podany w formularzu rejestracyjnym."
   }
 ];
 

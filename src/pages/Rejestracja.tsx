@@ -899,10 +899,10 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_no_guarantee" className="text-sm font-normal cursor-pointer">
-                      Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego
+                      * Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego
                       e-zwolnienia. Diagnoza oraz decyzja o zasadności i długości e-zwolnienia należą wyłącznie do
                       lekarza, który podejmuje je na podstawie przekazanych przeze mnie informacji i objawów. Data
-                      początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy. *
+                      początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy.
                     </Label>
                     {errors.consentNoGuarantee && (
                       <p className="text-sm text-destructive">{errors.consentNoGuarantee.message}</p>

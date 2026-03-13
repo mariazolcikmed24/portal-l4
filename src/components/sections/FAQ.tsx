@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     question: "Na ile dni mogę otrzymać zwolnienie online?",
-    answer: "e-zwolnienie może być wystawione na okres do 7 dni. Data początkowa może być maksymalnie 3 dni wstecz od dnia konsultacji. W przypadku konieczności dłuższego zwolnienia, lekarz może zalecić wizytę stacjonarną."
+    answer: "e-zwolnienie (L4) może zostać wystawione na liczbę dni odpowiadających potrzebie pacjenta -  w zależności od stanu zdrowia. Data początkowa może być maksymalnie 3 dni wstecz od dnia konsultacji. W przypadku konieczności dłuższego zwolnienia, lekarz może zalecić wizytę stacjonarną. Jeśli konieczne jest dłuższe zwolnienie, lekarz może zalecić dalsze leczenie lub wizytę stacjonarną. Warto pamiętać, że o wystawieniu zwolnienia i jego długości zawsze decyduje lekarz podczas konsultacji."
   },
   {
     question: "Czy moje dane są bezpieczne?",

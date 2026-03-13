@@ -7,7 +7,7 @@ const testimonials = [{
 }, {
   name: "Piotr M.",
   role: "Specjalista IT",
-  content: "Bardzo profesjonalna obsługa. Lekarz był rzeczowy, zadawał konkretne pytania medyczne. Wszystko odbyło się sprawnie i zgodnie z przepisami. Czułem się bezpiecznie przez cały proces.",
+  content: "Bardzo profesjonalna obsługa. Formularz był przejrzysty i zawierał konkretne pytania medyczne. Lekarz szybko przeanalizował moje zgłoszenie i wszystko odbyło się sprawnie, zgodnie z przepisami. Czułem się bezpiecznie przez cały proces.",
   rating: 5
 }, {
   name: "Magdalena W.",

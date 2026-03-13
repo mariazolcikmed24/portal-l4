@@ -4,9 +4,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, ClipboardList, Stethoscope, FileCheck } from "lucide-react";
 
-const faqs = [
+interface FaqItem {
+  question: string;
+  answer: string | null;
+  richAnswer?: boolean;
+}
+
+const faqs: FaqItem[] = [
   {
     question: "Czy zwolnienie lekarskie online jest legalne?",
     answer: "Tak, zwolnienia lekarskie wystawiane online są w pełni legalne i zgodne z polskim prawem. Konsultacje prowadzą licencjonowani lekarze posiadający prawo wykonywania zawodu. e-zwolnienie jest akceptowane przez ZUS i pracodawców na takich samych zasadach jak tradycyjne zwolnienie."
@@ -29,7 +35,8 @@ const faqs = [
   },
   {
     question: "Jak wygląda proces uzyskania zwolnienia?",
-    answer: "Proces składa się z trzech prostych kroków: 1) Wypełniasz formularz medyczny online, zajmie ci to do 2 minut 2) Lekarz weryfikuje dane z wypełnionego przez Ciebie formularza medycznego i w razie potrzeby przeprowadza konsultację telefoniczną z Tobą. 3) Otrzymujesz e-zwolnienie, które automatycznie trafia na Twojego maila, do ZUS i Twojego pracodawcy. Cały proces zajmuje nawet 30 minut, najczęściej do 4h, maksymalnie 24h."
+    answer: null,
+    richAnswer: true
   },
   {
     question: "Czy mogę uzyskać zwolnienie na opiekę nad dzieckiem?",
@@ -70,7 +77,45 @@ const FAQ = () => {
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
-                  {faq.answer}
+                  {faq.richAnswer ? (
+                    <div className="space-y-4">
+                      <p>Proces składa się z trzech prostych kroków:</p>
+                      <ol className="space-y-3">
+                        <li className="flex gap-3 items-start">
+                          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <ClipboardList className="w-4 h-4 text-primary" />
+                          </span>
+                          <div>
+                            <span className="font-semibold text-foreground">Wypełniasz formularz medyczny online</span>
+                            <span className="text-muted-foreground"> — zajmie Ci to do 2 minut.</span>
+                          </div>
+                        </li>
+                        <li className="flex gap-3 items-start">
+                          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Stethoscope className="w-4 h-4 text-primary" />
+                          </span>
+                          <div>
+                            <span className="font-semibold text-foreground">Lekarz weryfikuje Twoje dane</span>
+                            <span className="text-muted-foreground"> — i w razie potrzeby przeprowadza konsultację telefoniczną.</span>
+                          </div>
+                        </li>
+                        <li className="flex gap-3 items-start">
+                          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <FileCheck className="w-4 h-4 text-primary" />
+                          </span>
+                          <div>
+                            <span className="font-semibold text-foreground">Otrzymujesz e-zwolnienie</span>
+                            <span className="text-muted-foreground"> — automatycznie trafia na Twojego maila, do ZUS i pracodawcy.</span>
+                          </div>
+                        </li>
+                      </ol>
+                      <p className="text-sm bg-muted/50 rounded-lg px-4 py-2.5 border border-border">
+                        ⏱️ Cały proces zajmuje nawet <span className="font-semibold text-foreground">30 minut</span>, najczęściej do 4h, maksymalnie 24h.
+                      </p>
+                    </div>
+                  ) : (
+                    faq.answer
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}
@@ -82,7 +127,7 @@ const FAQ = () => {
           {faqs.map((faq, index) => (
             <div key={`seo-${index}`}>
               <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
+              <p>{faq.richAnswer ? "Proces składa się z trzech prostych kroków: 1) Wypełniasz formularz medyczny online, zajmie ci to do 2 minut 2) Lekarz weryfikuje dane z wypełnionego przez Ciebie formularza medycznego i w razie potrzeby przeprowadza konsultację telefoniczną z Tobą. 3) Otrzymujesz e-zwolnienie, które automatycznie trafia na Twojego maila, do ZUS i Twojego pracodawcy. Cały proces zajmuje nawet 30 minut, najczęściej do 4h, maksymalnie 24h." : faq.answer}</p>
             </div>
           ))}
         </div>

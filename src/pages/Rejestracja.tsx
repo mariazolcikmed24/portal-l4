@@ -825,15 +825,14 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_terms" className="text-sm font-normal cursor-pointer">
-                      Akceptuję{" "}
+                      * Akceptuję{" "}
                       <Link to="#" className="text-primary hover:underline">
                         Regulamin
                       </Link>{" "}
                       i{" "}
                       <Link to="#" className="text-primary hover:underline">
                         Politykę prywatności
-                      </Link>{" "}
-                      *
+                      </Link>
                     </Label>
                     {errors.consentTerms && <p className="text-sm text-destructive">{errors.consentTerms.message}</p>}
                   </div>

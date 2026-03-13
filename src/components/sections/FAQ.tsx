@@ -105,7 +105,7 @@ const FAQ = () => {
                           </span>
                           <div>
                             <span className="font-semibold text-foreground">Otrzymujesz e-zwolnienie</span>
-                            <span className="text-muted-foreground"> — automatycznie trafia na Twojego maila, do ZUS i pracodawcy.</span>
+                            <span className="text-muted-foreground"> — które automatycznie trafia na Twojego maila, do ZUS i Twojego pracodawcy.</span>
                           </div>
                         </li>
                       </ol>

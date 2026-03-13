@@ -825,15 +825,14 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_terms" className="text-sm font-normal cursor-pointer">
-                      Akceptuję{" "}
+                      * Akceptuję{" "}
                       <Link to="#" className="text-primary hover:underline">
                         Regulamin
                       </Link>{" "}
                       i{" "}
                       <Link to="#" className="text-primary hover:underline">
                         Politykę prywatności
-                      </Link>{" "}
-                      *
+                      </Link>
                     </Label>
                     {errors.consentTerms && <p className="text-sm text-destructive">{errors.consentTerms.message}</p>}
                   </div>
@@ -854,8 +853,8 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_employment" className="text-sm font-normal cursor-pointer">
-                      Oświadczam, że jestem aktualnie zatrudniony/a u Pracodawcy wskazanego w ankiecie oraz przysługuje
-                      mi prawo do zasiłku chorobowego. *
+                      * Oświadczam, że jestem aktualnie zatrudniony/a u Pracodawcy wskazanego w ankiecie oraz przysługuje
+                      mi prawo do zasiłku chorobowego.
                     </Label>
                     {errors.consentEmployment && (
                       <p className="text-sm text-destructive">{errors.consentEmployment.message}</p>
@@ -878,8 +877,8 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_call" className="text-sm font-normal cursor-pointer">
-                      Oświadczam, że przyjmuję do wiadomości, iż lekarz może skontaktować się ze mną telefonicznie w
-                      celu pogłębienia wywiadu medycznego. *
+                      * Oświadczam, że przyjmuję do wiadomości, iż lekarz może skontaktować się ze mną telefonicznie w
+                      celu pogłębienia wywiadu medycznego.
                     </Label>
                     {errors.consentCall && <p className="text-sm text-destructive">{errors.consentCall.message}</p>}
                   </div>
@@ -900,10 +899,10 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_no_guarantee" className="text-sm font-normal cursor-pointer">
-                      Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego
+                      * Rozumiem i akceptuję, że wykupienie e-konsultacji nie gwarantuje wystawienia wnioskowanego
                       e-zwolnienia. Diagnoza oraz decyzja o zasadności i długości e-zwolnienia należą wyłącznie do
                       lekarza, który podejmuje je na podstawie przekazanych przeze mnie informacji i objawów. Data
-                      początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy. *
+                      początkowa zwolnienia jest deklarowaną przeze mnie datą nieobecności w pracy.
                     </Label>
                     {errors.consentNoGuarantee && (
                       <p className="text-sm text-destructive">{errors.consentNoGuarantee.message}</p>
@@ -926,7 +925,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_truth" className="text-sm font-normal cursor-pointer">
-                      Oświadczam, że nie zatajam żadnych istotnych informacji dotyczących mojego stanu zdrowia *
+                      * Oświadczam, że nie zatajam żadnych istotnych informacji dotyczących mojego stanu zdrowia
                     </Label>
                     {errors.consentTruth && <p className="text-sm text-destructive">{errors.consentTruth.message}</p>}
                   </div>

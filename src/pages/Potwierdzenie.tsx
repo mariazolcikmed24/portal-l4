@@ -177,6 +177,9 @@ export default function Potwierdzenie() {
             "Twoje zgłoszenie zostało zarejestrowane. Oczekujemy na potwierdzenie płatności." :
             "Twoje zgłoszenie zostało pomyślnie opłacone i zarejestrowane."}
           </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Potwierdzenie płatności oraz dokumenty po konsultacji wyślemy na adres EMAIL podany w formularzu rejestracyjnym.
+          </p>
         </div>
 
         {caseNumber &&

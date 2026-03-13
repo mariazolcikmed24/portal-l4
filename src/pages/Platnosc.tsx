@@ -273,7 +273,7 @@ export default function Platnosc() {
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="font-normal">
-                        Wyrażam zgodę na rozpoczęcie realizacji Usługi medycznej przed upływem 14 dni od zawarcia Umowy i przyjmuję do wiadomości utratę prawa odstąpienia od Umowy po jej rozpoczęciu. *
+                        * Wyrażam zgodę na rozpoczęcie realizacji Usługi medycznej przed upływem 14 dni od zawarcia Umowy i przyjmuję do wiadomości utratę prawa odstąpienia od Umowy po jej rozpoczęciu.
                       </FormLabel>
                     </div>
                   </div>

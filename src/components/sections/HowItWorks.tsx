@@ -20,7 +20,7 @@ const HowItWorks = () => {
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Jak uzyskać <span className="text-primary">zwolnienie lekarskie online?</span>
+            Jak otrzymać <span className="text-primary">zwolnienie lekarskie (L4) online?</span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground">
             Prosty proces w trzech krokach. Wszystko online, bez kolejek i czekania.

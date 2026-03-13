@@ -258,10 +258,7 @@ export default function Potwierdzenie() {
           <Card className="bg-muted/50">
             <CardContent className="pt-6">
               <p className="text-sm">
-                <strong>Informacja dla studentów/uczniów:</strong>
-                <br />
-                Po pozytywnej decyzji lekarza otrzymasz dokument PDF na adres e-mail, który możesz pobrać i wykorzystać
-                według potrzeb.
+                Studenci i uczniowie – lekarz może wystawić zaświadczenie dla szkoły lub uczelni (nie L4 dla pracodawcy). Dokument otrzymasz w formie PDF na e-mail.
               </p>
             </CardContent>
           </Card>

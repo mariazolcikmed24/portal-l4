@@ -222,7 +222,7 @@ export default function StatusSprawy() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm sm:text-lg font-mono font-bold text-muted-foreground break-all mb-2">
-                        {caseData.case_number}
+                        {caseData.payment_psp_ref || caseData.case_number}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {status.description}

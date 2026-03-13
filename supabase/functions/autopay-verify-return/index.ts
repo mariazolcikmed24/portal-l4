@@ -107,6 +107,7 @@ Deno.serve(async (req) => {
         valid: true,
         case_id: caseData.id,
         case_number: caseData.case_number,
+        payment_psp_ref: caseData.payment_psp_ref,
         payment_status: caseData.payment_status,
         case_status: caseData.status,
       }),

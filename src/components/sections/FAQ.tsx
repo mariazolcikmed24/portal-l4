@@ -6,7 +6,13 @@ import {
 } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
 
-const faqs = [
+interface FaqItem {
+  question: string;
+  answer: string | null;
+  richAnswer?: boolean;
+}
+
+const faqs: FaqItem[] = [
   {
     question: "Czy zwolnienie lekarskie online jest legalne?",
     answer: "Tak, zwolnienia lekarskie wystawiane online są w pełni legalne i zgodne z polskim prawem. Konsultacje prowadzą licencjonowani lekarze posiadający prawo wykonywania zawodu. e-zwolnienie jest akceptowane przez ZUS i pracodawców na takich samych zasadach jak tradycyjne zwolnienie."

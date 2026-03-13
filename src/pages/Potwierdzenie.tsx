@@ -270,13 +270,13 @@ export default function Potwierdzenie() {
           </div>
         </div>
 
-        {caseNumber &&
+        {caseNumber ? (
         <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               Sprawdzisz stan swojej sprawy wkrótce za pomocą numeru {caseNumber}
             </p>
           </div>
-        }
+        ) : null}
       </div>
     </div>);
 

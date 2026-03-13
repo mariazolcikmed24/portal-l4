@@ -52,7 +52,7 @@ export default function StatusSprawy() {
 
   const handleSearch = async () => {
     if (!caseNumber.trim()) {
-      toast.error("Wprowadź numer wizyty");
+      toast.error("Wprowadź numer transakcji");
       return;
     }
 

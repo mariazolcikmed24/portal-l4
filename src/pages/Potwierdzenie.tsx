@@ -223,8 +223,7 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Decyzja lekarza</h3>
                   <p className="text-sm text-muted-foreground">
-                    Na podstawie wywiadu medycznego lekarz podejmie decyzję o wystawieniu e-zwolnienia. Pamiętaj, że
-                    e-konsultacja nie gwarantuje wystawienia zwolnienia.
+                    O wystawieniu świadczenia medycznego (l4, recepta itp.) każdorazowo decyduje lekarz na podstawie analizy stanu zdrowia Pacjenta, przekazanych informacji, dostarczonej dokumentacji medycznej oraz wywiadu medycznego.
                   </p>
                 </div>
               </div>

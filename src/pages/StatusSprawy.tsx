@@ -166,7 +166,7 @@ export default function StatusSprawy() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Sprawdź status wizyty</h1>
-          <p className="text-muted-foreground">Wprowadź numer wizyty, aby zobaczyć jej aktualny status</p>
+          <p className="text-muted-foreground">Wprowadź numer transakcji, aby zobaczyć aktualny status wizyty</p>
         </div>
 
         <Card className="mb-6">

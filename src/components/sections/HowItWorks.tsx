@@ -19,7 +19,7 @@ const HowItWorks = () => {
   return <section id="jak-to-dziala" className="pt-8 md:pt-12 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-          <p className="mb-4 text-base md:text-lg font-semibold text-primary bg-primary/10 inline-block px-4 py-2 rounded-lg">
+          <p className="mb-4 text-lg md:text-xl font-semibold text-primary bg-primary/10 inline-block px-4 py-2 rounded-lg">
             📧 Potwierdzenie konsultacji oraz dokumenty po konsultacji wyślemy na adres EMAIL podany w formularzu rejestracyjnym.
           </p>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">

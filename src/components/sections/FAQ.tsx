@@ -87,7 +87,7 @@ const FAQ = () => {
                           </span>
                           <div>
                             <span className="font-semibold text-foreground">Wypełniasz formularz medyczny online</span>
-                            <span className="text-muted-foreground"> — zajmie Ci to do 2 minut.</span>
+                            <span className="text-muted-foreground"> — zajmie ci to do 2 minut.</span>
                           </div>
                         </li>
                         <li className="flex gap-3 items-start">

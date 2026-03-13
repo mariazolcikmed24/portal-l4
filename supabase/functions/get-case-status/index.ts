@@ -16,16 +16,20 @@ serve(async (req) => {
 
     if (!case_number || typeof case_number !== 'string') {
       return new Response(
-        JSON.stringify({ error: 'Brak numeru sprawy' }),
+        JSON.stringify({ error: 'Brak numeru transakcji' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Validate case number format (EZ-XXXXXXXXX)
-    const caseNumberPattern = /^EZ-[A-Z0-9]{9}$/;
-    if (!caseNumberPattern.test(case_number.trim().toUpperCase())) {
+    const trimmed = case_number.trim().toUpperCase();
+
+    // Accept both formats: payment_psp_ref (e.g. ACK6KMWAS9) or legacy case_number (EZ-XXXXXXXXX)
+    const isLegacyCaseNumber = /^EZ-[A-Z0-9]{9}$/.test(trimmed);
+    const isPspRef = /^[A-Z0-9]{6,20}$/.test(trimmed);
+
+    if (!isLegacyCaseNumber && !isPspRef) {
       return new Response(
-        JSON.stringify({ error: 'Nieprawidłowy format numeru sprawy' }),
+        JSON.stringify({ error: 'Nieprawidłowy format numeru transakcji' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -35,12 +39,15 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Fetch only non-sensitive case data
+    // Search by payment_psp_ref first, fallback to case_number for legacy
+    const searchColumn = isLegacyCaseNumber ? 'case_number' : 'payment_psp_ref';
+
     const { data: caseData, error: caseError } = await supabaseAdmin
       .from('cases')
       .select(`
         id,
         case_number,
+        payment_psp_ref,
         status,
         payment_status,
         illness_start,
@@ -50,7 +57,7 @@ serve(async (req) => {
         med24_visit_id,
         med24_visit_status
       `)
-      .eq('case_number', case_number.trim().toUpperCase())
+      .eq(searchColumn, trimmed)
       .maybeSingle();
 
     if (caseError) {

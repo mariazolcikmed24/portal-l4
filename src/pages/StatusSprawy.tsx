@@ -52,7 +52,7 @@ export default function StatusSprawy() {
 
   const handleSearch = async () => {
     if (!caseNumber.trim()) {
-      toast.error("Wprowadź numer wizyty");
+      toast.error("Wprowadź numer transakcji");
       return;
     }
 
@@ -166,17 +166,17 @@ export default function StatusSprawy() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Sprawdź status wizyty</h1>
-          <p className="text-muted-foreground">Wprowadź numer wizyty, aby zobaczyć jej aktualny status</p>
+          <p className="text-muted-foreground">Wprowadź numer transakcji, aby zobaczyć aktualny status wizyty</p>
         </div>
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Wyszukaj wizytę</CardTitle>
+            <CardTitle>Wyszukaj po numerze transakcji</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-3">
               <Input
-                placeholder="Wprowadź numer wizyty (np. EZ-ABC123456)"
+                placeholder="Wprowadź numer transakcji (np. ACK6KMWAS9)"
                 value={caseNumber}
                 onChange={(e) => setCaseNumber(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -222,7 +222,7 @@ export default function StatusSprawy() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm sm:text-lg font-mono font-bold text-muted-foreground break-all mb-2">
-                        {caseData.case_number}
+                        {caseData.payment_psp_ref || caseData.case_number}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {status.description}

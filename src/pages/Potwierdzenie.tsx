@@ -56,15 +56,15 @@ export default function Potwierdzenie() {
           return;
         }
 
-        setCaseNumber(data.case_number);
+      setCaseNumber(data.payment_psp_ref || data.case_number);
 
-        // Map payment status
-        if (data.payment_status === "success") {
-          if (!hasTrackedPurchaseRef.current) {
+      // Map payment status
+      if (data.payment_status === "success") {
+        if (!hasTrackedPurchaseRef.current) {
             pushEvent({
               event: "purchase",
               ecommerce: {
-                transaction_id: data.case_number || orderId,
+                transaction_id: data.payment_psp_ref || data.case_number || orderId,
                 value: SERVICE_PRICE,
                 tax: 0,
                 shipping: 0,
@@ -182,14 +182,14 @@ export default function Potwierdzenie() {
         {caseNumber &&
         <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Numer sprawy</CardTitle>
+              <CardTitle>Numer transakcji</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center">
                 <span className="text-2xl font-mono font-bold text-primary">{caseNumber}</span>
               </div>
               <p className="text-sm text-muted-foreground text-center mt-2">
-                Zapisz ten numer - będzie potrzebny do śledzenia statusu sprawy
+                Zapisz ten numer - będzie potrzebny do śledzenia statusu wizyty
               </p>
             </CardContent>
           </Card>
@@ -272,7 +272,7 @@ export default function Potwierdzenie() {
         {caseNumber &&
         <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Sprawdź status swojej konsultacji o numerze {caseNumber}{" "}
+              Sprawdź status swojej wizyty o numerze {caseNumber}{" "}
               <Link to={`/status?case=${caseNumber}`} className="underline text-primary">
                 tutaj
               </Link>.

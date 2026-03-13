@@ -29,7 +29,8 @@ const faqs = [
   },
   {
     question: "Jak wygląda proces uzyskania zwolnienia?",
-    answer: "Proces składa się z trzech prostych kroków: 1) Wypełniasz formularz medyczny online, zajmie ci to do 2 minut 2) Lekarz weryfikuje dane z wypełnionego przez Ciebie formularza medycznego i w razie potrzeby przeprowadza konsultację telefoniczną z Tobą. 3) Otrzymujesz e-zwolnienie, które automatycznie trafia na Twojego maila, do ZUS i Twojego pracodawcy. Cały proces zajmuje nawet 30 minut, najczęściej do 4h, maksymalnie 24h."
+    answer: null,
+    richAnswer: true
   },
   {
     question: "Czy mogę uzyskać zwolnienie na opiekę nad dzieckiem?",

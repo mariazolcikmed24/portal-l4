@@ -17,7 +17,7 @@ const testimonials = [{
 }, {
   name: "Tomasz R.",
   role: "Przedsiębiorca",
-  content: "Idealne rozwiązanie dla osób pracujących. Wszystko online, bez wychodzenia z domu. Lekarz był bardzo pomocny i wyjaśnił mi wszystkie wątpliwości. Zdecydowanie będę korzystał ponownie.",
+  content: "Idealne rozwiązanie dla osób pracujących. Wypełniłem formularz w kilka minut, a lekarz sprawnie przeanalizował moje zgłoszenie. Wszystko online, bez wychodzenia z domu. Zdecydowanie skorzystam ponownie.",
   rating: 5
 }];
 const Testimonials = () => {

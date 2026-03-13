@@ -146,7 +146,7 @@ export default function Potwierdzenie() {
           <p className="text-muted-foreground mb-6">Płatność nie została zrealizowana. Możesz spróbować ponownie.</p>
           {caseNumber &&
           <p className="text-sm text-muted-foreground mb-4">
-              Numer sprawy: <span className="font-mono font-bold">{caseNumber}</span>
+              Numer potwierdzenia: <span className="font-mono font-bold">{caseNumber}</span>
             </p>
           }
           <div className="flex gap-3 justify-center">
@@ -185,7 +185,7 @@ export default function Potwierdzenie() {
         {caseNumber &&
         <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Numer sprawy</CardTitle>
+              <CardTitle>Numer potwierdzenia</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center">

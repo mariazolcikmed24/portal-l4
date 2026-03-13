@@ -35,7 +35,7 @@ const leaveTypes = [
 
 const additionalLeaveTypes = [
   {
-    title: "Służby mundurowe",
+    title: "Służby mundurowe (L4)",
     subtitle: "Umów konsultację lekarską online z możliwością otrzymania zwolnienia (L4) dla służb mundurowych i studentów służb mundurowych.",
     price: "79 zł",
     icon: Shield,

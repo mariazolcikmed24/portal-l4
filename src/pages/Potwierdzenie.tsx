@@ -144,11 +144,11 @@ export default function Potwierdzenie() {
           <XCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2">Płatność nieudana</h1>
           <p className="text-muted-foreground mb-6">Płatność nie została zrealizowana. Możesz spróbować ponownie.</p>
-          {caseNumber &&
+          {caseNumber ? (
           <p className="text-sm text-muted-foreground mb-4">
               Numer potwierdzenia: <span className="font-mono font-bold">{caseNumber}</span>
             </p>
-          }
+          ) : null}
           <div className="flex gap-3 justify-center">
             <Button variant="outline" onClick={() => navigate("/")}>
               Strona główna
@@ -182,7 +182,7 @@ export default function Potwierdzenie() {
           </p>
         </div>
 
-        {caseNumber &&
+        {caseNumber ? (
         <Card className="mb-6">
             <CardHeader>
               <CardTitle>Numer potwierdzenia</CardTitle>
@@ -196,7 +196,7 @@ export default function Potwierdzenie() {
               </p>
             </CardContent>
           </Card>
-        }
+        ) : null}
 
         <div className="space-y-6">
           <Card>
@@ -270,13 +270,13 @@ export default function Potwierdzenie() {
           </div>
         </div>
 
-        {caseNumber &&
+        {caseNumber ? (
         <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               Sprawdzisz stan swojej sprawy wkrótce za pomocą numeru {caseNumber}
             </p>
           </div>
-        }
+        ) : null}
       </div>
     </div>);
 

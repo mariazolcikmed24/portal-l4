@@ -192,7 +192,7 @@ export default function Potwierdzenie() {
                 <span className="text-2xl font-mono font-bold text-primary">{caseNumber}</span>
               </div>
               <p className="text-sm text-muted-foreground text-center mt-2">
-                Zapisz ten numer - będzie potrzebny do śledzenia statusu sprawy
+                Zapisz ten numer - będzie potrzebny do śledzenia statusu konsultacji
               </p>
             </CardContent>
           </Card>

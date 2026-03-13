@@ -144,11 +144,11 @@ export default function Potwierdzenie() {
           <XCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2">Płatność nieudana</h1>
           <p className="text-muted-foreground mb-6">Płatność nie została zrealizowana. Możesz spróbować ponownie.</p>
-          {caseNumber ? (
+          {caseNumber &&
           <p className="text-sm text-muted-foreground mb-4">
-              Numer potwierdzenia: <span className="font-mono font-bold">{caseNumber}</span>
+              Numer sprawy: <span className="font-mono font-bold">{caseNumber}</span>
             </p>
-          ) : null}
+          }
           <div className="flex gap-3 justify-center">
             <Button variant="outline" onClick={() => navigate("/")}>
               Strona główna
@@ -175,28 +175,25 @@ export default function Potwierdzenie() {
           <p className="text-muted-foreground">
             {isPending ?
             "Twoje zgłoszenie zostało zarejestrowane. Oczekujemy na potwierdzenie płatności." :
-            "Twoja konsultacja została pomyślnie opłacona i zarejestrowana."}
-          </p>
-          <p className="mt-4 text-lg font-semibold text-primary bg-primary/10 inline-block px-4 py-2 rounded-lg">
-            📧 Potwierdzenie płatności oraz dokumenty po konsultacji wyślemy na adres EMAIL podany w formularzu rejestracyjnym.
+            "Twoje zgłoszenie zostało pomyślnie opłacone i zarejestrowane."}
           </p>
         </div>
 
-        {caseNumber ? (
+        {caseNumber &&
         <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Numer potwierdzenia</CardTitle>
+              <CardTitle>Numer sprawy</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center">
                 <span className="text-2xl font-mono font-bold text-primary">{caseNumber}</span>
               </div>
               <p className="text-sm text-muted-foreground text-center mt-2">
-                Zapisz ten numer - będzie potrzebny do śledzenia statusu konsultacji.<br />Status konsultacji sprawdzisz <a href="/status-sprawy" className="text-primary underline hover:text-primary/80">tutaj</a>.
+                Zapisz ten numer - będzie potrzebny do śledzenia statusu sprawy
               </p>
             </CardContent>
           </Card>
-        ) : null}
+        }
 
         <div className="space-y-6">
           <Card>
@@ -211,7 +208,8 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Weryfikacja danych</h3>
                   <p className="text-sm text-muted-foreground">
-                    Lekarz sprawdzi przesłane przez Ciebie dane podane w formularzu i może skontaktować się z Tobą telefonicznie w celu weryfikacji lub pogłębienie wywiadu medycznego.
+                    Lekarz sprawdzi przesłane przez Ciebie dane i może skontaktować się telefonicznie w celu
+                    weryfikacji.
                   </p>
                 </div>
               </div>
@@ -223,7 +221,8 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Decyzja lekarza</h3>
                   <p className="text-sm text-muted-foreground">
-                    O wystawieniu świadczenia medycznego (l4, recepta itp.) każdorazowo decyduje lekarz na podstawie analizy stanu zdrowia Pacjenta, przekazanych informacji, dostarczonej dokumentacji medycznej oraz wywiadu medycznego.
+                    Na podstawie wywiadu medycznego lekarz podejmie decyzję o wystawieniu e-zwolnienia. Pamiętaj, że
+                    e-konsultacja nie gwarantuje wystawienia zwolnienia.
                   </p>
                 </div>
               </div>
@@ -235,8 +234,8 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Wysyłka e-zwolnienia</h3>
                   <p className="text-sm text-muted-foreground">
-                    Jeśli lekarz zdecyduje o wystawieniu e-zwolnienia, zostanie ono automatycznie wysłane do ZUS
-                    i Twojego pracodawcy. Kopię dokumentu otrzymasz także na e-mail.
+                    Jeśli lekarz podejmie pozytywną decyzję, e-zwolnienie zostanie automatycznie wysłane do systemu ZUS
+                    i do Twojego pracodawcy.
                   </p>
                 </div>
               </div>
@@ -258,7 +257,10 @@ export default function Potwierdzenie() {
           <Card className="bg-muted/50">
             <CardContent className="pt-6">
               <p className="text-sm">
-                Studenci i uczniowie – lekarz może wystawić zaświadczenie dla szkoły lub uczelni (nie L4 dla pracodawcy). Dokument otrzymasz w formie PDF na e-mail.
+                <strong>Studenci i uczniowie – lekarz wystawi zaświadczenie dla szkoły lub uczelni (nie L4 dla pracodawcy). Dokument otrzymasz w formie PDF na adres EMAIL podany w formularzu rejestracyjnym.</strong>
+                <br />
+                Po pozytywnej decyzji lekarza otrzymasz dokument PDF na adres e-mail, który możesz pobrać i wykorzystać
+                według potrzeb.
               </p>
             </CardContent>
           </Card>
@@ -270,13 +272,13 @@ export default function Potwierdzenie() {
           </div>
         </div>
 
-        {caseNumber ? (
+        {caseNumber &&
         <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               Sprawdzisz stan swojej sprawy wkrótce za pomocą numeru {caseNumber}
             </p>
           </div>
-        ) : null}
+        }
       </div>
     </div>);
 

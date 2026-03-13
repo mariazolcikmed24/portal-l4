@@ -925,7 +925,7 @@ const Rejestracja = () => {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent_truth" className="text-sm font-normal cursor-pointer">
-                      Oświadczam, że nie zatajam żadnych istotnych informacji dotyczących mojego stanu zdrowia *
+                      * Oświadczam, że nie zatajam żadnych istotnych informacji dotyczących mojego stanu zdrowia
                     </Label>
                     {errors.consentTruth && <p className="text-sm text-destructive">{errors.consentTruth.message}</p>}
                   </div>

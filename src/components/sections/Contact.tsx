@@ -27,7 +27,7 @@ const Contact = () => {
                     <a href="mailto:kontakt@e-zwolnienie.com.pl" className="text-primary hover:underline">
                       kontakt@e-zwolnienie.com.pl
                     </a>
-                    <p className="text-sm text-muted-foreground">Pon-Pt: 9:00 - 17:00</p>
+                    <p className="text-sm text-muted-foreground">Biuro obsługi pacjenta pracuje w godzinach 9:00 - 17:00 od poniedziałku do piątku.</p>
                   </div>
                 </div>
               </div>

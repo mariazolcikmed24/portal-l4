@@ -44,7 +44,7 @@ const additionalLeaveTypes = [
     popular: false,
   },
   {
-    title: "Pracodawca zagraniczny",
+    title: "Pracodawca zagraniczny (L4)",
     subtitle: "Umów konsultację lekarską online z możliwością otrzymania zwolnienia (L4) dla osób zatrudnionych u pracodawcy zagranicznego.",
     price: "79 zł",
     icon: Globe,

@@ -211,8 +211,7 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Weryfikacja danych</h3>
                   <p className="text-sm text-muted-foreground">
-                    Lekarz sprawdzi przesłane przez Ciebie dane i może skontaktować się telefonicznie w celu
-                    weryfikacji.
+                    Lekarz sprawdzi przesłane przez Ciebie dane podane w formularzu i może skontaktować się z Tobą telefonicznie w celu weryfikacji lub pogłębienie wywiadu medycznego.
                   </p>
                 </div>
               </div>

@@ -15,7 +15,7 @@ import { useDataLayer } from "@/hooks/useDataLayer";
 import { formatPriceUI } from "@/lib/formatters";
 
 const paymentSchema = z.object({
-  confirm_data: z.literal(true, { errorMap: () => ({ message: "Potwierdzenie jest wymagane" }) }),
+  confirm_data: z.literal(true, { errorMap: () => ({ message: "Potwierdzenie jest wymagane" }) })
 });
 
 type PaymentFormData = z.infer<typeof paymentSchema>;
@@ -30,7 +30,7 @@ export default function Platnosc() {
   const { pushEvent } = useDataLayer();
 
   const form = useForm<PaymentFormData>({
-    resolver: zodResolver(paymentSchema),
+    resolver: zodResolver(paymentSchema)
   });
 
   // DODANO: Helpery do mapowania parametrów analitycznych
@@ -42,7 +42,7 @@ export default function Platnosc() {
       care_family: "Opieka nad członkiem rodziny",
       krus: "Ubezpieczeni w KRUS",
       uniformed: "Służby mundurowe/Studenci służb mundurowych",
-      foreign_employer: "Pracodawca zagraniczny",
+      foreign_employer: "Pracodawca zagraniczny"
     };
     return labels[type] || type;
   };
@@ -58,7 +58,7 @@ export default function Platnosc() {
       eye: "Problemy z oczami",
       migraine: "Migrena",
       acute_stress: "Ostre reakcje na stres",
-      psych: "Problemy psychologiczne",
+      psych: "Problemy psychologiczne"
     };
     return labels[category] || category;
   };
@@ -76,7 +76,7 @@ export default function Platnosc() {
 
       // Pobierz przesłane pliki z sessionStorage
       const uploadedAttachments = JSON.parse(sessionStorage.getItem("uploadedFiles_attachments") || "[]");
-      const attachmentPaths = uploadedAttachments.map((f: { path: string }) => f.path);
+      const attachmentPaths = uploadedAttachments.map((f: {path: string;}) => f.path);
 
       // Znajdź profil użytkownika
       let profileId;
@@ -94,22 +94,22 @@ export default function Platnosc() {
 
       // Utwórz sprawę po stronie backendu (działa również dla gościa)
       const recipient_type =
-        rodzajZwolnienia.leave_type === "pl_employer"
-          ? "pl_employer"
-          : rodzajZwolnienia.leave_type === "foreign_employer"
-            ? "foreign_employer"
-            : rodzajZwolnienia.leave_type === "uniformed"
-              ? "uniformed"
-              : rodzajZwolnienia.leave_type === "care"
-                ? "care"
-                : rodzajZwolnienia.leave_type === "care_family"
-                  ? "care"
-                  : rodzajZwolnienia.leave_type === "krus"
-                    ? "krus"
-                    : "student";
+      rodzajZwolnienia.leave_type === "pl_employer" ?
+      "pl_employer" :
+      rodzajZwolnienia.leave_type === "foreign_employer" ?
+      "foreign_employer" :
+      rodzajZwolnienia.leave_type === "uniformed" ?
+      "uniformed" :
+      rodzajZwolnienia.leave_type === "care" ?
+      "care" :
+      rodzajZwolnienia.leave_type === "care_family" ?
+      "care" :
+      rodzajZwolnienia.leave_type === "krus" ?
+      "krus" :
+      "student";
 
       // Build employers array from NIPs
-      const employers: { nip: string }[] = [];
+      const employers: {nip: string;}[] = [];
       if (rodzajZwolnienia.leave_type === "pl_employer" && Array.isArray(rodzajZwolnienia.nips)) {
         rodzajZwolnienia.nips.forEach((nip: string) => employers.push({ nip }));
       } else if (rodzajZwolnienia.leave_type === "care" && Array.isArray(rodzajZwolnienia.care_nips)) {
@@ -144,8 +144,8 @@ export default function Platnosc() {
           uniformed_nip: rodzajZwolnienia.uniformed_nip || null,
           care_first_name: rodzajZwolnienia.care_first_name || rodzajZwolnienia.care_family_first_name || null,
           care_last_name: rodzajZwolnienia.care_last_name || rodzajZwolnienia.care_family_last_name || null,
-          care_pesel: rodzajZwolnienia.care_pesel || rodzajZwolnienia.care_family_pesel || null,
-        },
+          care_pesel: rodzajZwolnienia.care_pesel || rodzajZwolnienia.care_family_pesel || null
+        }
       });
 
       if (createCaseErr) {
@@ -164,8 +164,8 @@ export default function Platnosc() {
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke("autopay-initiate-payment", {
         body: {
           case_id: caseData.id,
-          amount: servicePriceGrosze, // 79 PLN w groszach
-        },
+          amount: servicePriceGrosze // 79 PLN w groszach
+        }
       });
 
       if (paymentError) {
@@ -181,8 +181,8 @@ export default function Platnosc() {
         eventModel: {
           form_name: "e_zwolnienie",
           step_number: 6,
-          step_name: "platnosc",
-        },
+          step_name: "platnosc"
+        }
       });
 
       // ANALYTICS EVENT
@@ -193,18 +193,18 @@ export default function Platnosc() {
           value: servicePrice,
           payment_type: "autopay",
           items: [
-            {
-              item_id: "e-konsultacja-zwolnienie",
-              item_name: "E-konsultacja + e-zwolnienie",
-              item_category: getLeaveTypeLabel(rodzajZwolnienia?.leave_type),
-              item_category2: wywiadObjawy?.main_category
-                ? getMainCategoryLabel(wywiadObjawy.main_category)
-                : undefined,
-              price: servicePrice,
-              quantity: 1,
-            },
-          ],
-        },
+          {
+            item_id: "e-konsultacja-zwolnienie",
+            item_name: "E-konsultacja + e-zwolnienie",
+            item_category: getLeaveTypeLabel(rodzajZwolnienia?.leave_type),
+            item_category2: wywiadObjawy?.main_category ?
+            getMainCategoryLabel(wywiadObjawy.main_category) :
+            undefined,
+            price: servicePrice,
+            quantity: 1
+          }]
+
+        }
       });
 
       // Redirect to Autopay gateway.
@@ -265,8 +265,8 @@ export default function Platnosc() {
             <FormField
               control={form.control}
               name="confirm_data"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
+              render={({ field }) =>
+              <FormItem className="space-y-3">
                   <div className="flex items-start space-x-2">
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} />
@@ -279,13 +279,13 @@ export default function Platnosc() {
                   </div>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
+              } />
+            
 
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
               <p className="text-base font-medium">Ważne informacje:</p>
               <p className="text-sm text-muted-foreground">
-                Po dokonaniu płatności wszystkie informacje dotyczące przebiegu wizyty oraz dokumentacja medyczna zostaną przesłane na Twój adres e-mail po jej zakończeniu - jeśli wiadomość nie pojawi się w skrzynce odbiorczej, prosimy sprawdzić folder SPAM.
+                Po dokonaniu płatności wszystkie informacje dotyczące przebiegu wizyty oraz dokumentacja medyczna zostaną przesłane na Twój adres EMAIL po jej zakończeniu - jeśli wiadomość nie pojawi się w skrzynce odbiorczej, prosimy sprawdzić folder SPAM.
               </p>
             </div>
 
@@ -295,8 +295,8 @@ export default function Platnosc() {
                 variant="outline"
                 onClick={() => navigate("/podsumowanie")}
                 className="flex-1"
-                disabled={isProcessing}
-              >
+                disabled={isProcessing}>
+                
                 Wstecz
               </Button>
               <Button type="submit" className="flex-1" disabled={isProcessing}>
@@ -306,6 +306,6 @@ export default function Platnosc() {
           </form>
         </Form>
       </div>
-    </div>
-  );
+    </div>);
+
 }

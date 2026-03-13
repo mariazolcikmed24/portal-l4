@@ -40,7 +40,7 @@ const faqs: FaqItem[] = [
   },
   {
     question: "Czy mogę uzyskać zwolnienie na opiekę nad dzieckiem?",
-    answer: "Tak, oferujemy również zwolnienia na opiekę nad chorym członkiem rodziny. W formularzu należy podać dane osoby chorej oraz pracodawcy. Lekarz oceni sytuację i wydecyduje o wystawieniu zwolnienia opiekuńczego."
+    answer: "Tak. Podczas konsultacji lekarz może wystawić zwolnienie na opiekę nad dzieckiem lub innym chorym członkiem Twojej rodziny (zwolnienie opiekuńcze). W formularzu podaj dane osoby chorej (wymagającej opieki) oraz dane Twojego pracodawcy. Lekarz oceni sytuację zdrowotną i podejmie decyzję o wystawieniu zwolnienia."
   },
   {
     question: "Co jeśli jestem studentem lub uczniem?",

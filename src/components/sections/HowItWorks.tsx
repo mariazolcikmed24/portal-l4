@@ -23,7 +23,10 @@ const HowItWorks = () => {
             Jak otrzymać <span className="text-primary">zwolnienie lekarskie (L4) online?</span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground">
-            Prosty proces w trzech krokach. Potwierdzenie wizyty oraz dokumenty po konsultacji wyślemy na e-mail podany przy rejestracji.
+            Prosty proces w trzech krokach.
+          </p>
+          <p className="mt-3 text-base md:text-lg font-semibold text-primary bg-primary/10 inline-block px-4 py-2 rounded-lg">
+            📧 Wszystkie dokumenty wyślemy na Twój e-mail podany przy rejestracji.
           </p>
         </div>
 

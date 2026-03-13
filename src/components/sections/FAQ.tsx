@@ -4,7 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, ClipboardList, Stethoscope, FileCheck } from "lucide-react";
 
 interface FaqItem {
   question: string;

@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     question: "Jak szybko otrzymam zwolnienie lekarskie?",
-    answer: "Zwolnienie możesz otrzymać w ciągu 30 minut od zakończenia konsultacji z lekarzem. e-zwolnienie jest automatycznie wysyłane do ZUS i Twojego pracodawcy, więc nie musisz niczego dodatkowo załatwiać."
+    answer: "Zwolnienie możesz otrzymać nawet do 30 minut od złożenia Zamówienia (maksymalny czas realizacji konsultacji to 24 godziny) e-zwolnienie jest automatycznie wysyłane do ZUS i Twojego pracodawcy, więc nie musisz niczego dodatkowo załatwiać. Otrzymasz go również na maila podanego w formularzu."
   },
   {
     question: "Czy lekarz na pewno wystawi mi zwolnienie?",

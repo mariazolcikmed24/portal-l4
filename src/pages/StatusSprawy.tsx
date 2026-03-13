@@ -171,7 +171,7 @@ export default function StatusSprawy() {
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Wyszukaj wizytę</CardTitle>
+            <CardTitle>Wyszukaj po numerze transakcji</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-3">

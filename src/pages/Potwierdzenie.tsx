@@ -192,7 +192,7 @@ export default function Potwierdzenie() {
                 <span className="text-2xl font-mono font-bold text-primary">{caseNumber}</span>
               </div>
               <p className="text-sm text-muted-foreground text-center mt-2">
-                Zapisz ten numer - będzie potrzebny do śledzenia statusu konsultacji. Status konsultacji sprawdzisz tutaj.
+                Zapisz ten numer - będzie potrzebny do śledzenia statusu konsultacji. Status konsultacji sprawdzisz <a href="/status-sprawy" className="text-primary underline hover:text-primary/80">tutaj</a>.
               </p>
             </CardContent>
           </Card>

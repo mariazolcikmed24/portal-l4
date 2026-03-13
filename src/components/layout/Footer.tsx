@@ -83,8 +83,6 @@ const Footer = () => {
                   kontakt@e-zwolnienie.com.pl
                 </a>
               </li>
-              <li>ul. Berezyńska 39</li>
-              <li>03-908 Warszawa</li>
             </ul>
           </div>
         </div>

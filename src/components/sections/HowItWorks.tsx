@@ -26,7 +26,7 @@ const HowItWorks = () => {
             Prosty proces w trzech krokach.
           </p>
           <p className="mt-3 text-base md:text-lg font-semibold text-primary bg-primary/10 inline-block px-4 py-2 rounded-lg">
-            📧 Wszystkie dokumenty wyślemy na Twój e-mail podany przy rejestracji.
+            📧 Wszystkie dokumenty wyślemy na Twój e-mail podany w formularzu rejestracyjnym.
           </p>
         </div>
 

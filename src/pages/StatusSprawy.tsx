@@ -176,7 +176,7 @@ export default function StatusSprawy() {
           <CardContent>
             <div className="flex gap-3">
               <Input
-                placeholder="Wprowadź numer wizyty (np. EZ-ABC123456)"
+                placeholder="Wprowadź numer transakcji (np. ACK6KMWAS9)"
                 value={caseNumber}
                 onChange={(e) => setCaseNumber(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

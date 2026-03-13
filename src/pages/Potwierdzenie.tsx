@@ -258,9 +258,6 @@ export default function Potwierdzenie() {
             <CardContent className="pt-6">
               <p className="text-sm">
                 <strong>Studenci i uczniowie – lekarz wystawi zaświadczenie dla szkoły lub uczelni (nie L4 dla pracodawcy). Dokument otrzymasz w formie PDF na adres EMAIL podany w formularzu rejestracyjnym.</strong>
-                <br />
-                Po pozytywnej decyzji lekarza otrzymasz dokument PDF na adres e-mail, który możesz pobrać i wykorzystać
-                według potrzeb.
               </p>
             </CardContent>
           </Card>

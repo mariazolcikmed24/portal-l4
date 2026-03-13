@@ -44,7 +44,7 @@ const faqs: FaqItem[] = [
   },
   {
     question: "Co jeśli jestem studentem lub uczniem?",
-    answer: "Studenci i uczniowie również mogą skorzystać z naszej usługi. W takim przypadku zwolnienie nie jest wysyłane do pracodawcy, ale otrzymujesz dokument w formie PDF, który możesz przedstawić w szkole lub na uczelni."
+    answer: "Studenci i uczniowie również mogą skorzystać z naszej usługi. W takim przypadku lekarz wystawi  zaświadczenie  na uczelnię (nie zwolnienie L4). Otrzymasz na maila dokument w formie PDF, który możesz przedstawić w szkole lub na uczelni. "
   }
 ];
 

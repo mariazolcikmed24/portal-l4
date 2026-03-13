@@ -26,7 +26,7 @@ const HowItWorks = () => {
             Prosty proces w trzech krokach.
           </p>
           <p className="mt-3 text-base md:text-lg font-semibold text-primary bg-primary/10 inline-block px-4 py-2 rounded-lg">
-            📧 Potwierdzenie wizyty oraz dokumenty po konsultacji wyślemy na adres e-mail podany w formularzu rejestracyjnym.
+            📧 Potwierdzenie konsultacji oraz dokumenty po konsultacji wyślemy na adres e-mail podany w formularzu rejestracyjnym.
           </p>
         </div>
 

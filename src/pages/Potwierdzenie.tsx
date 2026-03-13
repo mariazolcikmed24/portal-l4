@@ -272,7 +272,10 @@ export default function Potwierdzenie() {
         {caseNumber &&
         <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Sprawdź status swojej konsultacji o numerze {caseNumber} tutaj.
+              Sprawdź status swojej konsultacji o numerze {caseNumber}{" "}
+              <Link to={`/status?case=${caseNumber}`} className="underline text-primary">
+                tutaj
+              </Link>.
             </p>
           </div>
         }

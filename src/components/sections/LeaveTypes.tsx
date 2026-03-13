@@ -53,7 +53,7 @@ const additionalLeaveTypes = [
     popular: false,
   },
   {
-    title: "Opieka nad członkiem rodziny",
+    title: "Opieka nad członkiem rodziny (L4)",
     subtitle: "Umów konsultację lekarską online z możliwością otrzymania zwolnienia (L4) na opiekę nad członkiem rodziny.",
     price: "79 zł",
     icon: Users,

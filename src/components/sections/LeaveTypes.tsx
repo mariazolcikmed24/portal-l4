@@ -24,7 +24,7 @@ const leaveTypes = [
   },
   {
     title: "Zaświadczenie Student/Uczeń",
-    subtitle: "Umów konsultację lekarską online z możliwością otrzymania zwolnienia/zaświadczenia na uczelnię lub do szkoły.",
+    subtitle: "Umów konsultację lekarską online z możliwością otrzymania zwolnienia/zaświadczenia (nie L4 dla pracodawcy) na uczelnię lub do szkoły.",
     price: "79 zł",
     icon: GraduationCap,
     features: [],

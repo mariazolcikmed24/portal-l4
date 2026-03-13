@@ -127,7 +127,7 @@ const FAQ = () => {
           {faqs.map((faq, index) => (
             <div key={`seo-${index}`}>
               <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
+              <p>{faq.richAnswer ? "Proces składa się z trzech prostych kroków: 1) Wypełniasz formularz medyczny online, zajmie ci to do 2 minut 2) Lekarz weryfikuje dane z wypełnionego przez Ciebie formularza medycznego i w razie potrzeby przeprowadza konsultację telefoniczną z Tobą. 3) Otrzymujesz e-zwolnienie, które automatycznie trafia na Twojego maila, do ZUS i Twojego pracodawcy. Cały proces zajmuje nawet 30 minut, najczęściej do 4h, maksymalnie 24h." : faq.answer}</p>
             </div>
           ))}
         </div>

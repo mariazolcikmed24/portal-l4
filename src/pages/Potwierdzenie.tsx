@@ -46,7 +46,7 @@ export default function Potwierdzenie() {
 
       try {
         const { data, error } = await supabase.functions.invoke("autopay-verify-return", {
-          body: { ServiceID: serviceId, OrderID: orderId, Hash: hash },
+          body: { ServiceID: serviceId, OrderID: orderId, Hash: hash }
         });
 
         if (error || !data?.valid) {
@@ -70,14 +70,14 @@ export default function Potwierdzenie() {
                 shipping: 0,
                 currency: "PLN",
                 items: [
-                  {
-                    item_id: "e-konsultacja-zwolnienie",
-                    item_name: "E-konsultacja + e-zwolnienie",
-                    price: SERVICE_PRICE,
-                    quantity: 1,
-                  },
-                ],
-              },
+                {
+                  item_id: "e-konsultacja-zwolnienie",
+                  item_name: "E-konsultacja + e-zwolnienie",
+                  price: SERVICE_PRICE,
+                  quantity: 1
+                }]
+
+              }
             });
             hasTrackedPurchaseRef.current = true;
           }
@@ -88,7 +88,7 @@ export default function Potwierdzenie() {
           pushEvent({
             event: "payment_failed",
             error_type: "autopay_fail",
-            order_id: orderId,
+            order_id: orderId
           });
         } else {
           // pending - payment is being processed
@@ -120,8 +120,8 @@ export default function Potwierdzenie() {
           <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
           <p className="text-muted-foreground">Weryfikacja płatności...</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (status === "error") {
@@ -133,8 +133,8 @@ export default function Potwierdzenie() {
           <p className="text-muted-foreground mb-6">{errorMessage}</p>
           <Button onClick={() => navigate("/")}>Wróć na stronę główną</Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (status === "fail") {
@@ -144,11 +144,11 @@ export default function Potwierdzenie() {
           <XCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2">Płatność nieudana</h1>
           <p className="text-muted-foreground mb-6">Płatność nie została zrealizowana. Możesz spróbować ponownie.</p>
-          {caseNumber && (
-            <p className="text-sm text-muted-foreground mb-4">
+          {caseNumber &&
+          <p className="text-sm text-muted-foreground mb-4">
               Numer sprawy: <span className="font-mono font-bold">{caseNumber}</span>
             </p>
-          )}
+          }
           <div className="flex gap-3 justify-center">
             <Button variant="outline" onClick={() => navigate("/")}>
               Strona główna
@@ -156,8 +156,8 @@ export default function Potwierdzenie() {
             <Button onClick={() => navigate("/platnosc")}>Spróbuj ponownie</Button>
           </div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   const isPending = status === "pending";
@@ -173,14 +173,14 @@ export default function Potwierdzenie() {
           </div>
           <h1 className="text-3xl font-bold mb-2">{isPending ? "Zgłoszenie przyjęte" : "Płatność potwierdzona"}</h1>
           <p className="text-muted-foreground">
-            {isPending
-              ? "Twoje zgłoszenie zostało zarejestrowane. Oczekujemy na potwierdzenie płatności."
-              : "Twoje zgłoszenie zostało pomyślnie opłacone i zarejestrowane."}
+            {isPending ?
+            "Twoje zgłoszenie zostało zarejestrowane. Oczekujemy na potwierdzenie płatności." :
+            "Twoje zgłoszenie zostało pomyślnie opłacone i zarejestrowane."}
           </p>
         </div>
 
-        {caseNumber && (
-          <Card className="mb-6">
+        {caseNumber &&
+        <Card className="mb-6">
             <CardHeader>
               <CardTitle>Numer sprawy</CardTitle>
             </CardHeader>
@@ -193,7 +193,7 @@ export default function Potwierdzenie() {
               </p>
             </CardContent>
           </Card>
-        )}
+        }
 
         <div className="space-y-6">
           <Card>
@@ -247,7 +247,7 @@ export default function Potwierdzenie() {
                 <div>
                   <h3 className="font-semibold mb-1">Powiadomienie</h3>
                   <p className="text-sm text-muted-foreground">
-                    Otrzymasz wiadomość e-mail z potwierdzeniem i szczegółami dotyczącymi Twojego zwolnienia.
+                    Potwierdzenie płatności oraz dokumenty po konsultacji wyślemy na adres EMAIL podany w formularzu rejestracyjnym.
                   </p>
                 </div>
               </div>
@@ -272,14 +272,14 @@ export default function Potwierdzenie() {
           </div>
         </div>
 
-        {caseNumber && (
-          <div className="mt-8 text-center">
+        {caseNumber &&
+        <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               Sprawdzisz stan swojej sprawy wkrótce za pomocą numeru {caseNumber}
             </p>
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }

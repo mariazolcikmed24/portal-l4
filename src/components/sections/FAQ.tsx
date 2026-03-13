@@ -77,7 +77,45 @@ const FAQ = () => {
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
-                  {faq.answer}
+                  {faq.richAnswer ? (
+                    <div className="space-y-4">
+                      <p>Proces składa się z trzech prostych kroków:</p>
+                      <ol className="space-y-3">
+                        <li className="flex gap-3 items-start">
+                          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <ClipboardList className="w-4 h-4 text-primary" />
+                          </span>
+                          <div>
+                            <span className="font-semibold text-foreground">Wypełniasz formularz medyczny online</span>
+                            <span className="text-muted-foreground"> — zajmie Ci to do 2 minut.</span>
+                          </div>
+                        </li>
+                        <li className="flex gap-3 items-start">
+                          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Stethoscope className="w-4 h-4 text-primary" />
+                          </span>
+                          <div>
+                            <span className="font-semibold text-foreground">Lekarz weryfikuje Twoje dane</span>
+                            <span className="text-muted-foreground"> — i w razie potrzeby przeprowadza konsultację telefoniczną.</span>
+                          </div>
+                        </li>
+                        <li className="flex gap-3 items-start">
+                          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <FileCheck className="w-4 h-4 text-primary" />
+                          </span>
+                          <div>
+                            <span className="font-semibold text-foreground">Otrzymujesz e-zwolnienie</span>
+                            <span className="text-muted-foreground"> — automatycznie trafia na Twojego maila, do ZUS i pracodawcy.</span>
+                          </div>
+                        </li>
+                      </ol>
+                      <p className="text-sm bg-muted/50 rounded-lg px-4 py-2.5 border border-border">
+                        ⏱️ Cały proces zajmuje nawet <span className="font-semibold text-foreground">30 minut</span>, najczęściej do 4h, maksymalnie 24h.
+                      </p>
+                    </div>
+                  ) : (
+                    faq.answer
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}

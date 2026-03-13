@@ -87,7 +87,7 @@ const FAQ = () => {
                           </span>
                           <div>
                             <span className="font-semibold text-foreground">Wypełniasz formularz medyczny online</span>
-                            <span className="text-muted-foreground"> — zajmie Ci to do 2 minut.</span>
+                            <span className="text-muted-foreground"> — zajmie ci to do 2 minut.</span>
                           </div>
                         </li>
                         <li className="flex gap-3 items-start">
@@ -95,8 +95,8 @@ const FAQ = () => {
                             <Stethoscope className="w-4 h-4 text-primary" />
                           </span>
                           <div>
-                            <span className="font-semibold text-foreground">Lekarz weryfikuje Twoje dane</span>
-                            <span className="text-muted-foreground"> — i w razie potrzeby przeprowadza konsultację telefoniczną.</span>
+                            <span className="font-semibold text-foreground">Lekarz weryfikuje dane z wypełnionego przez Ciebie formularza medycznego</span>
+                            <span className="text-muted-foreground"> — i w razie potrzeby przeprowadza konsultację telefoniczną z Tobą.</span>
                           </div>
                         </li>
                         <li className="flex gap-3 items-start">
@@ -105,7 +105,7 @@ const FAQ = () => {
                           </span>
                           <div>
                             <span className="font-semibold text-foreground">Otrzymujesz e-zwolnienie</span>
-                            <span className="text-muted-foreground"> — automatycznie trafia na Twojego maila, do ZUS i pracodawcy.</span>
+                            <span className="text-muted-foreground"> — które automatycznie trafia na Twojego maila, do ZUS i Twojego pracodawcy.</span>
                           </div>
                         </li>
                       </ol>
